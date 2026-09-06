@@ -1,53 +1,114 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Клейви Чат</title>
-    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 </head>
+
 
 <body>
 
 <div class="app">
 
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
         <div class="logo">
-            <div class="logo-icon">K</div>
-            <span>Клейви Чат</span>
+
+            <div class="logo-icon">
+                K
+            </div>
+
+            <span>
+                Клейви Чат
+            </span>
+
         </div>
 
-        <button class="menu-button active" id="chatsButton">
+
+        <button
+            class="menu-button active"
+            id="chatsButton"
+        >
+
             💬
-            <span>Чаты</span>
+
+            <span>
+                Чаты
+            </span>
+
         </button>
 
-        <button class="menu-button" id="contactsButton">
+
+        <button
+            class="menu-button"
+            id="contactsButton"
+        >
+
             👥
-            <span>Контакты</span>
+
+            <span>
+                Контакты
+            </span>
+
         </button>
 
-        <button class="menu-button" id="profileButton">
+
+        <button
+            class="menu-button"
+            id="profileButton"
+        >
+
             👤
-            <span>Профиль</span>
+
+            <span>
+                Профиль
+            </span>
+
         </button>
 
     </aside>
 
 
     <!-- СПИСОК ЧАТОВ -->
-    <section class="chat-list" id="chatList">
+
+    <section
+        class="chat-list"
+        id="chatList"
+    >
 
         <div class="chat-list-header">
-            <h2>Чаты</h2>
+
+            <h2>
+                Чаты
+            </h2>
 
             <button class="new-chat">
                 +
             </button>
+
         </div>
+
 
         <input
             class="search"
@@ -55,11 +116,16 @@
             placeholder="Поиск"
         >
 
+
         <div class="chat active-chat">
 
-            <div class="avatar" id="chatAvatar">
+            <div
+                class="avatar"
+                id="chatAvatar"
+            >
                 K
             </div>
+
 
             <div class="chat-info">
 
@@ -73,6 +139,7 @@
 
             </div>
 
+
             <span class="time">
                 сейчас
             </span>
@@ -83,13 +150,21 @@
 
 
     <!-- ОКНО ЧАТА -->
-    <main class="messages" id="chatWindow">
+
+    <main
+        class="messages"
+        id="chatWindow"
+    >
 
         <header class="messages-header">
 
-            <div class="avatar" id="headerAvatar">
+            <div
+                class="avatar"
+                id="headerAvatar"
+            >
                 K
             </div>
+
 
             <div>
 
@@ -132,6 +207,7 @@
                 autocomplete="off"
             >
 
+
             <button id="sendButton">
                 ➤
             </button>
@@ -142,6 +218,7 @@
 
 
     <!-- ПРОФИЛЬ -->
+
     <main
         class="profile-page"
         id="profilePage"
@@ -149,6 +226,7 @@
     >
 
         <div class="profile-card">
+
 
             <!-- ФОТО -->
 
@@ -161,6 +239,7 @@
                     alt="Фото профиля"
                 >
 
+
                 <div
                     id="avatarPlaceholder"
                     class="profile-avatar-placeholder"
@@ -168,9 +247,11 @@
                     K
                 </div>
 
+
                 <div class="avatar-edit">
                     📷
                 </div>
+
 
                 <input
                     id="avatarInput"
@@ -189,6 +270,7 @@
                 <h1 id="profileName">
                     Пользователь
                 </h1>
+
 
                 <button id="editNameButton">
                     ✏️
@@ -211,6 +293,7 @@
 
             <div class="profile-info">
 
+
                 <div class="profile-row">
 
                     <div>
@@ -224,6 +307,7 @@
                         </strong>
 
                     </div>
+
 
                     <button id="editNameButton2">
                         ✏️
@@ -245,6 +329,7 @@
                         </strong>
 
                     </div>
+
 
                     <button id="editUsernameButton">
                         ✏️
@@ -269,6 +354,7 @@
                     Тема оформления
                 </span>
 
+
                 <div class="theme-buttons">
 
                     <button
@@ -277,6 +363,7 @@
                     >
                         🌙 Тёмная
                     </button>
+
 
                     <button
                         class="theme-button"
@@ -306,631 +393,570 @@
 </div>
 
 
+<!-- ОСНОВНОЙ SCRIPT -->
+
 <script src="script.js"></script>
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    /* =========================
-       НАХОДИМ ЭЛЕМЕНТЫ
-    ========================= */
+/* =========================================
+   SUPABASE
+========================================= */
 
-    const profileButton =
-        document.getElementById("profileButton");
-
-    const chatsButton =
-        document.getElementById("chatsButton");
-
-    const profilePage =
-        document.getElementById("profilePage");
-
-    const chatList =
-        document.getElementById("chatList");
-
-    const chatWindow =
-        document.getElementById("chatWindow");
+const SUPABASE_URL =
+    "https://tnzdjjtubeulxrvfrmfr.supabase.co";
 
 
-    /* =========================
-       ПРОВЕРКА
-    ========================= */
-
-    if (!profileButton) {
-        console.error("Кнопка профиля не найдена!");
-        return;
-    }
-
-    if (!profilePage) {
-        console.error("Страница профиля не найдена!");
-        return;
-    }
+const SUPABASE_KEY =
+    "ВСТАВЬ_СЮДА_СВОЙ_ANON_КЛЮЧ";
 
 
-    /* =========================
-       ФУНКЦИЯ ПРОФИЛЯ
-    ========================= */
-
-    function openProfile() {
-
-        console.log("Профиль открыт");
-
-
-        chatList.style.display = "none";
-
-        chatWindow.style.display = "none";
-
-        profilePage.style.display = "flex";
-
-
-        document
-            .querySelectorAll(".menu-button")
-            .forEach(function (button) {
-
-                button.classList.remove("active");
-
-            });
-
-
-        profileButton.classList.add("active");
-
-    }
-
-
-    /* =========================
-       ФУНКЦИЯ ЧАТОВ
-    ========================= */
-
-    function openChats() {
-
-        profilePage.style.display = "none";
-
-        chatList.style.display = "block";
-
-        chatWindow.style.display = "flex";
-
-
-        document
-            .querySelectorAll(".menu-button")
-            .forEach(function (button) {
-
-                button.classList.remove("active");
-
-            });
-
-
-        chatsButton.classList.add("active");
-
-    }
-
-
-    /* =========================
-       КНОПКИ
-    ========================= */
-
-    profileButton.addEventListener(
-        "click",
-        openProfile
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
     );
 
 
-    chatsButton.addEventListener(
-        "click",
-        openChats
+/* =========================================
+   ПРОВЕРКА АВТОРИЗАЦИИ
+========================================= */
+
+async function checkAuth() {
+
+    const {
+        data,
+        error
+    } = await supabaseClient.auth.getSession();
+
+
+    if (error) {
+
+        console.error(
+            "Ошибка проверки авторизации:",
+            error
+        );
+
+        window.location.replace(
+            "register.html"
+        );
+
+        return;
+
+    }
+
+
+    if (!data.session) {
+
+        window.location.replace(
+            "register.html"
+        );
+
+        return;
+
+    }
+
+
+    console.log(
+        "Пользователь авторизован:",
+        data.session.user.email
     );
 
 
-    /* =========================
-       ДАННЫЕ
-    ========================= */
+    loadProfile();
 
-    const savedName =
-        localStorage.getItem("kleivy_name");
-
-    const savedUsername =
-        localStorage.getItem("kleivy_username");
+}
 
 
-    if (savedName) {
+/* =========================================
+   ЗАГРУЗКА ПРОФИЛЯ ИЗ SUPABASE
+========================================= */
+
+async function loadProfile() {
+
+    const {
+        data: {
+            user
+        }
+    } = await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+        return;
+    }
+
+
+    const {
+        data: profile,
+        error
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select(
+                "name, username, avatar_url"
+            )
+            .eq(
+                "id",
+                user.id
+            )
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Ошибка загрузки профиля:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    if (!profile) {
+        return;
+    }
+
+
+    /* =========================================
+       ИМЯ
+    ========================================= */
+
+    if (profile.name) {
 
         document.getElementById(
             "userName"
-        ).textContent = savedName;
+        ).textContent =
+            profile.name;
+
 
         document.getElementById(
             "chatUserName"
-        ).textContent = savedName;
+        ).textContent =
+            profile.name;
+
 
         document.getElementById(
             "profileName"
-        ).textContent = savedName;
+        ).textContent =
+            profile.name;
+
 
         document.getElementById(
             "profileNameInfo"
-        ).textContent = savedName;
+        ).textContent =
+            profile.name;
 
     }
 
 
-    if (savedUsername) {
+    /* =========================================
+       USERNAME
+    ========================================= */
+
+    if (profile.username) {
 
         document.getElementById(
             "profileUsername"
         ).textContent =
-            "@" + savedUsername;
+            "@" + profile.username;
+
 
         document.getElementById(
             "profileUsernameInfo"
         ).textContent =
-            "@" + savedUsername;
+            "@" + profile.username;
 
     }
 
 
-    /* =========================
+    /* =========================================
        АВАТАР
-    ========================= */
+    ========================================= */
 
-    function updateAvatar() {
+    if (profile.avatar_url) {
 
-        const avatar =
-            localStorage.getItem(
-                "kleivy_avatar"
-            );
-
-        const profileAvatar =
-            document.getElementById(
-                "profileAvatar"
-            );
-
-        const placeholder =
-            document.getElementById(
-                "avatarPlaceholder"
-            );
-
-        const chatAvatar =
-            document.getElementById(
-                "chatAvatar"
-            );
-
-        const headerAvatar =
-            document.getElementById(
-                "headerAvatar"
-            );
-
-
-        if (!avatar) {
-            return;
-        }
-
-
-        profileAvatar.src = avatar;
-
-        profileAvatar.style.display =
-            "block";
-
-        placeholder.style.display =
-            "none";
-
-
-        chatAvatar.style.backgroundImage =
-            "url('" + avatar + "')";
-
-        chatAvatar.style.backgroundSize =
-            "cover";
-
-        chatAvatar.style.backgroundPosition =
-            "center";
-
-        chatAvatar.textContent = "";
-
-
-        headerAvatar.style.backgroundImage =
-            "url('" + avatar + "')";
-
-        headerAvatar.style.backgroundSize =
-            "cover";
-
-        headerAvatar.style.backgroundPosition =
-            "center";
-
-        headerAvatar.textContent = "";
+        setAvatar(
+            profile.avatar_url
+        );
 
     }
 
-
-    updateAvatar();
-
-
-    /* =========================
-       ЗАГРУЗКА ФОТО
-    ========================= */
-
-    document
-        .getElementById("avatarInput")
-        .addEventListener(
-            "change",
-            function () {
-
-                const file =
-                    this.files[0];
+}
 
 
-                if (!file) {
-                    return;
-                }
+/* =========================================
+   АВАТАР
+========================================= */
+
+function setAvatar(url) {
+
+    const profileAvatar =
+        document.getElementById(
+            "profileAvatar"
+        );
 
 
-                if (
-                    !file.type.startsWith("image/")
-                ) {
-
-                    alert(
-                        "Выбери изображение!"
-                    );
-
-                    return;
-
-                }
+    const placeholder =
+        document.getElementById(
+            "avatarPlaceholder"
+        );
 
 
-                const reader =
-                    new FileReader();
+    const chatAvatar =
+        document.getElementById(
+            "chatAvatar"
+        );
 
 
-                reader.onload =
-                    function () {
+    const headerAvatar =
+        document.getElementById(
+            "headerAvatar"
+        );
 
-                        localStorage.setItem(
-                            "kleivy_avatar",
-                            reader.result
+
+    profileAvatar.src =
+        url;
+
+
+    profileAvatar.style.display =
+        "block";
+
+
+    placeholder.style.display =
+        "none";
+
+
+    chatAvatar.style.backgroundImage =
+        "url('" + url + "')";
+
+
+    chatAvatar.style.backgroundSize =
+        "cover";
+
+
+    chatAvatar.style.backgroundPosition =
+        "center";
+
+
+    chatAvatar.textContent =
+        "";
+
+
+    headerAvatar.style.backgroundImage =
+        "url('" + url + "')";
+
+
+    headerAvatar.style.backgroundSize =
+        "cover";
+
+
+    headerAvatar.style.backgroundPosition =
+        "center";
+
+
+    headerAvatar.textContent =
+        "";
+
+}
+
+
+/* =========================================
+   НАВИГАЦИЯ
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const profileButton =
+            document.getElementById(
+                "profileButton"
+            );
+
+
+        const chatsButton =
+            document.getElementById(
+                "chatsButton"
+            );
+
+
+        const profilePage =
+            document.getElementById(
+                "profilePage"
+            );
+
+
+        const chatList =
+            document.getElementById(
+                "chatList"
+            );
+
+
+        const chatWindow =
+            document.getElementById(
+                "chatWindow"
+            );
+
+
+        /* ПРОФИЛЬ */
+
+        function openProfile() {
+
+            chatList.style.display =
+                "none";
+
+
+            chatWindow.style.display =
+                "none";
+
+
+            profilePage.style.display =
+                "flex";
+
+
+            document
+                .querySelectorAll(
+                    ".menu-button"
+                )
+                .forEach(
+                    function (button) {
+
+                        button.classList.remove(
+                            "active"
                         );
 
-                        updateAvatar();
-
-                    };
-
-
-                reader.readAsDataURL(file);
-
-            }
-        );
+                    }
+                );
 
 
-    /* =========================
-       ИЗМЕНЕНИЕ ИМЕНИ
-    ========================= */
-
-    function editName() {
-
-        const oldName =
-            localStorage.getItem(
-                "kleivy_name"
-            ) ||
-            "Пользователь";
-
-
-        const newName =
-            prompt(
-                "Введите новое имя:",
-                oldName
+            profileButton.classList.add(
+                "active"
             );
 
-
-        if (
-            newName === null ||
-            newName.trim() === ""
-        ) {
-            return;
         }
 
 
-        const name =
-            newName.trim();
+        /* ЧАТЫ */
+
+        function openChats() {
+
+            profilePage.style.display =
+                "none";
 
 
-        localStorage.setItem(
-            "kleivy_name",
-            name
+            chatList.style.display =
+                "block";
+
+
+            chatWindow.style.display =
+                "flex";
+
+
+            document
+                .querySelectorAll(
+                    ".menu-button"
+                )
+                .forEach(
+                    function (button) {
+
+                        button.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+            chatsButton.classList.add(
+                "active"
+            );
+
+        }
+
+
+        profileButton.addEventListener(
+            "click",
+            openProfile
         );
 
 
-        document.getElementById(
-            "userName"
-        ).textContent = name;
+        chatsButton.addEventListener(
+            "click",
+            openChats
+        );
+
+    }
+);
 
 
-        document.getElementById(
-            "chatUserName"
-        ).textContent = name;
+/* =========================================
+   ИЗМЕНЕНИЕ ИМЕНИ
+========================================= */
+
+async function editName() {
+
+    const {
+        data: {
+            user
+        }
+    } = await supabaseClient.auth.getUser();
 
 
-        document.getElementById(
-            "profileName"
-        ).textContent = name;
+    if (!user) {
+        return;
+    }
 
 
+    const currentName =
         document.getElementById(
             "profileNameInfo"
-        ).textContent = name;
-
-    }
-
-
-    document
-        .getElementById("editNameButton")
-        .addEventListener(
-            "click",
-            editName
-        );
+        ).textContent ||
+        "Пользователь";
 
 
-    document
-        .getElementById("editNameButton2")
-        .addEventListener(
-            "click",
-            editName
-        );
-
-
-    /* =========================
-       USERNAME
-    ========================= */
-
-    document
-        .getElementById("editUsernameButton")
-        .addEventListener(
-            "click",
-            function () {
-
-                const alreadyChanged =
-                    localStorage.getItem(
-                        "kleivy_username_changed"
-                    );
-
-
-                if (
-                    alreadyChanged === "true"
-                ) {
-
-                    alert(
-                        "Username уже изменён. Изменить его второй раз нельзя."
-                    );
-
-                    return;
-
-                }
-
-
-                const oldUsername =
-                    localStorage.getItem(
-                        "kleivy_username"
-                    ) || "";
-
-
-                const newUsername =
-                    prompt(
-                        "Введите новый username без @:",
-                        oldUsername
-                    );
-
-
-                if (
-                    newUsername === null ||
-                    newUsername.trim() === ""
-                ) {
-                    return;
-                }
-
-
-                const username =
-                    newUsername
-                        .trim()
-                        .replace("@", "");
-
-
-                if (
-                    username.length < 3
-                ) {
-
-                    alert(
-                        "Username должен содержать минимум 3 символа."
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    !/^[a-zA-Z0-9_]+$/.test(
-                        username
-                    )
-                ) {
-
-                    alert(
-                        "Используй только латинские буквы, цифры и _"
-                    );
-
-                    return;
-
-                }
-
-
-                localStorage.setItem(
-                    "kleivy_username",
-                    username
-                );
-
-
-                localStorage.setItem(
-                    "kleivy_username_changed",
-                    "true"
-                );
-
-
-                document.getElementById(
-                    "profileUsername"
-                ).textContent =
-                    "@" + username;
-
-
-                document.getElementById(
-                    "profileUsernameInfo"
-                ).textContent =
-                    "@" + username;
-
-
-                document.getElementById(
-                    "usernameWarning"
-                ).textContent =
-                    "Username изменён. Повторно изменить его нельзя.";
-
-            }
-        );
-
-
-    /* =========================
-       ТЕМА
-    ========================= */
-
-    const darkButton =
-        document.getElementById(
-            "darkThemeButton"
-        );
-
-    const lightButton =
-        document.getElementById(
-            "lightThemeButton"
-        );
-
-
-    function updateThemeButtons() {
-
-        darkButton.classList.remove(
-            "active"
-        );
-
-        lightButton.classList.remove(
-            "active"
-        );
-
-
-        if (
-            document.body.classList.contains(
-                "light-theme"
-            )
-        ) {
-
-            lightButton.classList.add(
-                "active"
-            );
-
-        } else {
-
-            darkButton.classList.add(
-                "active"
-            );
-
-        }
-
-    }
-
-
-    const savedTheme =
-        localStorage.getItem(
-            "kleivy_theme"
+    const newName =
+        prompt(
+            "Введите новое имя:",
+            currentName
         );
 
 
     if (
-        savedTheme === "light"
+        newName === null ||
+        newName.trim() === ""
     ) {
+        return;
+    }
 
-        document.body.classList.add(
-            "light-theme"
+
+    const name =
+        newName.trim();
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("profiles")
+            .update({
+                name: name
+            })
+            .eq(
+                "id",
+                user.id
+            );
+
+
+    if (error) {
+
+        alert(
+            "Ошибка сохранения имени: " +
+            error.message
         );
+
+        return;
 
     }
 
 
-    updateThemeButtons();
+    document.getElementById(
+        "userName"
+    ).textContent =
+        name;
 
 
-    lightButton.onclick =
-        function () {
-
-            document.body.classList.add(
-                "light-theme"
-            );
-
-            localStorage.setItem(
-                "kleivy_theme",
-                "light"
-            );
-
-            updateThemeButtons();
-
-        };
+    document.getElementById(
+        "chatUserName"
+    ).textContent =
+        name;
 
 
-    darkButton.onclick =
-        function () {
-
-            document.body.classList.remove(
-                "light-theme"
-            );
-
-            localStorage.setItem(
-                "kleivy_theme",
-                "dark"
-            );
-
-            updateThemeButtons();
-
-        };
+    document.getElementById(
+        "profileName"
+    ).textContent =
+        name;
 
 
-    /* =========================
-       ВЫХОД
-    ========================= */
+    document.getElementById(
+        "profileNameInfo"
+    ).textContent =
+        name;
 
-    document
-        .getElementById("logoutButton")
-        .addEventListener(
-            "click",
-            function () {
+}
 
-                localStorage.removeItem(
-                    "kleivy_name"
+
+document
+    .getElementById(
+        "editNameButton"
+    )
+    .addEventListener(
+        "click",
+        editName
+    );
+
+
+document
+    .getElementById(
+        "editNameButton2"
+    )
+    .addEventListener(
+        "click",
+        editName
+    );
+
+
+/* =========================================
+   ВЫХОД
+========================================= */
+
+document
+    .getElementById(
+        "logoutButton"
+    )
+    .addEventListener(
+        "click",
+        async function () {
+
+
+            const {
+                error
+            } =
+                await supabaseClient.auth.signOut();
+
+
+            if (error) {
+
+                alert(
+                    "Ошибка выхода: " +
+                    error.message
                 );
 
-                localStorage.removeItem(
-                    "kleivy_username"
-                );
-
-                localStorage.removeItem(
-                    "kleivy_password"
-                );
-
-                localStorage.removeItem(
-                    "kleivy_avatar"
-                );
-
-                localStorage.removeItem(
-                    "kleivy_username_changed"
-                );
-
-                window.location.href =
-                    "login.html";
+                return;
 
             }
-        );
 
-});
+
+            window.location.replace(
+                "login.html"
+            );
+
+        }
+    );
+
+
+/* =========================================
+   ЗАПУСК
+========================================= */
+
+checkAuth();
 
 </script>
 
 </body>
 
 </html>
+```
