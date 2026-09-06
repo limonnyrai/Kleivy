@@ -952,7 +952,94 @@ document
         }
     );
 
+/* =========================================
+   УДАЛЕНИЕ АККАУНТА
+========================================= */
 
+document
+    .getElementById("deleteAccountButton")
+    .addEventListener(
+        "click",
+        async function () {
+
+            const confirmed =
+                confirm(
+                    "ВНИМАНИЕ!\n\n" +
+                    "Аккаунт будет полностью удалён.\n" +
+                    "Профиль и данные аккаунта будут удалены.\n\n" +
+                    "Продолжить?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            const secondConfirm =
+                prompt(
+                    "Для подтверждения удаления напиши: УДАЛИТЬ"
+                );
+
+
+            if (
+                secondConfirm !== "УДАЛИТЬ"
+            ) {
+
+                alert(
+                    "Удаление отменено."
+                );
+
+                return;
+
+            }
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .rpc(
+                        "delete_my_account"
+                    );
+
+
+            if (error) {
+
+                console.error(
+                    "Ошибка удаления:",
+                    error
+                );
+
+                alert(
+                    "Не удалось удалить аккаунт:\n" +
+                    error.message
+                );
+
+                return;
+
+            }
+
+
+            await supabaseClient.auth.signOut();
+
+
+            localStorage.removeItem(
+                "kleivy_logged_in"
+            );
+
+
+            localStorage.removeItem(
+                "username"
+            );
+
+
+            window.location.replace(
+                "register.html"
+            );
+
+        }
+    );
 /* =========================================
    ЗАПУСК
 ========================================= */
