@@ -499,7 +499,7 @@ async function loadProfile() {
         await supabaseClient
             .from("profiles")
             .select(
-                "name, username, avatar_url"
+                "id, name, username, avatar_url"
             )
             .eq(
                 "id",
@@ -521,10 +521,81 @@ async function loadProfile() {
 
 
     if (!profile) {
+
+        console.error(
+            "Профиль пользователя не найден."
+        );
+
         return;
+
     }
 
 
+    /* =========================================
+       ИМЯ
+    ========================================= */
+
+    const name =
+        profile.name || "Пользователь";
+
+
+    document.getElementById(
+        "userName"
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        "chatUserName"
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        "profileName"
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        "profileNameInfo"
+    ).textContent =
+        name;
+
+
+    /* =========================================
+       USERNAME
+    ========================================= */
+
+    const username =
+        profile.username || "username";
+
+
+    document.getElementById(
+        "profileUsername"
+    ).textContent =
+        "@" + username;
+
+
+    document.getElementById(
+        "profileUsernameInfo"
+    ).textContent =
+        "@" + username;
+
+
+    /* =========================================
+       АВАТАР
+    ========================================= */
+
+    if (profile.avatar_url) {
+
+        setAvatar(
+            profile.avatar_url
+        );
+
+    }
+
+}
     /* =========================================
        ИМЯ
     ========================================= */
