@@ -72,3 +72,11 @@ end $$;
 
 -- После выполнения проверь, что у profiles и messages RLS разрешает
 -- пользователю читать/обновлять ТОЛЬКО нужные ему строки.
+
+
+-- 6. Убираем ограничение 50 МБ именно на уровне bucket chat-media.
+-- Если bucket уже существует, лимит становится NULL.
+update storage.buckets
+set file_size_limit = null
+where id = 'chat-media';
+
