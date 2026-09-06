@@ -310,12 +310,6 @@
 
 
 <script>
-const { data: { session } } =
-    await supabaseClient.auth.getSession();
-
-if (!session) {
-    window.location.replace("register.html");
-}
 document.addEventListener("DOMContentLoaded", function () {
 
     /* =========================
