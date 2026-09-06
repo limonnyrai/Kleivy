@@ -1,8 +1,8 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -17,10 +17,7 @@
         href="style.css"
     >
 
-    <!-- SUPABASE -->
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
 
 
@@ -33,15 +30,11 @@
     <aside class="sidebar">
 
         <div class="logo">
-
-            <div class="logo-icon">
-                K
-            </div>
+            <div class="logo-icon">K</div>
 
             <span>
                 Клейви Чат
             </span>
-
         </div>
 
 
@@ -49,13 +42,8 @@
             class="menu-button active"
             id="chatsButton"
         >
-
             💬
-
-            <span>
-                Чаты
-            </span>
-
+            <span>Чаты</span>
         </button>
 
 
@@ -63,13 +51,8 @@
             class="menu-button"
             id="contactsButton"
         >
-
             👥
-
-            <span>
-                Контакты
-            </span>
-
+            <span>Контакты</span>
         </button>
 
 
@@ -77,13 +60,8 @@
             class="menu-button"
             id="profileButton"
         >
-
             👤
-
-            <span>
-                Профиль
-            </span>
-
+            <span>Профиль</span>
         </button>
 
     </aside>
@@ -98,9 +76,7 @@
 
         <div class="chat-list-header">
 
-            <h2>
-                Чаты
-            </h2>
+            <h2>Чаты</h2>
 
             <button class="new-chat">
                 +
@@ -206,7 +182,6 @@
                 autocomplete="off"
             >
 
-
             <button id="sendButton">
                 ➤
             </button>
@@ -291,7 +266,6 @@
             <!-- ИНФОРМАЦИЯ -->
 
             <div class="profile-info">
-
 
                 <div class="profile-row">
 
@@ -384,12 +358,17 @@
             >
                 🚪 Выйти из аккаунта
             </button>
+
+
+            <!-- УДАЛЕНИЕ -->
+
             <button
-    class="delete-account-button"
-    id="deleteAccountButton"
->
-    🗑️ Удалить аккаунт
-</button>
+                class="delete-account-button"
+                id="deleteAccountButton"
+            >
+                🗑️ Удалить аккаунт
+            </button>
+
         </div>
 
     </main>
@@ -432,7 +411,8 @@ async function checkAuth() {
     const {
         data,
         error
-    } = await supabaseClient.auth.getSession();
+    } =
+        await supabaseClient.auth.getSession();
 
 
     if (error) {
@@ -447,7 +427,6 @@ async function checkAuth() {
         );
 
         return;
-
     }
 
 
@@ -458,7 +437,6 @@ async function checkAuth() {
         );
 
         return;
-
     }
 
 
@@ -468,13 +446,12 @@ async function checkAuth() {
     );
 
 
-    loadProfile();
-
+    await loadProfile();
 }
 
 
 /* =========================================
-   ЗАГРУЗКА ПРОФИЛЯ ИЗ SUPABASE
+   ЗАГРУЗКА ПРОФИЛЯ
 ========================================= */
 
 async function loadProfile() {
@@ -483,7 +460,8 @@ async function loadProfile() {
         data: {
             user
         }
-    } = await supabaseClient.auth.getUser();
+    } =
+        await supabaseClient.auth.getUser();
 
 
     if (!user) {
@@ -494,11 +472,17 @@ async function loadProfile() {
     const {
         data: profile,
         error
-    } = await supabaseClient
-        .from("profiles")
-        .select("id, name, username, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle();
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select(
+                "id, name, username, avatar_url"
+            )
+            .eq(
+                "id",
+                user.id
+            )
+            .maybeSingle();
 
 
     if (error) {
@@ -515,7 +499,7 @@ async function loadProfile() {
     if (!profile) {
 
         console.error(
-            "Профиль пользователя не найден."
+            "Профиль не найден"
         );
 
         return;
@@ -525,33 +509,39 @@ async function loadProfile() {
     /* ИМЯ */
 
     const name =
-        profile.name || "Пользователь";
+        profile.name ||
+        "Пользователь";
 
 
     document.getElementById(
         "userName"
-    ).textContent = name;
+    ).textContent =
+        name;
 
 
     document.getElementById(
         "chatUserName"
-    ).textContent = name;
+    ).textContent =
+        name;
 
 
     document.getElementById(
         "profileName"
-    ).textContent = name;
+    ).textContent =
+        name;
 
 
     document.getElementById(
         "profileNameInfo"
-    ).textContent = name;
+    ).textContent =
+        name;
 
 
     /* USERNAME */
 
     const username =
-        profile.username || "username";
+        profile.username ||
+        "username";
 
 
     document.getElementById(
@@ -568,92 +558,15 @@ async function loadProfile() {
 
     /* АВАТАР */
 
-    if (profile.avatar_url) {
+    if (
+        profile.avatar_url
+    ) {
 
         setAvatar(
             profile.avatar_url
         );
 
     }
-
-}
-    /* =========================================
-       АВАТАР
-    ========================================= */
-
-    if (profile.avatar_url) {
-
-        setAvatar(
-            profile.avatar_url
-        );
-
-    }
-
-}
-    /* =========================================
-       ИМЯ
-    ========================================= */
-
-    if (profile.name) {
-
-        document.getElementById(
-            "userName"
-        ).textContent =
-            profile.name;
-
-
-        document.getElementById(
-            "chatUserName"
-        ).textContent =
-            profile.name;
-
-
-        document.getElementById(
-            "profileName"
-        ).textContent =
-            profile.name;
-
-
-        document.getElementById(
-            "profileNameInfo"
-        ).textContent =
-            profile.name;
-
-    }
-
-
-    /* =========================================
-       USERNAME
-    ========================================= */
-
-    if (profile.username) {
-
-        document.getElementById(
-            "profileUsername"
-        ).textContent =
-            "@" + profile.username;
-
-
-        document.getElementById(
-            "profileUsernameInfo"
-        ).textContent =
-            "@" + profile.username;
-
-    }
-
-
-    /* =========================================
-       АВАТАР
-    ========================================= */
-
-    if (profile.avatar_url) {
-
-        setAvatar(
-            profile.avatar_url
-        );
-
-    }
-
 }
 
 
@@ -741,7 +654,6 @@ document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-
         const profileButton =
             document.getElementById(
                 "profileButton"
@@ -751,6 +663,12 @@ document.addEventListener(
         const chatsButton =
             document.getElementById(
                 "chatsButton"
+            );
+
+
+        const contactsButton =
+            document.getElementById(
+                "contactsButton"
             );
 
 
@@ -848,6 +766,17 @@ document.addEventListener(
         }
 
 
+        /* КОНТАКТЫ */
+
+        function openContacts() {
+
+            alert(
+                "Контакты пока в разработке."
+            );
+
+        }
+
+
         profileButton.addEventListener(
             "click",
             openProfile
@@ -857,6 +786,12 @@ document.addEventListener(
         chatsButton.addEventListener(
             "click",
             openChats
+        );
+
+
+        contactsButton.addEventListener(
+            "click",
+            openContacts
         );
 
     }
@@ -873,7 +808,8 @@ async function editName() {
         data: {
             user
         }
-    } = await supabaseClient.auth.getUser();
+    } =
+        await supabaseClient.auth.getUser();
 
 
     if (!user) {
@@ -884,8 +820,7 @@ async function editName() {
     const currentName =
         document.getElementById(
             "profileNameInfo"
-        ).textContent ||
-        "Пользователь";
+        ).textContent;
 
 
     const newName =
@@ -924,12 +859,11 @@ async function editName() {
     if (error) {
 
         alert(
-            "Ошибка сохранения имени: " +
+            "Ошибка сохранения имени:\n" +
             error.message
         );
 
         return;
-
     }
 
 
@@ -958,6 +892,8 @@ async function editName() {
 
 }
 
+
+/* КНОПКИ ИЗМЕНЕНИЯ ИМЕНИ */
 
 document
     .getElementById(
@@ -991,7 +927,6 @@ document
         "click",
         async function () {
 
-
             const {
                 error
             } =
@@ -1001,13 +936,22 @@ document
             if (error) {
 
                 alert(
-                    "Ошибка выхода: " +
+                    "Ошибка выхода:\n" +
                     error.message
                 );
 
                 return;
-
             }
+
+
+            localStorage.removeItem(
+                "kleivy_logged_in"
+            );
+
+
+            localStorage.removeItem(
+                "username"
+            );
 
 
             window.location.replace(
@@ -1017,12 +961,15 @@ document
         }
     );
 
+
 /* =========================================
    УДАЛЕНИЕ АККАУНТА
 ========================================= */
 
 document
-    .getElementById("deleteAccountButton")
+    .getElementById(
+        "deleteAccountButton"
+    )
     .addEventListener(
         "click",
         async function () {
@@ -1048,7 +995,8 @@ document
 
 
             if (
-                secondConfirm !== "УДАЛИТЬ"
+                secondConfirm !==
+                "УДАЛИТЬ"
             ) {
 
                 alert(
@@ -1056,17 +1004,15 @@ document
                 );
 
                 return;
-
             }
 
 
             const {
                 error
             } =
-                await supabaseClient
-                    .rpc(
-                        "delete_my_account"
-                    );
+                await supabaseClient.rpc(
+                    "delete_my_account"
+                );
 
 
             if (error) {
@@ -1076,13 +1022,13 @@ document
                     error
                 );
 
+
                 alert(
                     "Не удалось удалить аккаунт:\n" +
                     error.message
                 );
 
                 return;
-
             }
 
 
@@ -1099,12 +1045,19 @@ document
             );
 
 
+            alert(
+                "Аккаунт успешно удалён."
+            );
+
+
             window.location.replace(
                 "register.html"
             );
 
         }
     );
+
+
 /* =========================================
    ЗАПУСК
 ========================================= */
