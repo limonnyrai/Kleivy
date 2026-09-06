@@ -795,6 +795,211 @@ button{-webkit-tap-highlight-color:transparent}
     font-size:13px;
 }
 
+/* MESSAGE STATUS / PRESENCE */
+
+.message-status{
+    margin-left:4px;
+    font-size:11px;
+    letter-spacing:-2px;
+    opacity:.8;
+}
+
+.message-status.read{
+    color:#8fd3ff;
+}
+
+.chat-header-user-info{
+    min-width:0;
+    flex:1;
+}
+
+.chat-header-presence{
+    color:#718099;
+    font-size:12px;
+    margin-top:3px;
+}
+
+.chat-more-button{
+    margin-left:auto;
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    background:#151d2b;
+    color:#d7dfed;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.message.selected{
+    outline:2px solid #168cff;
+    outline-offset:2px;
+}
+
+.attach-wrap{
+    position:relative;
+    flex-shrink:0;
+}
+
+.attach-menu{
+    display:none;
+    position:absolute;
+    left:0;
+    bottom:58px;
+    width:210px;
+    padding:7px;
+    background:#101725;
+    border:1px solid #26344c;
+    border-radius:14px;
+    box-shadow:0 15px 40px rgba(0,0,0,.45);
+    z-index:200;
+}
+
+.attach-menu.active{
+    display:block;
+}
+
+.attach-menu button{
+    width:100%;
+    padding:11px 12px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    color:white;
+    text-align:left;
+    cursor:pointer;
+}
+
+.attach-menu button:hover{
+    background:#182438;
+}
+
+.attach-menu .danger{
+    color:#ff7186;
+}
+
+.message-video{
+    display:block;
+    width:100%;
+    max-width:360px;
+    max-height:420px;
+    border-radius:11px;
+    background:#000;
+}
+
+.message-actions{
+    display:flex;
+    gap:6px;
+    margin-top:6px;
+}
+
+.message-actions button{
+    border:0;
+    border-radius:8px;
+    padding:6px 9px;
+    background:rgba(0,0,0,.18);
+    color:#dce7f5;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.message-actions button.danger{
+    color:#ff8a9b;
+}
+
+.blocked-note{
+    width:100%;
+    text-align:center;
+    color:#8c9ab0;
+    font-size:13px;
+    padding:10px;
+}
+
+.mobile-home{
+    display:none;
+}
+
+.mobile-home-header{
+    display:none;
+}
+
+@media(max-width:700px){
+
+    .sidebar .search-box,
+    .sidebar .chat-list,
+    .sidebar .search-results{
+        display:none !important;
+    }
+
+    .sidebar{
+        width:270px;
+    }
+
+    .mobile-home{
+        display:flex;
+        flex:1;
+        min-height:0;
+        flex-direction:column;
+    }
+
+    .mobile-home-header{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 12px;
+        border-bottom:1px solid #1b2638;
+        flex-shrink:0;
+    }
+
+    .mobile-home-search{
+        flex:1;
+        min-width:0;
+        padding:11px 13px;
+        border-radius:12px;
+        border:1px solid #202c40;
+        outline:none;
+        background:#151c2a;
+        color:white;
+        font-size:15px;
+    }
+
+    .mobile-home-list{
+        flex:1;
+        min-height:0;
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .mobile-home-search-results{
+        display:none;
+        flex:1;
+        min-height:0;
+        overflow-y:auto;
+    }
+
+    .mobile-home .plus-button{
+        width:40px;
+        height:40px;
+    }
+
+    .chat-more-button{
+        width:40px;
+        min-width:40px;
+        height:40px;
+    }
+
+    .attach-menu{
+        bottom:54px;
+        left:-4px;
+        width:190px;
+    }
+
+    .message-video{
+        max-width:280px;
+        max-height:360px;
+    }
+}
+
 /* MEDIA VIEWER */
 
 .media-viewer{
@@ -1152,11 +1357,13 @@ style="display:none;height:100%;flex-direction:column;min-height:0;"
 
 <div id="chatAvatar" class="avatar"></div>
 
-<div>
+<div class="chat-header-user-info">
 <div id="chatName" class="chat-header-name"></div>
-
 <div id="chatUsername" class="chat-header-username"></div>
+<div id="chatPresence" class="chat-header-presence"></div>
 </div>
+
+<button id="chatMoreButton" class="chat-more-button" title="Действия">⋮</button>
 
 </div>
 
@@ -1189,16 +1396,27 @@ class="file-preview-remove"
 id="fileInput"
 type="file"
 style="display:none"
-accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.csv"
+accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.csv"
 >
 
+<div class="attach-wrap">
 <button
 id="attachButton"
 class="attach-button"
-title="Прикрепить файл"
+title="Прикрепить"
 >
 📎
 </button>
+
+<div id="attachMenu" class="attach-menu">
+
+<button id="photoVideoButton">🖼️ Фото / 🎥 Видео</button>
+<button id="fileOnlyButton">📄 Файл</button>
+<button id="editSelectedButton">✏️ Изменить выбранное</button>
+<button id="deleteSelectedButton" class="danger">🗑️ Удалить выбранное</button>
+
+</div>
+</div>
 
 <input
 id="messageInput"
@@ -1215,6 +1433,25 @@ class="send-button"
 </button>
 
 </div>
+
+</div>
+
+<div id="mobileHome" class="mobile-home">
+
+<div class="mobile-home-header">
+<input
+id="mobileSearchInput"
+class="mobile-home-search"
+type="text"
+placeholder="Поиск..."
+autocomplete="off">
+</div>
+
+<div id="mobileChatList" class="mobile-home-list">
+<div class="empty">Пока нет чатов</div>
+</div>
+
+<div id="mobileSearchResults" class="mobile-home-search-results"></div>
 
 </div>
 
@@ -1413,6 +1650,24 @@ class="profile-button"
 </div>
 </div>
 
+
+<div id="chatActionsModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-title" id="chatActionsTitle">Действия</div>
+
+<button id="blockUserButton" class="profile-button">
+🚫 Заблокировать пользователя
+</button>
+
+<button id="closeChatActionsButton" class="profile-button">
+Отмена
+</button>
+
+</div>
+</div>
+
 <!-- CHANNEL INFO -->
 
 <div id="channelInfoModal" class="modal">
@@ -1507,6 +1762,11 @@ let selectedChannelFile = null;
 
 let selectedChatFile = null;
 let selectedViewerUrl = null;
+let selectedMessageId = null;
+let selectedMessage = null;
+let presenceTimer = null;
+let profileRealtimeChannel = null;
+let isCurrentContactBlocked = false;
 
 
 /* AUTH */
@@ -1527,6 +1787,208 @@ currentUser=session.user;
 
 await loadProfile();
 await loadChats();
+await setMyPresence(true);
+startPresenceHeartbeat();
+subscribeToProfilePresence();
+}
+
+
+/* PRESENCE */
+
+async function setMyPresence(online){
+
+if(!currentUser){
+return;
+}
+
+const update = online
+? {online:true,last_seen:new Date().toISOString()}
+: {online:false,last_seen:new Date().toISOString()};
+
+const {error} = await supabaseClient
+.from("profiles")
+.update(update)
+.eq("id",currentUser.id);
+
+if(error){
+console.warn("Presence:",error.message);
+}
+
+}
+
+function startPresenceHeartbeat(){
+
+if(presenceTimer){
+clearInterval(presenceTimer);
+}
+
+presenceTimer=setInterval(()=>{
+setMyPresence(true);
+},30000);
+
+}
+
+function formatLastSeen(profile){
+
+if(!profile){
+return "";
+}
+
+if(profile.online){
+return "в сети";
+}
+
+if(!profile.last_seen){
+return "был(а) в сети недавно";
+}
+
+const date=new Date(profile.last_seen);
+const now=new Date();
+const diff=Math.max(0,now-date);
+
+if(diff<60000){
+return "был(а) в сети только что";
+}
+
+if(diff<3600000){
+return "был(а) в сети "+Math.floor(diff/60000)+" мин. назад";
+}
+
+if(date.toDateString()===now.toDateString()){
+return "был(а) в сети сегодня в "+date.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+}
+
+return "был(а) в сети "+date.toLocaleDateString("ru-RU")+" в "+date.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+}
+
+async function isUserBlocked(userId){
+
+if(!userId){
+return false;
+}
+
+const {data,error}=await supabaseClient
+.from("blocked_users")
+.select("id")
+.eq("blocker_id",currentUser.id)
+.eq("blocked_id",userId)
+.maybeSingle();
+
+if(error){
+console.warn("Блокировка:",error.message);
+return false;
+}
+
+return !!data;
+}
+
+async function toggleBlockUser(){
+
+if(!currentContact){
+return;
+}
+
+const blocked=await isUserBlocked(currentContact.id);
+
+if(blocked){
+
+const {error}=await supabaseClient
+.from("blocked_users")
+.delete()
+.eq("blocker_id",currentUser.id)
+.eq("blocked_id",currentContact.id);
+
+if(error){
+alert("Не удалось разблокировать пользователя: "+error.message);
+return;
+}
+
+isCurrentContactBlocked=false;
+document.getElementById("blockUserButton").textContent="🚫 Заблокировать пользователя";
+document.getElementById("messageInputArea").style.display="flex";
+alert("Пользователь разблокирован.");
+
+}else{
+
+const {error}=await supabaseClient
+.from("blocked_users")
+.insert({
+blocker_id:currentUser.id,
+blocked_id:currentContact.id
+});
+
+if(error){
+alert("Не удалось заблокировать пользователя: "+error.message);
+return;
+}
+
+isCurrentContactBlocked=true;
+document.getElementById("blockUserButton").textContent="🔓 Разблокировать пользователя";
+document.getElementById("messageInputArea").style.display="none";
+alert("Пользователь заблокирован.");
+}
+
+}
+
+function updateChatPresence(){
+
+const el=document.getElementById("chatPresence");
+
+if(!el || !currentContact){
+return;
+}
+
+el.textContent=formatLastSeen(currentContact);
+
+}
+
+async function refreshCurrentContact(){
+
+if(!currentContact){
+return;
+}
+
+const {data,error}=await supabaseClient
+.from("profiles")
+.select("*")
+.eq("id",currentContact.id)
+.single();
+
+if(error || !data){
+return;
+}
+
+currentContact=data;
+updateChatPresence();
+
+if(document.getElementById("chatAvatar")){
+setAvatar(document.getElementById("chatAvatar"),data);
+}
+
+}
+
+function subscribeToProfilePresence(){
+
+if(profileRealtimeChannel){
+supabaseClient.removeChannel(profileRealtimeChannel);
+}
+
+profileRealtimeChannel=supabaseClient
+.channel("profile-presence-"+currentUser.id)
+.on("postgres_changes",{
+event:"UPDATE",
+schema:"public",
+table:"profiles"
+},payload=>{
+
+if(currentContact && payload.new.id===currentContact.id){
+currentContact={...currentContact,...payload.new};
+updateChatPresence();
+}
+
+})
+.subscribe();
+
 }
 
 
@@ -1634,6 +2096,11 @@ document.getElementById("chatList");
 
 list.innerHTML="";
 
+const mobileList=document.getElementById("mobileChatList");
+if(mobileList){
+mobileList.innerHTML="";
+}
+
 let hasSomething=false;
 
 const {
@@ -1698,6 +2165,11 @@ if(!hasSomething){
 
 list.innerHTML =
 `<div class="empty">Пока нет чатов</div>`;
+
+if(mobileList){
+mobileList.innerHTML =
+`<div class="empty">Пока нет чатов</div>`;
+}
 }
 }
 
@@ -1708,6 +2180,9 @@ function createContactElement(profile){
 
 const list =
 document.getElementById("chatList");
+
+const mobileList =
+document.getElementById("mobileChatList");
 
 const item =
 document.createElement("div");
@@ -1744,6 +2219,17 @@ openChat(profile);
 };
 
 list.appendChild(item);
+
+if(mobileList){
+
+const mobileItem=item.cloneNode(true);
+
+mobileItem.onclick=()=>{
+openChat(profile);
+};
+
+mobileList.appendChild(mobileItem);
+}
 }
 
 
@@ -1753,6 +2239,9 @@ function createChannelElement(channel){
 
 const list =
 document.getElementById("chatList");
+
+const mobileList =
+document.getElementById("mobileChatList");
 
 const item =
 document.createElement("div");
@@ -1803,6 +2292,22 @@ openChannelInfo(channel);
 };
 
 list.appendChild(item);
+
+if(mobileList){
+
+const mobileItem=item.cloneNode(true);
+
+mobileItem.onclick=()=>{
+openChannel(channel);
+};
+
+mobileItem.oncontextmenu=event=>{
+event.preventDefault();
+openChannelInfo(channel);
+};
+
+mobileList.appendChild(mobileItem);
+}
 }
 
 
@@ -2024,6 +2529,78 @@ results.innerHTML =
 });
 
 
+/* MOBILE CHAT SEARCH */
+
+const mobileSearchInput=document.getElementById("mobileSearchInput");
+
+mobileSearchInput.addEventListener("input",async function(){
+
+const query=this.value.trim().replace(/^@/,"").toLowerCase();
+const list=document.getElementById("mobileChatList");
+const results=document.getElementById("mobileSearchResults");
+
+if(!query){
+results.style.display="none";
+list.style.display="block";
+return;
+}
+
+list.style.display="none";
+results.style.display="block";
+results.innerHTML='<div class="empty">Поиск...</div>';
+
+const {data:users,error}=await supabaseClient
+.from("profiles")
+.select("id,name,username,avatar_url,online,last_seen")
+.ilike("username",`${query}%`)
+.neq("id",currentUser.id)
+.limit(10);
+
+results.innerHTML="";
+let found=false;
+
+if(!error && users){
+for(const profile of users){
+
+found=true;
+
+const card=document.createElement("div");
+card.className="search-card";
+
+const avatar=document.createElement("div");
+avatar.className="avatar";
+setAvatar(avatar,profile);
+
+const info=document.createElement("div");
+info.className="search-card-info";
+info.innerHTML=`
+<div class="contact-name">${escapeHtml(profile.name)}</div>
+<div class="contact-username">${usernameHTML(profile)}</div>
+<div class="chat-header-presence">${escapeHtml(formatLastSeen(profile))}</div>
+`;
+
+const button=document.createElement("button");
+button.className="add-button";
+button.textContent="Открыть";
+
+button.onclick=()=>{
+openChat(profile);
+};
+
+card.appendChild(avatar);
+card.appendChild(info);
+card.appendChild(button);
+results.appendChild(card);
+}
+}
+
+if(!found){
+results.innerHTML='<div class="empty">Ничего не найдено</div>';
+}
+
+});
+
+
 /* OPEN CHAT */
 
 async function openChat(profile){
@@ -2073,6 +2650,22 @@ document.getElementById(
 "messageInput"
 ).placeholder =
 "Написать сообщение...";
+
+await refreshCurrentContact();
+
+isCurrentContactBlocked=await isUserBlocked(profile.id);
+
+document.getElementById("blockUserButton").textContent =
+isCurrentContactBlocked
+?"🔓 Разблокировать пользователя"
+:"🚫 Заблокировать пользователя";
+
+document.getElementById("chatPresence").textContent =
+formatLastSeen(currentContact);
+
+if(isCurrentContactBlocked){
+document.getElementById("messageInputArea").style.display="none";
+}
 
 await loadMessages();
 
@@ -2206,6 +2799,8 @@ for(const message of data){
 displayMessage(message);
 }
 
+await markMessagesRead();
+
 messages.scrollTop =
 messages.scrollHeight;
 }
@@ -2273,6 +2868,19 @@ message.sender_id===currentUser.id
 
 element.dataset.id =
 String(message.id);
+
+if(message.sender_id===currentUser.id){
+element.addEventListener("click",event=>{
+if(event.target.closest("button,video,img")){
+return;
+}
+selectMessage(message,element);
+});
+element.addEventListener("contextmenu",event=>{
+event.preventDefault();
+selectMessage(message,element);
+});
+}
 
 const time =
 new Date(message.created_at)
@@ -2410,10 +3018,43 @@ document.createElement("div");
 timeElement.className =
 "message-time";
 
-timeElement.textContent =
-time;
+timeElement.textContent = time;
+
+if(message.sender_id===currentUser.id){
+
+const status=document.createElement("span");
+status.className="message-status "+(message.read_at?"read":"");
+status.textContent=message.read_at?"✓✓":"✓";
+timeElement.appendChild(status);
+}
+
+if(message.edited_at){
+const edited=document.createElement("span");
+edited.style.marginLeft="5px";
+edited.style.fontSize="10px";
+edited.style.opacity=".55";
+edited.textContent="изменено";
+timeElement.appendChild(edited);
+}
 
 element.appendChild(timeElement);
+
+if(message.sender_id===currentUser.id){
+const actions=document.createElement("div");
+actions.className="message-actions";
+actions.innerHTML='<button type="button">✏️ Изменить</button><button type="button" class="danger">🗑️ Удалить</button>';
+actions.children[0].onclick=event=>{
+event.stopPropagation();
+selectMessage(message,element);
+editSelectedMessage();
+};
+actions.children[1].onclick=event=>{
+event.stopPropagation();
+selectMessage(message,element);
+deleteSelectedMessage();
+};
+element.appendChild(actions);
+}
 
 container.appendChild(element);
 
@@ -2472,27 +3113,59 @@ container.scrollHeight;
 }
 
 
+/* ATTACHMENT MENU */
+
+const attachButton=document.getElementById("attachButton");
+const attachMenu=document.getElementById("attachMenu");
+const photoVideoButton=document.getElementById("photoVideoButton");
+const fileOnlyButton=document.getElementById("fileOnlyButton");
+
+attachButton.onclick=event=>{
+event.stopPropagation();
+
+if(!currentContact){
+alert("Файлы и видео пока можно отправлять только в личных чатах.");
+return;
+}
+
+attachMenu.classList.toggle("active");
+};
+
+photoVideoButton.onclick=event=>{
+event.stopPropagation();
+fileInput.accept="image/*,video/*";
+fileInput.click();
+closeAttachMenu();
+};
+
+fileOnlyButton.onclick=event=>{
+event.stopPropagation();
+fileInput.accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.csv";
+fileInput.click();
+closeAttachMenu();
+};
+
+document.getElementById("editSelectedButton").onclick=event=>{
+event.stopPropagation();
+editSelectedMessage();
+};
+
+document.getElementById("deleteSelectedButton").onclick=event=>{
+event.stopPropagation();
+deleteSelectedMessage();
+};
+
+document.addEventListener("click",event=>{
+if(!event.target.closest(".attach-wrap")){
+closeAttachMenu();
+}
+});
+
+
 /* FILE SELECT */
 
 const fileInput =
 document.getElementById("fileInput");
-
-document.getElementById(
-"attachButton"
-).onclick=()=>{
-
-if(!currentContact){
-
-alert(
-"Файлы пока можно отправлять только в личных чатах."
-);
-
-return;
-}
-
-fileInput.click();
-};
-
 
 fileInput.addEventListener(
 "change",
@@ -2627,6 +3300,11 @@ document.getElementById(
 );
 
 async function sendMessage(){
+
+if(currentContact && isCurrentContactBlocked){
+alert("Сначала разблокируйте пользователя.");
+return;
+}
 
 const text =
 messageInput.value.trim();
@@ -2867,6 +3545,160 @@ sendMessage();
 });
 
 
+/* MESSAGE READ / EDIT / DELETE */
+
+async function markMessagesRead(){
+
+if(!currentContact){
+return;
+}
+
+const {error}=await supabaseClient
+.from("messages")
+.update({read_at:new Date().toISOString()})
+.eq("sender_id",currentContact.id)
+.eq("receiver_id",currentUser.id)
+.is("read_at",null);
+
+if(error){
+console.warn("Read status:",error.message);
+}
+}
+
+function selectMessage(message,element){
+
+document.querySelectorAll(".message.selected").forEach(el=>{
+el.classList.remove("selected");
+});
+
+selectedMessageId=message.id;
+selectedMessage=message;
+
+element.classList.add("selected");
+
+const attachMenu=document.getElementById("attachMenu");
+attachMenu.classList.add("active");
+}
+
+async function editSelectedMessage(){
+
+if(!selectedMessage || selectedMessage.sender_id!==currentUser.id){
+alert("Можно изменять только свои сообщения.");
+return;
+}
+
+const newText=prompt(
+"Изменить сообщение:",
+selectedMessage.content||""
+);
+
+if(newText===null){
+return;
+}
+
+const clean=newText.trim();
+
+if(!clean && !selectedMessage.media_url){
+alert("Сообщение не может быть пустым.");
+return;
+}
+
+const {error}=await supabaseClient
+.from("messages")
+.update({
+content:clean||null,
+edited_at:new Date().toISOString()
+})
+.eq("id",selectedMessage.id)
+.eq("sender_id",currentUser.id);
+
+if(error){
+alert("Не удалось изменить сообщение: "+error.message);
+return;
+}
+
+closeAttachMenu();
+selectedMessage=null;
+selectedMessageId=null;
+}
+
+async function deleteSelectedMessage(){
+
+if(!selectedMessage || selectedMessage.sender_id!==currentUser.id){
+alert("Можно удалять только свои сообщения.");
+return;
+}
+
+if(!confirm("Удалить это сообщение?")){
+return;
+}
+
+const {error}=await supabaseClient
+.from("messages")
+.delete()
+.eq("id",selectedMessage.id)
+.eq("sender_id",currentUser.id);
+
+if(error){
+alert("Не удалось удалить сообщение: "+error.message);
+return;
+}
+
+const element=document.querySelector(
+`.message[data-id="${CSS.escape(String(selectedMessage.id))}"]`
+);
+
+if(element){
+element.remove();
+}
+
+selectedMessage=null;
+selectedMessageId=null;
+closeAttachMenu();
+}
+
+function updateRenderedMessage(message){
+
+const old=document.querySelector(
+`.message[data-id="${CSS.escape(String(message.id))}"]`
+);
+
+if(!old){
+displayMessage(message);
+return;
+}
+
+if(message.deleted_at){
+old.remove();
+return;
+}
+
+const wasSelected=old.classList.contains("selected");
+old.remove();
+displayMessage(message);
+
+if(wasSelected){
+const replacement=document.querySelector(
+`.message[data-id="${CSS.escape(String(message.id))}"]`
+);
+if(replacement){
+replacement.classList.add("selected");
+}
+}
+}
+
+function closeAttachMenu(){
+
+document.getElementById("attachMenu").classList.remove("active");
+
+document.querySelectorAll(".message.selected").forEach(el=>{
+el.classList.remove("selected");
+});
+
+selectedMessage=null;
+selectedMessageId=null;
+}
+
 /* REALTIME PERSONAL */
 
 function subscribeToMessages(){
@@ -2918,6 +3750,33 @@ return;
 
 displayMessage(message);
 
+}
+)
+.on(
+"postgres_changes",
+{
+event:"UPDATE",
+schema:"public",
+table:"messages"
+},
+payload=>{
+
+const message=payload.new;
+
+if(!currentContact){
+return;
+}
+
+const belongs =
+(message.sender_id===currentUser.id && message.receiver_id===currentContact.id)
+||
+(message.sender_id===currentContact.id && message.receiver_id===currentUser.id);
+
+if(!belongs){
+return;
+}
+
+updateRenderedMessage(message);
 }
 )
 .subscribe();
@@ -3616,6 +4475,35 @@ button.textContent="Создать";
 };
 
 
+/* CHAT ACTIONS */
+
+document.getElementById("chatMoreButton").onclick=async()=>{
+if(!currentContact){
+return;
+}
+
+isCurrentContactBlocked=await isUserBlocked(currentContact.id);
+
+document.getElementById("blockUserButton").textContent=
+isCurrentContactBlocked
+?"🔓 Разблокировать пользователя"
+:"🚫 Заблокировать пользователя";
+
+document.getElementById("chatActionsTitle").textContent=
+currentContact.name;
+
+document.getElementById("chatActionsModal").classList.add("active");
+};
+
+document.getElementById("blockUserButton").onclick=async()=>{
+await toggleBlockUser();
+document.getElementById("chatActionsModal").classList.remove("active");
+};
+
+document.getElementById("closeChatActionsButton").onclick=()=>{
+document.getElementById("chatActionsModal").classList.remove("active");
+};
+
 /* CHANNEL INFO */
 
 function openChannelInfo(channel){
@@ -3773,9 +4661,14 @@ setActiveButton(
 
 hideAllPages();
 
-document.getElementById(
-"chatList"
-).style.display="block";
+if(window.innerWidth<=700){
+document.getElementById("mobileHome").style.display="flex";
+document.getElementById("mobileChatList").style.display="block";
+document.getElementById("mobileSearchResults").style.display="none";
+mobileSearchInput.value="";
+}else{
+document.getElementById("chatList").style.display="block";
+}
 
 searchInput.value="";
 
@@ -3801,6 +4694,15 @@ const list =
 document.getElementById(
 "chatList"
 );
+
+const mobileList=document.getElementById("mobileChatList");
+
+if(window.innerWidth<=700){
+document.getElementById("mobileHome").style.display="flex";
+mobileList.style.display="block";
+document.getElementById("mobileSearchResults").style.display="none";
+mobileList.innerHTML="";
+}
 
 list.style.display="block";
 
@@ -3894,6 +4796,10 @@ function hideAllPages(){
 
 document.getElementById(
 "profilePage"
+).style.display="none";
+
+document.getElementById(
+"mobileHome"
 ).style.display="none";
 
 document.getElementById(
@@ -4320,12 +5226,29 @@ document.getElementById(
 "mobileBackButton"
 ).style.display="none";
 
+if(window.innerWidth<=700){
+document.getElementById("mobileHome").style.display="flex";
+document.getElementById("mobileChatList").style.display="block";
+}
+
 document.getElementById(
 "chatList"
 ).style.display="block";
 }
 );
 
+
+window.addEventListener("beforeunload",()=>{
+setMyPresence(false);
+});
+
+document.addEventListener("visibilitychange",()=>{
+if(document.visibilityState==="visible"){
+setMyPresence(true);
+}else{
+setMyPresence(false);
+}
+});
 
 /* ESCAPE */
 
