@@ -326,6 +326,13 @@ button{-webkit-tap-highlight-color:transparent}
     text-align:right;
 }
 
+.channel-sender{
+    font-size:12px;
+    font-weight:600;
+    color:#8fd3ff;
+    margin-bottom:3px;
+}
+
 /* MEDIA */
 
 .message-media{
@@ -3346,7 +3353,7 @@ minute:"2-digit"
 );
 
 element.innerHTML=`
-${isMine ? "" : `<div class="channel-sender">${escapeHtml(senderName || "—")}</div>`}
+${isMine ? "" : `<div class="channel-sender"></div>`}
 ${channelMediaHtml(message)}
 <div>
 ${escapeHtml(message.content)}
