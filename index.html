@@ -599,6 +599,16 @@ button{-webkit-tap-highlight-color:transparent}
     cursor:pointer;
 }
 
+.avatar-upload-info{
+    text-align:center;
+    color:#718099;
+    font-size:12px;
+    margin-top:8px;
+}
+
+#changeAvatarButton{
+    margin-top:0;
+}
 .logout{
     background:#2b1720;
     color:#ff7186;
@@ -3935,7 +3945,218 @@ id
 ).classList.add("active");
 }
 
+/* CHANGE AVATAR */
 
+const avatarInput =
+document.getElementById("avatarInput");
+
+const changeAvatarButton =
+document.getElementById("changeAvatarButton");
+
+
+changeAvatarButton.onclick=()=>{
+
+    avatarInput.click();
+
+};
+
+
+avatarInput.addEventListener(
+    "change",
+    async event=>{
+
+        const file =
+        event.target.files[0];
+
+        if(!file){
+            return;
+        }
+
+        /* Проверяем размер */
+
+        const maxSize =
+        10 * 1024 * 1024;
+
+        if(file.size > maxSize){
+
+            alert(
+                "Фото слишком большое. Максимальный размер — 10 МБ."
+            );
+
+            avatarInput.value="";
+            return;
+        }
+
+
+        /* Проверяем тип */
+
+        if(!file.type.startsWith("image/")){
+
+            alert(
+                "Можно выбрать только изображение."
+            );
+
+            avatarInput.value="";
+            return;
+        }
+
+
+        changeAvatarButton.disabled=true;
+
+        changeAvatarButton.textContent =
+        "⏳ Загрузка...";
+
+
+        try{
+
+            const extension =
+            file.name.includes(".")
+            ? file.name.split(".").pop().toLowerCase()
+            : "jpg";
+
+
+            const filePath =
+            currentUser.id +
+            "/" +
+            crypto.randomUUID() +
+            "." +
+            extension;
+
+
+            /* Загружаем в avatars */
+
+            const {
+                error:uploadError
+            } =
+            await supabaseClient
+            .storage
+            .from("avatars")
+            .upload(
+                filePath,
+                file,
+                {
+                    cacheControl:"3600",
+                    upsert:false,
+                    contentType:file.type
+                }
+            );
+
+
+            if(uploadError){
+
+                console.error(uploadError);
+
+                throw new Error(
+                    "Не удалось загрузить фото: " +
+                    uploadError.message
+                );
+            }
+
+
+            /* Получаем публичную ссылку */
+
+            const {
+                data:publicData
+            } =
+            supabaseClient
+            .storage
+            .from("avatars")
+            .getPublicUrl(filePath);
+
+
+            const avatarUrl =
+            publicData.publicUrl;
+
+
+            /* Сохраняем ссылку в profiles */
+
+            const {
+                error:updateError
+            } =
+            await supabaseClient
+            .from("profiles")
+            .update({
+                avatar_url:avatarUrl
+            })
+            .eq(
+                "id",
+                currentUser.id
+            );
+
+
+            if(updateError){
+
+                console.error(updateError);
+
+                throw new Error(
+                    "Не удалось сохранить фото профиля: " +
+                    updateError.message
+                );
+            }
+
+
+            /* Обновляем текущий профиль */
+
+            currentProfile.avatar_url =
+            avatarUrl;
+
+
+            /* Обновляем фото на странице профиля */
+
+            const profileAvatar =
+            document.getElementById(
+                "profileAvatar"
+            );
+
+            profileAvatar.innerHTML =
+            `<img src="${escapeHtml(avatarUrl)}" alt="">`;
+
+
+            /* Если сейчас открыт чат */
+
+            if(currentContact){
+
+                setAvatar(
+                    document.getElementById(
+                        "chatAvatar"
+                    ),
+                    currentProfile
+                );
+
+            }
+
+
+            /* Обновляем список чатов */
+
+            await loadChats();
+
+
+            alert(
+                "✅ Фото профиля изменено!"
+            );
+
+
+        }catch(error){
+
+            console.error(error);
+
+            alert(
+                error.message
+            );
+
+        }finally{
+
+            changeAvatarButton.disabled=false;
+
+            changeAvatarButton.textContent =
+            "📷 Изменить фото";
+
+            avatarInput.value="";
+
+        }
+
+    }
+);
 /* EDIT NAME */
 
 document.getElementById(
