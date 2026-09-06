@@ -326,6 +326,13 @@ button{-webkit-tap-highlight-color:transparent}
     text-align:right;
 }
 
+.channel-sender{
+    font-size:12px;
+    font-weight:bold;
+    color:#4ea1ff;
+    margin-bottom:5px;
+}
+
 /* MEDIA */
 
 .message-media{
@@ -1878,77 +1885,23 @@ let qrSessionUrl = null;
 
 async function checkAuth(){
 
-const loadingScreen=document.getElementById("loadingScreen");
-
-try{
-
 const {
 data:{session}
 }=await supabaseClient.auth.getSession();
 
 if(!session){
+
 window.location.href="login.html";
 return;
 }
 
 currentUser=session.user;
 
-/*
-  ВАЖНО: не ждём загрузки профиля и всех чатов перед показом приложения.
-  Сначала сразу показываем интерфейс и официальный чат, а данные догружаем
-  параллельно в фоне. Поэтому пользователь больше не смотрит на загрузчик
-  несколько секунд.
-*/
-createWelcomeChatElement();
-showHomeAfterAuth();
-
-if(loadingScreen){
-loadingScreen.classList.add("hide");
-setTimeout(()=>loadingScreen.remove(),450);
-}
-
-/* Быстрая параллельная загрузка */
-Promise.allSettled([
-loadProfile(),
-loadChats()
-]).then(()=>{
-setMyPresence(true);
+await loadProfile();
+await loadChats();
+await setMyPresence(true);
 startPresenceHeartbeat();
 subscribeToProfilePresence();
-});
-
-}catch(error){
-console.error("Auth:",error);
-if(loadingScreen){
-loadingScreen.classList.add("hide");
-setTimeout(()=>loadingScreen.remove(),450);
-}
-}
-}
-
-function showHomeAfterAuth(){
-
-const chatList=document.getElementById("chatList");
-const mobileList=document.getElementById("mobileChatList");
-
-/* Официальный чат виден сразу, ещё до ответа Supabase. */
-if(chatList){
-chatList.style.display="block";
-if(!chatList.querySelector(".welcome-chat-item")){
-createWelcomeChatElement();
-}
-}
-
-if(mobileList){
-mobileList.style.display="block";
-if(!mobileList.querySelector(".welcome-chat-item")){
-createWelcomeChatElement();
-}
-}
-
-document.getElementById("chatWindow").style.display="none";
-document.getElementById("welcome").style.display="flex";
-document.getElementById("profilePage").style.display="none";
 }
 
 
@@ -2250,90 +2203,89 @@ data.name.charAt(0).toUpperCase();
 
 async function loadChats(){
 
-const list=document.getElementById("chatList");
-const mobileList=document.getElementById("mobileChatList");
+const list =
+document.getElementById("chatList");
 
-/* Не очищаем список мгновенно: официальный чат уже показан пользователю. */
-if(list){
 list.innerHTML="";
-createWelcomeChatElement();
-}
 
-let mobileReady=false;
+const mobileList=document.getElementById("mobileChatList");
 if(mobileList){
 mobileList.innerHTML="";
-createWelcomeChatElement();
-mobileReady=true;
 }
 
-/* Получаем контакты и каналы одновременно. */
-const [contactsResult,channelsResult]=await Promise.all([
+let hasSomething=false;
 
-supabaseClient
+createWelcomeChatElement();
+hasSomething=true;
+
+const {
+data:contacts,
+error:contactsError
+}=await supabaseClient
 .from("contacts")
 .select("contact_id")
-.eq("user_id",currentUser.id),
+.eq("user_id",currentUser.id);
 
-supabaseClient
-.from("channels")
-.select("id,owner_id,name,description,avatar_url,type,username,invite_code,created_at")
-.order("created_at",{ascending:false})
-
-]);
-
-const contacts=contactsResult.data||[];
-
-if(contactsResult.error){
-console.warn("Контакты недоступны:",contactsResult.error.message);
-}
-
-/* Один запрос profiles вместо отдельного запроса для каждого контакта. */
-const contactIds=[...new Set(contacts.map(c=>c.contact_id).filter(Boolean))];
-let profiles=[];
-
-if(contactIds.length){
-const {data,error}=await supabaseClient
-.from("profiles")
-.select("id,name,username,avatar_url,online,last_seen")
-.in("id",contactIds);
-
-if(error){
-console.warn("Профили контактов:",error.message);
-}else{
-profiles=data||[];
-}
-}
-
-const profileMap=new Map(profiles.map(profile=>[profile.id,profile]));
+if(!contactsError && contacts){
 
 for(const contact of contacts){
-const profile=profileMap.get(contact.contact_id);
-if(profile){
+
+const {data:profile} =
+await supabaseClient
+.from("profiles")
+.select("*")
+.eq("id",contact.contact_id)
+.single();
+
+if(!profile)continue;
+
 createContactElement(profile);
+
+hasSomething=true;
 }
 }
 
-const channels=channelsResult.data||[];
+const {
+data:channels,
+error:channelsError
+}=await supabaseClient
+.from("channels")
+.select("*")
+.order("created_at",{ascending:false});
 
-if(channelsResult.error){
-console.warn("Каналы недоступны:",channelsResult.error.message);
-}else{
+if(channelsError){
+
+console.warn(
+"Каналы недоступны:",
+channelsError.message
+);
+
+}else if(channels){
+
 for(const channel of channels){
-const canShow=channel.type==="public"||channel.owner_id===currentUser.id;
-if(canShow){
+
+const canShow =
+channel.type==="public" ||
+channel.owner_id===currentUser.id;
+
+if(!canShow)continue;
+
 createChannelElement(channel);
-}
+
+hasSomething=true;
 }
 }
 
-if(list && list.children.length===0){
-list.innerHTML=`<div class="empty">Пока нет чатов</div>`;
-}
+if(!hasSomething){
 
-if(mobileReady && mobileList && mobileList.children.length===0){
-mobileList.innerHTML=`<div class="empty">Пока нет чатов</div>`;
-}
+list.innerHTML =
+`<div class="empty">Пока нет чатов</div>`;
 
+if(mobileList){
+mobileList.innerHTML =
+`<div class="empty">Пока нет чатов</div>`;
+}
+}
 }
 
 
@@ -3308,7 +3260,9 @@ container.scrollHeight;
 
 /* DISPLAY CHANNEL MESSAGE */
 
-function displayChannelMessage(message){
+const channelSenderCache = {};
+
+async function displayChannelMessage(message){
 
 const container =
 document.getElementById("messages");
@@ -3324,7 +3278,13 @@ return;
 const element =
 document.createElement("div");
 
-element.className="message mine";
+element.className =
+"message "+
+(
+message.sender_id===currentUser.id
+?"mine"
+:"theirs"
+);
 
 element.dataset.id =
 String(message.id);
@@ -3339,15 +3299,87 @@ minute:"2-digit"
 }
 );
 
-element.innerHTML=`
-<div>
-${escapeHtml(message.content)}
-</div>
+if(message.sender_id && message.sender_id!==currentUser.id){
 
-<div class="message-time">
-${time}
-</div>
-`;
+let senderName=null;
+
+const cached=channelSenderCache[message.sender_id];
+
+if(cached){
+senderName=cached;
+}else{
+const {data:profile,error}=await supabaseClient
+.from("profiles")
+.select("name")
+.eq("id",message.sender_id)
+.maybeSingle();
+if(!error && profile){
+senderName=profile.name;
+channelSenderCache[message.sender_id]=senderName;
+}
+}
+
+if(senderName){
+const nameEl=document.createElement("div");
+nameEl.className="channel-sender";
+nameEl.textContent=senderName;
+element.appendChild(nameEl);
+}
+}
+
+if(message.media_url){
+
+const mediaWrap=document.createElement("div");
+mediaWrap.className="message-media";
+
+if(message.media_type && message.media_type.startsWith("image/")){
+const img=document.createElement("img");
+img.className="message-image";
+img.src=message.media_url;
+img.alt=message.media_name||"Изображение";
+img.loading="lazy";
+img.onclick=()=>openMediaViewer(message.media_url);
+mediaWrap.appendChild(img);
+}else{
+const fc=document.createElement("div");
+fc.className="file-card";
+const icon=document.createElement("div");
+icon.className="file-icon";
+icon.textContent="📄";
+const info=document.createElement("div");
+info.className="file-info";
+const nm=document.createElement("div");
+nm.className="file-name";
+nm.textContent=message.media_name||"Файл";
+const sz=document.createElement("div");
+sz.className="file-size";
+sz.textContent=formatFileSize(message.media_size);
+info.appendChild(nm);
+info.appendChild(sz);
+const dl=document.createElement("button");
+dl.className="file-download";
+dl.textContent="⬇️";
+dl.onclick=()=>downloadFile(message.media_url,message.media_name||"file");
+fc.appendChild(icon);
+fc.appendChild(info);
+fc.appendChild(dl);
+mediaWrap.appendChild(fc);
+}
+
+element.appendChild(mediaWrap);
+}
+
+if(message.content){
+const cap=document.createElement("div");
+cap.className="message-caption";
+cap.textContent=message.content;
+element.appendChild(cap);
+}
+
+const timeElement=document.createElement("div");
+timeElement.className="message-time";
+timeElement.textContent=time;
+element.appendChild(timeElement);
 
 container.appendChild(element);
 
@@ -3366,8 +3398,8 @@ const fileOnlyButton=document.getElementById("fileOnlyButton");
 attachButton.onclick=event=>{
 event.stopPropagation();
 
-if(!currentContact){
-alert("Файлы и видео пока можно отправлять только в личных чатах.");
+if(!currentContact && !currentChannel){
+alert("Сначала открой контакт или канал.");
 return;
 }
 
@@ -3505,6 +3537,8 @@ clearSelectedFile();
 function clearSelectedFile(){
 
 selectedChatFile=null;
+
+selectedMediaForChannel=null;
 
 fileInput.value="";
 
@@ -3703,6 +3737,71 @@ return;
 }
 
 
+/* CHANNEL FILE UPLOAD HELPER */
+
+let selectedMediaForChannel = null;
+
+async function uploadSelectedFileForChannel(){
+
+const file=selectedChatFile;
+
+if(!file){
+return true;
+}
+
+const maxSize=50*1024*1024;
+
+if(file.size>maxSize){
+alert("Файл слишком большой. Максимальный размер — 50 МБ.");
+return false;
+}
+
+const extension=
+file.name.includes(".")
+?file.name.split(".").pop().toLowerCase()
+:"";
+
+const filePath=
+currentUser.id+
+"/channel/"+
+crypto.randomUUID()+
+(extension?"."+extension:"");
+
+const {
+error:uploadError
+}=await supabaseClient
+.storage
+.from("chat-media")
+.upload(filePath,file,{
+cacheControl:"3600",
+upsert:false,
+contentType:file.type||"application/octet-stream"
+});
+
+if(uploadError){
+console.error(uploadError);
+alert("Не удалось загрузить файл: "+uploadError.message);
+return false;
+}
+
+const {
+data:publicData
+}=supabaseClient
+.storage
+.from("chat-media")
+.getPublicUrl(filePath);
+
+selectedMediaForChannel={
+url:publicData.publicUrl,
+name:file.name,
+type:file.type||"application/octet-stream",
+size:file.size
+};
+
+return true;
+}
+
+
 /* CHANNEL */
 
 if(currentChannel){
@@ -3723,11 +3822,15 @@ return;
 
 if(selectedChatFile){
 
-alert(
-"Отправка файлов в каналах будет добавлена позже."
-);
+const uploadResult =
+await uploadSelectedFileForChannel();
+
+if(!uploadResult){
+
+messageInput.value=text;
 
 return;
+}
 }
 
 messageInput.value="";
@@ -3745,7 +3848,27 @@ sender_id:
 currentUser.id,
 
 content:
-text
+text||null,
+
+media_url:
+selectedMediaForChannel ?
+selectedMediaForChannel.url :
+null,
+
+media_name:
+selectedMediaForChannel ?
+selectedMediaForChannel.name :
+null,
+
+media_type:
+selectedMediaForChannel ?
+selectedMediaForChannel.type :
+null,
+
+media_size:
+selectedMediaForChannel ?
+selectedMediaForChannel.size :
+null
 
 });
 
@@ -3759,6 +3882,10 @@ alert(
 
 messageInput.value=text;
 }
+
+clearSelectedFile();
+
+selectedMediaForChannel=null;
 
 }
 
