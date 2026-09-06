@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клейви Чат</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">K</div>
+            <span>Клейви Чат</span>
+        </div>
+
+        <button class="menu-button active" id="chatsButton">
+            💬
+            <span>Чаты</span>
+        </button>
+
+        <button class="menu-button" id="contactsButton">
+            👥
+            <span>Контакты</span>
+        </button>
+
+        <button class="menu-button" id="profileButton">
+            👤
+            <span>Профиль</span>
+        </button>
+
+    </aside>
+
+
+    <!-- СПИСОК ЧАТОВ -->
+    <section class="chat-list" id="chatList">
+
+        <div class="chat-list-header">
+            <h2>Чаты</h2>
+
+            <button class="new-chat">
+                +
+            </button>
+        </div>
+
+        <input
+            class="search"
+            type="text"
+            placeholder="Поиск"
+        >
+
+        <div class="chat active-chat">
+
+            <div class="avatar" id="chatAvatar">
+                K
+            </div>
+
+            <div class="chat-info">
+
+                <strong id="userName">
+                    Пользователь
+                </strong>
+
+                <p>
+                    Добро пожаловать! 👋
+                </p>
+
+            </div>
+
+            <span class="time">
+                сейчас
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- ОКНО ЧАТА -->
+    <main class="messages" id="chatWindow">
+
+        <header class="messages-header">
+
+            <div class="avatar" id="headerAvatar">
+                K
+            </div>
+
+            <div>
+
+                <strong id="chatUserName">
+                    Пользователь
+                </strong>
+
+                <p>
+                    онлайн
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <div class="message-area">
+
+            <div class="welcome">
+
+                <h1>
+                    Добро пожаловать! 👋
+                </h1>
+
+                <p>
+                    Это твой новый мессенджер — Клейви Чат.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="message-input">
+
+            <input
+                id="messageInput"
+                type="text"
+                placeholder="Написать сообщение..."
+                autocomplete="off"
+            >
+
+            <button id="sendButton">
+                ➤
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- ПРОФИЛЬ -->
+    <main
+        class="profile-page"
+        id="profilePage"
+        style="display: none;"
+    >
+
+        <div class="profile-card">
+
+            <!-- ФОТО -->
+
+            <label class="profile-avatar-wrapper">
+
+                <img
+                    id="profileAvatar"
+                    class="profile-avatar-image"
+                    src=""
+                    alt="Фото профиля"
+                >
+
+                <div
+                    id="avatarPlaceholder"
+                    class="profile-avatar-placeholder"
+                >
+                    K
+                </div>
+
+                <div class="avatar-edit">
+                    📷
+                </div>
+
+                <input
+                    id="avatarInput"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                >
+
+            </label>
+
+
+            <!-- ИМЯ -->
+
+            <div class="profile-name-container">
+
+                <h1 id="profileName">
+                    Пользователь
+                </h1>
+
+                <button id="editNameButton">
+                    ✏️
+                </button>
+
+            </div>
+
+
+            <!-- USERNAME -->
+
+            <p
+                id="profileUsername"
+                class="profile-username"
+            >
+                @username
+            </p>
+
+
+            <!-- ИНФОРМАЦИЯ -->
+
+            <div class="profile-info">
+
+                <div class="profile-row">
+
+                    <div>
+
+                        <span>
+                            Имя
+                        </span>
+
+                        <strong id="profileNameInfo">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <button id="editNameButton2">
+                        ✏️
+                    </button>
+
+                </div>
+
+
+                <div class="profile-row">
+
+                    <div>
+
+                        <span>
+                            Username
+                        </span>
+
+                        <strong id="profileUsernameInfo">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <button id="editUsernameButton">
+                        ✏️
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="usernameWarning"
+                class="username-warning"
+            ></p>
+
+
+            <!-- ТЕМА -->
+
+            <div class="theme-section">
+
+                <span class="theme-title">
+                    Тема оформления
+                </span>
+
+                <div class="theme-buttons">
+
+                    <button
+                        class="theme-button"
+                        id="darkThemeButton"
+                    >
+                        🌙 Тёмная
+                    </button>
+
+                    <button
+                        class="theme-button"
+                        id="lightThemeButton"
+                    >
+                        ☀️ Светлая
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ВЫХОД -->
+
+            <button
+                class="logout-button"
+                id="logoutButton"
+            >
+                🚪 Выйти из аккаунта
+            </button>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="script.js"></script>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =========================
+       НАХОДИМ ЭЛЕМЕНТЫ
+    ========================= */
+
+    const profileButton =
+        document.getElementById("profileButton");
+
+    const chatsButton =
+        document.getElementById("chatsButton");
+
+    const profilePage =
+        document.getElementById("profilePage");
+
+    const chatList =
+        document.getElementById("chatList");
+
+    const chatWindow =
+        document.getElementById("chatWindow");
+
+
+    /* =========================
+       ПРОВЕРКА
+    ========================= */
+
+    if (!profileButton) {
+        console.error("Кнопка профиля не найдена!");
+        return;
+    }
+
+    if (!profilePage) {
+        console.error("Страница профиля не найдена!");
+        return;
+    }
+
+
+    /* =========================
+       ФУНКЦИЯ ПРОФИЛЯ
+    ========================= */
+
+    function openProfile() {
+
+        console.log("Профиль открыт");
+
+
+        chatList.style.display = "none";
+
+        chatWindow.style.display = "none";
+
+        profilePage.style.display = "flex";
+
+
+        document
+            .querySelectorAll(".menu-button")
+            .forEach(function (button) {
+
+                button.classList.remove("active");
+
+            });
+
+
+        profileButton.classList.add("active");
+
+    }
+
+
+    /* =========================
+       ФУНКЦИЯ ЧАТОВ
+    ========================= */
+
+    function openChats() {
+
+        profilePage.style.display = "none";
+
+        chatList.style.display = "block";
+
+        chatWindow.style.display = "flex";
+
+
+        document
+            .querySelectorAll(".menu-button")
+            .forEach(function (button) {
+
+                button.classList.remove("active");
+
+            });
+
+
+        chatsButton.classList.add("active");
+
+    }
+
+
+    /* =========================
+       КНОПКИ
+    ========================= */
+
+    profileButton.addEventListener(
+        "click",
+        openProfile
+    );
+
+
+    chatsButton.addEventListener(
+        "click",
+        openChats
+    );
+
+
+    /* =========================
+       ДАННЫЕ
+    ========================= */
+
+    const savedName =
+        localStorage.getItem("kleivy_name");
+
+    const savedUsername =
+        localStorage.getItem("kleivy_username");
+
+
+    if (savedName) {
+
+        document.getElementById(
+            "userName"
+        ).textContent = savedName;
+
+        document.getElementById(
+            "chatUserName"
+        ).textContent = savedName;
+
+        document.getElementById(
+            "profileName"
+        ).textContent = savedName;
+
+        document.getElementById(
+            "profileNameInfo"
+        ).textContent = savedName;
+
+    }
+
+
+    if (savedUsername) {
+
+        document.getElementById(
+            "profileUsername"
+        ).textContent =
+            "@" + savedUsername;
+
+        document.getElementById(
+            "profileUsernameInfo"
+        ).textContent =
+            "@" + savedUsername;
+
+    }
+
+
+    /* =========================
+       АВАТАР
+    ========================= */
+
+    function updateAvatar() {
+
+        const avatar =
+            localStorage.getItem(
+                "kleivy_avatar"
+            );
+
+        const profileAvatar =
+            document.getElementById(
+                "profileAvatar"
+            );
+
+        const placeholder =
+            document.getElementById(
+                "avatarPlaceholder"
+            );
+
+        const chatAvatar =
+            document.getElementById(
+                "chatAvatar"
+            );
+
+        const headerAvatar =
+            document.getElementById(
+                "headerAvatar"
+            );
+
+
+        if (!avatar) {
+            return;
+        }
+
+
+        profileAvatar.src = avatar;
+
+        profileAvatar.style.display =
+            "block";
+
+        placeholder.style.display =
+            "none";
+
+
+        chatAvatar.style.backgroundImage =
+            "url('" + avatar + "')";
+
+        chatAvatar.style.backgroundSize =
+            "cover";
+
+        chatAvatar.style.backgroundPosition =
+            "center";
+
+        chatAvatar.textContent = "";
+
+
+        headerAvatar.style.backgroundImage =
+            "url('" + avatar + "')";
+
+        headerAvatar.style.backgroundSize =
+            "cover";
+
+        headerAvatar.style.backgroundPosition =
+            "center";
+
+        headerAvatar.textContent = "";
+
+    }
+
+
+    updateAvatar();
+
+
+    /* =========================
+       ЗАГРУЗКА ФОТО
+    ========================= */
+
+    document
+        .getElementById("avatarInput")
+        .addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    this.files[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                if (
+                    !file.type.startsWith("image/")
+                ) {
+
+                    alert(
+                        "Выбери изображение!"
+                    );
+
+                    return;
+
+                }
+
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function () {
+
+                        localStorage.setItem(
+                            "kleivy_avatar",
+                            reader.result
+                        );
+
+                        updateAvatar();
+
+                    };
+
+
+                reader.readAsDataURL(file);
+
+            }
+        );
+
+
+    /* =========================
+       ИЗМЕНЕНИЕ ИМЕНИ
+    ========================= */
+
+    function editName() {
+
+        const oldName =
+            localStorage.getItem(
+                "kleivy_name"
+            ) ||
+            "Пользователь";
+
+
+        const newName =
+            prompt(
+                "Введите новое имя:",
+                oldName
+            );
+
+
+        if (
+            newName === null ||
+            newName.trim() === ""
+        ) {
+            return;
+        }
+
+
+        const name =
+            newName.trim();
+
+
+        localStorage.setItem(
+            "kleivy_name",
+            name
+        );
+
+
+        document.getElementById(
+            "userName"
+        ).textContent = name;
+
+
+        document.getElementById(
+            "chatUserName"
+        ).textContent = name;
+
+
+        document.getElementById(
+            "profileName"
+        ).textContent = name;
+
+
+        document.getElementById(
+            "profileNameInfo"
+        ).textContent = name;
+
+    }
+
+
+    document
+        .getElementById("editNameButton")
+        .addEventListener(
+            "click",
+            editName
+        );
+
+
+    document
+        .getElementById("editNameButton2")
+        .addEventListener(
+            "click",
+            editName
+        );
+
+
+    /* =========================
+       USERNAME
+    ========================= */
+
+    document
+        .getElementById("editUsernameButton")
+        .addEventListener(
+            "click",
+            function () {
+
+                const alreadyChanged =
+                    localStorage.getItem(
+                        "kleivy_username_changed"
+                    );
+
+
+                if (
+                    alreadyChanged === "true"
+                ) {
+
+                    alert(
+                        "Username уже изменён. Изменить его второй раз нельзя."
+                    );
+
+                    return;
+
+                }
+
+
+                const oldUsername =
+                    localStorage.getItem(
+                        "kleivy_username"
+                    ) || "";
+
+
+                const newUsername =
+                    prompt(
+                        "Введите новый username без @:",
+                        oldUsername
+                    );
+
+
+                if (
+                    newUsername === null ||
+                    newUsername.trim() === ""
+                ) {
+                    return;
+                }
+
+
+                const username =
+                    newUsername
+                        .trim()
+                        .replace("@", "");
+
+
+                if (
+                    username.length < 3
+                ) {
+
+                    alert(
+                        "Username должен содержать минимум 3 символа."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    !/^[a-zA-Z0-9_]+$/.test(
+                        username
+                    )
+                ) {
+
+                    alert(
+                        "Используй только латинские буквы, цифры и _"
+                    );
+
+                    return;
+
+                }
+
+
+                localStorage.setItem(
+                    "kleivy_username",
+                    username
+                );
+
+
+                localStorage.setItem(
+                    "kleivy_username_changed",
+                    "true"
+                );
+
+
+                document.getElementById(
+                    "profileUsername"
+                ).textContent =
+                    "@" + username;
+
+
+                document.getElementById(
+                    "profileUsernameInfo"
+                ).textContent =
+                    "@" + username;
+
+
+                document.getElementById(
+                    "usernameWarning"
+                ).textContent =
+                    "Username изменён. Повторно изменить его нельзя.";
+
+            }
+        );
+
+
+    /* =========================
+       ТЕМА
+    ========================= */
+
+    const darkButton =
+        document.getElementById(
+            "darkThemeButton"
+        );
+
+    const lightButton =
+        document.getElementById(
+            "lightThemeButton"
+        );
+
+
+    function updateThemeButtons() {
+
+        darkButton.classList.remove(
+            "active"
+        );
+
+        lightButton.classList.remove(
+            "active"
+        );
+
+
+        if (
+            document.body.classList.contains(
+                "light-theme"
+            )
+        ) {
+
+            lightButton.classList.add(
+                "active"
+            );
+
+        } else {
+
+            darkButton.classList.add(
+                "active"
+            );
+
+        }
+
+    }
+
+
+    const savedTheme =
+        localStorage.getItem(
+            "kleivy_theme"
+        );
+
+
+    if (
+        savedTheme === "light"
+    ) {
+
+        document.body.classList.add(
+            "light-theme"
+        );
+
+    }
+
+
+    updateThemeButtons();
+
+
+    lightButton.onclick =
+        function () {
+
+            document.body.classList.add(
+                "light-theme"
+            );
+
+            localStorage.setItem(
+                "kleivy_theme",
+                "light"
+            );
+
+            updateThemeButtons();
+
+        };
+
+
+    darkButton.onclick =
+        function () {
+
+            document.body.classList.remove(
+                "light-theme"
+            );
+
+            localStorage.setItem(
+                "kleivy_theme",
+                "dark"
+            );
+
+            updateThemeButtons();
+
+        };
+
+
+    /* =========================
+       ВЫХОД
+    ========================= */
+
+    document
+        .getElementById("logoutButton")
+        .addEventListener(
+            "click",
+            function () {
+
+                localStorage.removeItem(
+                    "kleivy_name"
+                );
+
+                localStorage.removeItem(
+                    "kleivy_username"
+                );
+
+                localStorage.removeItem(
+                    "kleivy_password"
+                );
+
+                localStorage.removeItem(
+                    "kleivy_avatar"
+                );
+
+                localStorage.removeItem(
+                    "kleivy_username_changed"
+                );
+
+                window.location.href =
+                    "login.html";
+
+            }
+        );
+
+});
+
+</script>
+
+</body>
+
+</html>

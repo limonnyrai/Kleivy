@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Клейви Чат — Регистрация</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div class="login-page">
+
+    <div class="login-box">
+
+        <div class="login-logo">
+            K
+        </div>
+
+        <h1>Создать аккаунт</h1>
+
+        <p class="login-subtitle">
+            Добро пожаловать в Клейви Чат!
+        </p>
+
+
+        <!-- ИМЯ -->
+
+        <input
+            id="newName"
+            type="text"
+            placeholder="Твоё имя"
+            autocomplete="name"
+        >
+
+
+        <!-- USERNAME -->
+
+        <input
+            id="newUsername"
+            type="text"
+            placeholder="Username"
+            autocomplete="username"
+        >
+
+
+        <!-- EMAIL -->
+
+        <input
+            id="newEmail"
+            type="email"
+            placeholder="Email"
+            autocomplete="email"
+        >
+
+
+        <!-- ПАРОЛЬ -->
+
+        <div class="password-wrapper">
+
+            <input
+                id="newPassword"
+                type="password"
+                placeholder="Пароль (минимум 6 символов)"
+                autocomplete="new-password"
+            >
+
+            <button
+                type="button"
+                class="password-toggle"
+                id="showPasswordButton"
+            >
+                👁️
+            </button>
+
+        </div>
+
+
+        <!-- ПОВТОР ПАРОЛЯ -->
+
+        <div class="password-wrapper">
+
+            <input
+                id="repeatPassword"
+                type="password"
+                placeholder="Повтори пароль"
+                autocomplete="new-password"
+            >
+
+            <button
+                type="button"
+                class="password-toggle"
+                id="showRepeatPasswordButton"
+            >
+                👁️
+            </button>
+
+        </div>
+
+
+        <!-- КНОПКА -->
+
+        <button
+            id="registerAccountButton"
+            type="button"
+        >
+            Создать аккаунт
+        </button>
+
+
+        <p id="registerMessage"></p>
+
+
+        <p class="register-text">
+
+            Уже есть аккаунт?
+
+            <button
+                id="backToLogin"
+                type="button"
+            >
+                Войти
+            </button>
+
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =================================
+   SUPABASE
+================================= */
+
+const SUPABASE_URL =
+    "https://tnzdjjtubeulxrvfrmfr.supabase.co";
+
+const SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRuemRqanR1YmV1bHhydmZybWZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODM5MTAsImV4cCI6MjEwNDI1OTkxMH0.o_SkrX4U1xUJ_aequb1PFSPEgsffxrvhOrrcjEHBWfI";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =================================
+   ЭЛЕМЕНТЫ
+================================= */
+
+const nameInput =
+    document.getElementById("newName");
+
+const usernameInput =
+    document.getElementById("newUsername");
+
+const emailInput =
+    document.getElementById("newEmail");
+
+const passwordInput =
+    document.getElementById("newPassword");
+
+const repeatPasswordInput =
+    document.getElementById("repeatPassword");
+
+const registerButton =
+    document.getElementById(
+        "registerAccountButton"
+    );
+
+const message =
+    document.getElementById(
+        "registerMessage"
+    );
+
+
+/* =================================
+   ПОКАЗ ПАРОЛЯ
+================================= */
+
+document
+    .getElementById("showPasswordButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            if (
+                passwordInput.type === "password"
+            ) {
+
+                passwordInput.type = "text";
+                this.textContent = "🙈";
+
+            } else {
+
+                passwordInput.type = "password";
+                this.textContent = "👁️";
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("showRepeatPasswordButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            if (
+                repeatPasswordInput.type === "password"
+            ) {
+
+                repeatPasswordInput.type = "text";
+                this.textContent = "🙈";
+
+            } else {
+
+                repeatPasswordInput.type = "password";
+                this.textContent = "👁️";
+
+            }
+
+        }
+    );
+
+
+/* =================================
+   РЕГИСТРАЦИЯ
+================================= */
+
+registerButton.addEventListener(
+    "click",
+    async function () {
+
+        const name =
+            nameInput.value.trim();
+
+        const username =
+            usernameInput.value.trim();
+
+        const email =
+            emailInput.value.trim();
+
+        const password =
+            passwordInput.value;
+
+        const repeatPassword =
+            repeatPasswordInput.value;
+
+
+        message.textContent = "";
+        message.style.color = "";
+
+
+        /* ИМЯ */
+
+        if (name.length < 2) {
+
+            message.textContent =
+                "Введите имя.";
+
+            return;
+
+        }
+
+
+        /* USERNAME */
+
+        if (username.length < 3) {
+
+            message.textContent =
+                "Username должен содержать минимум 3 символа.";
+
+            return;
+
+        }
+
+
+        if (
+            !/^[а-яА-ЯёЁa-zA-Z0-9_]+$/.test(
+                username
+            )
+        ) {
+
+            message.textContent =
+                "Username может содержать буквы, цифры и _.";
+
+            return;
+
+        }
+
+
+        /* EMAIL */
+
+        if (email === "") {
+
+            message.textContent =
+                "Введите email.";
+
+            return;
+
+        }
+
+
+        /* ПАРОЛЬ */
+
+        if (password.length < 6) {
+
+            message.textContent =
+                "Пароль должен содержать минимум 6 символов.";
+
+            return;
+
+        }
+
+
+        /* ПОВТОР */
+
+        if (
+            password !== repeatPassword
+        ) {
+
+            message.textContent =
+                "Пароли не совпадают.";
+
+            return;
+
+        }
+
+
+        registerButton.disabled = true;
+
+        registerButton.textContent =
+            "Создание аккаунта...";
+
+
+        /* =================================
+           ПРОВЕРЯЕМ USERNAME
+        ================================= */
+
+        const {
+            data: existingProfile,
+            error: usernameError
+        } =
+            await supabaseClient
+                .from("profiles")
+                .select("id")
+                .eq("username", username)
+                .maybeSingle();
+
+
+        if (usernameError) {
+
+            console.error(
+                usernameError
+            );
+
+            message.textContent =
+                "Ошибка проверки username: " +
+                usernameError.message;
+
+            registerButton.disabled = false;
+
+            registerButton.textContent =
+                "Создать аккаунт";
+
+            return;
+
+        }
+
+
+        if (existingProfile) {
+
+            message.textContent =
+                "Этот username уже занят.";
+
+            registerButton.disabled = false;
+
+            registerButton.textContent =
+                "Создать аккаунт";
+
+            return;
+
+        }
+
+
+        /* =================================
+           SUPABASE AUTH
+        ================================= */
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth.signUp({
+
+                email: email,
+
+                password: password
+
+            });
+
+
+        if (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "Ошибка регистрации: " +
+                error.message;
+
+            registerButton.disabled = false;
+
+            registerButton.textContent =
+                "Создать аккаунт";
+
+            return;
+
+        }
+
+
+        if (!data.user) {
+
+            message.textContent =
+                "Не удалось создать аккаунт.";
+
+            registerButton.disabled = false;
+
+            registerButton.textContent =
+                "Создать аккаунт";
+
+            return;
+
+        }
+
+
+        /* =================================
+           ПРОФИЛЬ
+        ================================= */
+
+        const {
+            error: profileError
+        } =
+            await supabaseClient
+                .from("profiles")
+                .insert({
+
+                    id: data.user.id,
+
+                    username: username,
+
+                    name: name
+
+                });
+
+
+        if (profileError) {
+
+            console.error(
+                profileError
+            );
+
+            message.textContent =
+                "Аккаунт создан, но профиль не сохранился: " +
+                profileError.message;
+
+            registerButton.disabled = false;
+
+            registerButton.textContent =
+                "Создать аккаунт";
+
+            return;
+
+        }
+
+
+        /* =================================
+           УСПЕХ
+        ================================= */
+
+        message.style.color =
+            "#3c8cff";
+
+        message.textContent =
+            "Аккаунт успешно создан! 🎉";
+
+
+        localStorage.setItem(
+            "kleivy_logged_in",
+            "true"
+        );
+
+
+        setTimeout(
+            function () {
+
+                window.location.href =
+                    "index.html";
+
+            },
+            1000
+        );
+
+    }
+);
+
+
+/* =================================
+   НАЗАД
+================================= */
+
+document
+    .getElementById("backToLogin")
+    .addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
