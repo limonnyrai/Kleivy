@@ -21,7 +21,11 @@ html,body{
     width:100%;
     height:100%;
 }
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/Kleivy/sw.js');
+}
+</script>
 body{
     font-family:Arial,sans-serif;
     background:#080b12;
