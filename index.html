@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <title>Клейви Чат</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -27,7 +29,8 @@
         }
 
         button,
-        input {
+        input,
+        textarea {
             font-family: inherit;
         }
 
@@ -37,9 +40,9 @@
 
         .app {
             display: flex;
+            width: 100%;
             height: 100vh;
             height: 100dvh;
-            width: 100%;
         }
 
         /* =========================================
@@ -61,6 +64,28 @@
             font-size: 25px;
             font-weight: bold;
             color: #168cff;
+        }
+
+        .sidebar-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 15px;
+        }
+
+        .plus-button {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 12px;
+            background: #168cff;
+            color: white;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .plus-button:active {
+            transform: scale(.95);
         }
 
         .search-box {
@@ -107,7 +132,8 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .contact-item {
+        .contact-item,
+        .channel-item {
             padding: 13px 16px;
             display: flex;
             align-items: center;
@@ -116,13 +142,15 @@
             border-bottom: 1px solid #141c2a;
         }
 
-        .contact-item:hover {
+        .contact-item:hover,
+        .channel-item:hover {
             background: #151d2c;
         }
 
         .avatar {
             width: 48px;
             height: 48px;
+            min-width: 48px;
             border-radius: 50%;
             background: #167cff;
             display: flex;
@@ -160,6 +188,12 @@
             white-space: nowrap;
         }
 
+        .channel-badge {
+            color: #168cff;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
         .empty {
             color: #718099;
             text-align: center;
@@ -179,10 +213,6 @@
             height: 100vh;
             height: 100dvh;
         }
-
-        /* =========================================
-           DESKTOP CHAT
-        ========================================= */
 
         .chat-header {
             height: 70px;
@@ -248,7 +278,7 @@
 
         .message-time {
             font-size: 10px;
-            opacity: 0.6;
+            opacity: .6;
             margin-top: 4px;
             text-align: right;
         }
@@ -284,10 +314,6 @@
             cursor: pointer;
         }
 
-        .send-button:active {
-            transform: scale(.96);
-        }
-
         /* =========================================
            SEARCH
         ========================================= */
@@ -296,7 +322,6 @@
             display: none;
             flex: 1;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .search-card {
@@ -337,7 +362,6 @@
             flex: 1;
             overflow-y: auto;
             padding: 40px;
-            -webkit-overflow-scrolling: touch;
         }
 
         .profile-box {
@@ -397,7 +421,194 @@
         }
 
         /* =========================================
-           MOBILE TOP BAR
+           CREATE CHANNEL MODAL
+        ========================================= */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.72);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 15px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #101725;
+            border: 1px solid #26344c;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.5);
+        }
+
+        .modal-title {
+            font-size: 23px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .modal-label {
+            display: block;
+            color: #9ba8bd;
+            font-size: 13px;
+            margin-bottom: 7px;
+            margin-top: 15px;
+        }
+
+        .modal-input,
+        .modal-textarea {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1px solid #26344c;
+            background: #151e2e;
+            color: white;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .modal-textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .channel-photo-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .channel-photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #168cff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            font-weight: bold;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .channel-photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-type {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .type-option {
+            flex: 1;
+            padding: 13px;
+            border: 1px solid #26344c;
+            border-radius: 12px;
+            background: #151e2e;
+            color: #9ba8bd;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .type-option.selected {
+            border-color: #168cff;
+            background: #102d4b;
+            color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .modal-cancel,
+        .modal-create {
+            flex: 1;
+            padding: 13px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-cancel {
+            background: #202b3e;
+            color: white;
+        }
+
+        .modal-create {
+            background: #168cff;
+            color: white;
+        }
+
+        .channel-info {
+            text-align: center;
+        }
+
+        .channel-info-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: #168cff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .channel-info-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-info-name {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .channel-info-description {
+            margin-top: 10px;
+            color: #9ba8bd;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .channel-info-link {
+            margin-top: 18px;
+            padding: 13px;
+            background: #151e2e;
+            border-radius: 12px;
+            color: #168cff;
+            word-break: break-all;
+        }
+
+        .channel-info-type {
+            margin-top: 10px;
+            color: #718099;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           MOBILE
         ========================================= */
 
         .mobile-topbar {
@@ -415,7 +626,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            padding: 0;
         }
 
         .mobile-title {
@@ -433,41 +643,29 @@
             display: none;
         }
 
-        /* =========================================
-           MOBILE
-        ========================================= */
-
         @media (max-width: 700px) {
 
             body {
-                width: 100%;
                 height: 100dvh;
                 overflow: hidden;
             }
 
             .app {
-                width: 100%;
                 height: 100dvh;
                 position: relative;
                 overflow: hidden;
             }
 
-            /* БОКОВОЕ МЕНЮ */
-
             .sidebar {
                 position: fixed;
                 left: 0;
                 top: 0;
-
                 width: 85%;
                 max-width: 330px;
                 height: 100dvh;
-
                 transform: translateX(-105%);
                 transition: transform .25s ease;
-
                 box-shadow: 10px 0 35px rgba(0,0,0,.5);
-
                 z-index: 1000;
             }
 
@@ -488,21 +686,14 @@
                 font-size: 13px;
             }
 
-            /* ЗАТЕМНЕНИЕ */
-
             .mobile-overlay {
                 display: block;
-
                 position: fixed;
                 inset: 0;
-
                 background: rgba(0,0,0,.65);
-
                 opacity: 0;
                 pointer-events: none;
-
                 transition: opacity .25s ease;
-
                 z-index: 900;
             }
 
@@ -511,37 +702,25 @@
                 pointer-events: auto;
             }
 
-            /* MAIN */
-
             .main {
                 width: 100%;
                 height: 100dvh;
-                min-width: 0;
             }
-
-            /* ВЕРХНЯЯ ПАНЕЛЬ */
 
             .mobile-topbar {
                 display: flex;
-
                 width: 100%;
                 height: 62px;
                 min-height: 62px;
-
                 align-items: center;
-
                 padding: 0 10px;
-
                 background: #0d111b;
                 border-bottom: 1px solid #1b2638;
             }
 
-            /* ЧАТ */
-
             #chatWindow {
                 width: 100%;
                 height: calc(100dvh - 62px) !important;
-                min-height: 0;
             }
 
             .chat-header {
@@ -553,20 +732,15 @@
 
             .mobile-back-button {
                 display: flex;
-
                 width: 40px;
                 min-width: 40px;
                 height: 42px;
-
                 align-items: center;
                 justify-content: center;
-
                 border: none;
                 background: transparent;
-
                 color: white;
                 font-size: 29px;
-
                 cursor: pointer;
             }
 
@@ -575,74 +749,37 @@
                 height: 43px;
             }
 
-            .chat-header-name {
-                font-size: 15px;
-            }
-
-            .chat-header-username {
-                font-size: 12px;
-            }
-
             .messages {
                 padding: 12px 9px;
-                gap: 6px;
             }
 
             .message {
                 max-width: 84%;
-                padding: 9px 12px;
                 font-size: 15px;
             }
 
             .message-input-area {
                 padding: 8px;
                 padding-bottom: max(8px, env(safe-area-inset-bottom));
-
                 min-height: 64px;
             }
 
             .message-input-area input {
-                min-width: 0;
-                padding: 12px;
                 font-size: 16px;
-                border-radius: 14px;
             }
-
-            .send-button {
-                width: 46px;
-                min-width: 46px;
-                height: 46px;
-            }
-
-            /* WELCOME */
 
             .welcome {
                 height: calc(100dvh - 62px);
                 flex: none;
             }
 
-            .welcome h2 {
-                font-size: 22px;
-            }
-
-            /* СПИСОК */
-
             .chat-list {
                 height: calc(100dvh - 62px);
             }
 
-            .contact-item {
-                min-height: 70px;
-                padding: 11px 14px;
-            }
-
-            /* ПОИСК */
-
             .search-results {
                 height: calc(100dvh - 62px);
             }
-
-            /* ПРОФИЛЬ */
 
             .profile-page {
                 height: calc(100dvh - 62px);
@@ -654,21 +791,19 @@
                 padding: 25px 18px;
             }
 
-            .profile-name {
-                font-size: 22px;
+            .modal {
+                align-items: flex-end;
+                padding: 0;
             }
 
-            /* ПОИСКОВАЯ КАРТОЧКА */
-
-            .search-card {
-                padding: 12px;
-            }
-
-            .add-button {
-                padding: 9px 10px;
-                font-size: 13px;
+            .modal-box {
+                max-width: none;
+                max-height: 94dvh;
+                border-radius: 22px 22px 0 0;
+                padding: 22px 18px;
             }
         }
+
     </style>
 </head>
 
@@ -676,42 +811,63 @@
 
 <div class="app">
 
-    <!-- =========================================
-         SIDEBAR
-    ========================================== -->
+    <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
-        <div class="logo">
-            Клейви Чат
+        <div class="sidebar-top">
+
+            <div class="logo">
+                Клейви Чат
+            </div>
+
+            <button
+                id="plusButton"
+                class="plus-button"
+            >
+                +
+            </button>
+
         </div>
 
         <div class="search-box">
+
             <input
                 id="searchInput"
                 type="text"
-                placeholder="Поиск пользователей..."
+                placeholder="Поиск пользователей и каналов..."
                 autocomplete="off"
             >
+
         </div>
 
         <div class="menu">
 
-            <button id="chatsButton" class="active">
+            <button
+                id="chatsButton"
+                class="active"
+            >
                 💬 Чаты
             </button>
 
-            <button id="contactsButton">
+            <button
+                id="contactsButton"
+            >
                 👥 Контакты
             </button>
 
-            <button id="profileButton">
+            <button
+                id="profileButton"
+            >
                 👤 Профиль
             </button>
 
         </div>
 
-        <div id="chatList" class="chat-list">
+        <div
+            id="chatList"
+            class="chat-list"
+        >
 
             <div class="empty">
                 Пока нет чатов
@@ -719,14 +875,15 @@
 
         </div>
 
-        <div id="searchResults" class="search-results"></div>
+        <div
+            id="searchResults"
+            class="search-results"
+        ></div>
 
     </aside>
 
 
-    <!-- =========================================
-         MOBILE OVERLAY
-    ========================================== -->
+    <!-- MOBILE OVERLAY -->
 
     <div
         id="mobileOverlay"
@@ -734,13 +891,9 @@
     ></div>
 
 
-    <!-- =========================================
-         MAIN
-    ========================================== -->
+    <!-- MAIN -->
 
     <main class="main">
-
-        <!-- MOBILE TOP BAR -->
 
         <div class="mobile-topbar">
 
@@ -758,13 +911,11 @@
         </div>
 
 
-        <!-- =========================================
-             CHAT
-        ========================================== -->
+        <!-- CHAT -->
 
         <div
             id="chatWindow"
-            style="display:none; height:100%; flex-direction:column;"
+            style="display:none;height:100%;flex-direction:column;"
         >
 
             <div class="chat-header">
@@ -797,12 +948,10 @@
 
             </div>
 
-
             <div
                 id="messages"
                 class="messages"
             ></div>
-
 
             <div
                 id="messageInputArea"
@@ -828,9 +977,7 @@
         </div>
 
 
-        <!-- =========================================
-             WELCOME
-        ========================================== -->
+        <!-- WELCOME -->
 
         <div
             id="welcome"
@@ -844,7 +991,7 @@
                 </h2>
 
                 <p>
-                    Выберите контакт, чтобы начать общение
+                    Выберите контакт или канал
                 </p>
 
             </div>
@@ -852,9 +999,7 @@
         </div>
 
 
-        <!-- =========================================
-             PROFILE
-        ========================================== -->
+        <!-- PROFILE -->
 
         <div
             id="profilePage"
@@ -907,6 +1052,233 @@
 </div>
 
 
+<!-- =========================================
+     CREATE CHANNEL MODAL
+========================================= -->
+
+<div
+    id="createChannelModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            Создать канал
+        </div>
+
+        <input
+            id="channelPhotoInput"
+            type="file"
+            accept="image/*"
+            style="display:none"
+        >
+
+        <div class="channel-photo-area">
+
+            <div
+                id="channelPhotoPreview"
+                class="channel-photo-preview"
+            >
+                📷
+            </div>
+
+        </div>
+
+        <div
+            style="text-align:center;color:#718099;font-size:13px;"
+        >
+            Нажмите на фото, чтобы выбрать изображение
+        </div>
+
+        <label class="modal-label">
+            Название канала
+        </label>
+
+        <input
+            id="channelNameInput"
+            class="modal-input"
+            type="text"
+            maxlength="100"
+            placeholder="Например: Новости Клейви"
+        >
+
+        <label class="modal-label">
+            Описание
+        </label>
+
+        <textarea
+            id="channelDescriptionInput"
+            class="modal-textarea"
+            maxlength="500"
+            placeholder="О чём этот канал?"
+        ></textarea>
+
+        <label class="modal-label">
+            Тип канала
+        </label>
+
+        <div class="channel-type">
+
+            <div
+                id="privateType"
+                class="type-option selected"
+            >
+                🔒 Частный
+            </div>
+
+            <div
+                id="publicType"
+                class="type-option"
+            >
+                🌐 Публичный
+            </div>
+
+        </div>
+
+        <div
+            id="publicUsernameBlock"
+            style="display:none;"
+        >
+
+            <label class="modal-label">
+                Публичная ссылка
+            </label>
+
+            <input
+                id="channelUsernameInput"
+                class="modal-input"
+                type="text"
+                maxlength="40"
+                placeholder="например kleivy_news"
+            >
+
+            <div
+                style="color:#718099;font-size:12px;margin-top:6px;"
+            >
+                К этому каналу можно будет перейти по адресу:
+                сайт/username
+            </div>
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button
+                id="cancelChannelButton"
+                class="modal-cancel"
+            >
+                Отмена
+            </button>
+
+            <button
+                id="createChannelButton"
+                class="modal-create"
+            >
+                Создать
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     PLUS MENU
+========================================= -->
+
+<div
+    id="plusModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+            Создать
+        </div>
+
+        <button
+            id="newContactButton"
+            class="profile-button"
+            style="margin-top:0;"
+        >
+            👤 Новый контакт
+        </button>
+
+        <button
+            id="newChannelButton"
+            class="profile-button"
+        >
+            📢 Создать канал
+        </button>
+
+        <button
+            id="closePlusButton"
+            class="profile-button"
+        >
+            Отмена
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     CHANNEL INFO
+========================================= -->
+
+<div
+    id="channelInfoModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="channel-info">
+
+            <div
+                id="infoChannelAvatar"
+                class="channel-info-avatar"
+            ></div>
+
+            <div
+                id="infoChannelName"
+                class="channel-info-name"
+            ></div>
+
+            <div
+                id="infoChannelDescription"
+                class="channel-info-description"
+            ></div>
+
+            <div
+                id="infoChannelLink"
+                class="channel-info-link"
+            ></div>
+
+            <div
+                id="infoChannelType"
+                class="channel-info-type"
+            ></div>
+
+            <button
+                id="closeChannelInfoButton"
+                class="profile-button"
+            >
+                Закрыть
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
 
 /* =========================================
@@ -931,12 +1303,14 @@ const supabaseClient =
 ========================================= */
 
 let currentUser = null;
-
 let currentProfile = null;
-
 let currentContact = null;
+let currentChannel = null;
 
 let realtimeChannel = null;
+
+let selectedChannelType = "private";
+let selectedChannelFile = null;
 
 
 /* =========================================
@@ -951,23 +1325,18 @@ async function checkAuth() {
         }
     } = await supabaseClient.auth.getSession();
 
-
     if (!session) {
 
-        window.location.href =
-            "login.html";
+        window.location.href = "login.html";
 
         return;
     }
 
-
-    currentUser =
-        session.user;
-
+    currentUser = session.user;
 
     await loadProfile();
 
-    await loadContacts();
+    await loadChats();
 }
 
 
@@ -986,7 +1355,6 @@ async function loadProfile() {
         .eq("id", currentUser.id)
         .single();
 
-
     if (error) {
 
         console.error(error);
@@ -994,28 +1362,20 @@ async function loadProfile() {
         return;
     }
 
-
-    currentProfile =
-        data;
-
+    currentProfile = data;
 
     document.getElementById(
         "profileName"
-    ).textContent =
-        data.name;
-
+    ).textContent = data.name;
 
     document.getElementById(
         "profileUsername"
-    ).textContent =
-        "@" + data.username;
-
+    ).textContent = "@" + data.username;
 
     const avatar =
         document.getElementById(
             "profileAvatar"
         );
-
 
     if (data.avatar_url) {
 
@@ -1033,14 +1393,26 @@ async function loadProfile() {
 
 
 /* =========================================
-   CONTACTS
+   LOAD CHATS
 ========================================= */
 
-async function loadContacts() {
+async function loadChats() {
+
+    const list =
+        document.getElementById(
+            "chatList"
+        );
+
+    list.innerHTML = "";
+
+    let hasSomething = false;
+
+
+    /* CONTACTS */
 
     const {
         data: contacts,
-        error
+        error: contactsError
     } = await supabaseClient
         .from("contacts")
         .select("contact_id")
@@ -1049,62 +1421,77 @@ async function loadContacts() {
             currentUser.id
         );
 
+    if (!contactsError && contacts) {
 
-    if (error) {
+        for (
+            const contact of contacts
+        ) {
 
-        console.error(error);
+            const {
+                data: profile
+            } = await supabaseClient
+                .from("profiles")
+                .select("*")
+                .eq(
+                    "id",
+                    contact.contact_id
+                )
+                .single();
 
-        return;
+            if (!profile) {
+                continue;
+            }
+
+            createContactElement(profile);
+
+            hasSomething = true;
+        }
     }
 
 
-    const list =
-        document.getElementById(
-            "chatList"
+    /* CHANNELS */
+
+    const {
+        data: channels,
+        error: channelsError
+    } = await supabaseClient
+        .from("channels")
+        .select("*")
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
         );
 
+    if (!channelsError && channels) {
 
-    list.innerHTML = "";
+        for (
+            const channel of channels
+        ) {
+
+            const canShow =
+                channel.type === "public"
+                ||
+                channel.owner_id === currentUser.id;
+
+            if (!canShow) {
+                continue;
+            }
+
+            createChannelElement(channel);
+
+            hasSomething = true;
+        }
+    }
 
 
-    if (
-        !contacts ||
-        contacts.length === 0
-    ) {
+    if (!hasSomething) {
 
         list.innerHTML =
             `<div class="empty">
-                У вас пока нет контактов
+                Пока нет чатов
             </div>`;
-
-        return;
-    }
-
-
-    for (
-        const contact of contacts
-    ) {
-
-        const {
-            data: profile
-        } = await supabaseClient
-            .from("profiles")
-            .select("*")
-            .eq(
-                "id",
-                contact.contact_id
-            )
-            .single();
-
-
-        if (!profile) {
-            continue;
-        }
-
-
-        createContactElement(
-            profile
-        );
     }
 }
 
@@ -1113,35 +1500,24 @@ async function loadContacts() {
    CONTACT ELEMENT
 ========================================= */
 
-function createContactElement(
-    profile
-) {
+function createContactElement(profile) {
 
     const list =
         document.getElementById(
             "chatList"
         );
 
-
     const item =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     item.className =
         "contact-item";
 
-
     const avatar =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     avatar.className =
         "avatar";
-
 
     if (profile.avatar_url) {
 
@@ -1156,16 +1532,11 @@ function createContactElement(
                 .toUpperCase();
     }
 
-
     const info =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     info.className =
         "contact-info";
-
 
     info.innerHTML = `
         <div class="contact-name">
@@ -1177,11 +1548,8 @@ function createContactElement(
         </div>
     `;
 
-
     item.appendChild(avatar);
-
     item.appendChild(info);
-
 
     item.onclick = () => {
 
@@ -1189,6 +1557,86 @@ function createContactElement(
 
     };
 
+    list.appendChild(item);
+}
+
+
+/* =========================================
+   CHANNEL ELEMENT
+========================================= */
+
+function createChannelElement(channel) {
+
+    const list =
+        document.getElementById(
+            "chatList"
+        );
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "channel-item";
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "avatar";
+
+    if (channel.avatar_url) {
+
+        avatar.innerHTML =
+            `<img src="${escapeHtml(channel.avatar_url)}">`;
+
+    } else {
+
+        avatar.textContent =
+            channel.name
+                .charAt(0)
+                .toUpperCase();
+    }
+
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "contact-info";
+
+    const usernameText =
+        channel.username
+            ? "@" + channel.username
+            : "🔒 Частный канал";
+
+    info.innerHTML = `
+        <div class="contact-name">
+            ${escapeHtml(channel.name)}
+            <span class="channel-badge">
+                📢
+            </span>
+        </div>
+
+        <div class="contact-username">
+            ${escapeHtml(usernameText)}
+        </div>
+    `;
+
+    item.appendChild(avatar);
+    item.appendChild(info);
+
+    item.onclick = () => {
+
+        openChannel(channel);
+
+    };
+
+    item.oncontextmenu = event => {
+
+        event.preventDefault();
+
+        openChannelInfo(channel);
+
+    };
 
     list.appendChild(item);
 }
@@ -1203,7 +1651,6 @@ const searchInput =
         "searchInput"
     );
 
-
 searchInput.addEventListener(
     "input",
     async function () {
@@ -1211,20 +1658,18 @@ searchInput.addEventListener(
         const query =
             this.value
                 .trim()
-                .replace(/^@/, "");
-
+                .replace(/^@/, "")
+                .toLowerCase();
 
         const results =
             document.getElementById(
                 "searchResults"
             );
 
-
         const chatList =
             document.getElementById(
                 "chatList"
             );
-
 
         if (!query) {
 
@@ -1237,13 +1682,11 @@ searchInput.addEventListener(
             return;
         }
 
-
         chatList.style.display =
             "none";
 
         results.style.display =
             "block";
-
 
         results.innerHTML =
             `<div class="empty">
@@ -1251,9 +1694,13 @@ searchInput.addEventListener(
             </div>`;
 
 
+        let html = "";
+
+        /* USERS */
+
         const {
-            data,
-            error
+            data: users,
+            error: usersError
         } = await supabaseClient
             .from("profiles")
             .select(
@@ -1269,44 +1716,256 @@ searchInput.addEventListener(
             )
             .limit(10);
 
+        if (!usersError && users) {
 
-        if (error) {
+            for (
+                const profile of users
+            ) {
 
-            console.error(error);
+                const card =
+                    document.createElement(
+                        "div"
+                    );
 
-            results.innerHTML =
-                `<div class="empty">
-                    Ошибка поиска
-                </div>`;
+                card.className =
+                    "search-card";
 
-            return;
+                const avatar =
+                    document.createElement(
+                        "div"
+                    );
+
+                avatar.className =
+                    "avatar";
+
+                if (profile.avatar_url) {
+
+                    avatar.innerHTML =
+                        `<img src="${escapeHtml(profile.avatar_url)}">`;
+
+                } else {
+
+                    avatar.textContent =
+                        profile.name
+                            .charAt(0)
+                            .toUpperCase();
+                }
+
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+                info.className =
+                    "search-card-info";
+
+                info.innerHTML = `
+                    <div class="contact-name">
+                        ${escapeHtml(profile.name)}
+                    </div>
+
+                    <div class="contact-username">
+                        @${escapeHtml(profile.username)}
+                    </div>
+                `;
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.className =
+                    "add-button";
+
+                button.textContent =
+                    "Добавить";
+
+                const {
+                    data: existing
+                } = await supabaseClient
+                    .from("contacts")
+                    .select("id")
+                    .eq(
+                        "user_id",
+                        currentUser.id
+                    )
+                    .eq(
+                        "contact_id",
+                        profile.id
+                    )
+                    .maybeSingle();
+
+                if (existing) {
+
+                    button.textContent =
+                        "Добавлен";
+
+                    button.classList.add(
+                        "added"
+                    );
+
+                    button.disabled =
+                        true;
+                }
+
+                button.onclick =
+                    async event => {
+
+                        event.stopPropagation();
+
+                        const {
+                            error
+                        } = await supabaseClient
+                            .from("contacts")
+                            .insert({
+                                user_id:
+                                    currentUser.id,
+
+                                contact_id:
+                                    profile.id
+                            });
+
+                        if (error) {
+
+                            alert(
+                                "Не удалось добавить контакт"
+                            );
+
+                            return;
+                        }
+
+                        button.textContent =
+                            "Добавлен";
+
+                        button.classList.add(
+                            "added"
+                        );
+
+                        button.disabled =
+                            true;
+
+                        await loadChats();
+                    };
+
+                card.appendChild(avatar);
+                card.appendChild(info);
+                card.appendChild(button);
+
+                results.appendChild(card);
+            }
         }
 
 
-        results.innerHTML = "";
+        /* CHANNELS */
+
+        const {
+            data: channels,
+            error: channelsError
+        } = await supabaseClient
+            .from("channels")
+            .select("*")
+            .eq(
+                "type",
+                "public"
+            )
+            .or(
+                `username.ilike.${query}%,name.ilike.%${query}%`
+            )
+            .limit(10);
+
+        if (!channelsError && channels) {
+
+            for (
+                const channel of channels
+            ) {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+                card.className =
+                    "search-card";
+
+                const avatar =
+                    document.createElement(
+                        "div"
+                    );
+
+                avatar.className =
+                    "avatar";
+
+                if (channel.avatar_url) {
+
+                    avatar.innerHTML =
+                        `<img src="${escapeHtml(channel.avatar_url)}">`;
+
+                } else {
+
+                    avatar.textContent =
+                        channel.name
+                            .charAt(0)
+                            .toUpperCase();
+                }
+
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+                info.className =
+                    "search-card-info";
+
+                info.innerHTML = `
+                    <div class="contact-name">
+                        ${escapeHtml(channel.name)}
+                        <span class="channel-badge">
+                            📢
+                        </span>
+                    </div>
+
+                    <div class="contact-username">
+                        @${escapeHtml(channel.username || "")}
+                    </div>
+                `;
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.className =
+                    "add-button";
+
+                button.textContent =
+                    "Открыть";
+
+                button.onclick =
+                    () => {
+
+                        openChannel(channel);
+
+                    };
+
+                card.appendChild(avatar);
+                card.appendChild(info);
+                card.appendChild(button);
+
+                results.appendChild(card);
+            }
+        }
 
 
         if (
-            !data ||
-            data.length === 0
+            (!users || users.length === 0)
+            &&
+            (!channels || channels.length === 0)
         ) {
 
             results.innerHTML =
                 `<div class="empty">
-                    Пользователь не найден
+                    Ничего не найдено
                 </div>`;
-
-            return;
-        }
-
-
-        for (
-            const profile of data
-        ) {
-
-            await createSearchCard(
-                profile
-            );
         }
 
     }
@@ -1314,224 +1973,92 @@ searchInput.addEventListener(
 
 
 /* =========================================
-   SEARCH CARD
+   OPEN CHAT
 ========================================= */
 
-async function createSearchCard(
-    profile
-) {
+async function openChat(profile) {
 
-    const results =
+    currentContact = profile;
+    currentChannel = null;
+
+    stopRealtime();
+
+    document.getElementById(
+        "welcome"
+    ).style.display = "none";
+
+    document.getElementById(
+        "profilePage"
+    ).style.display = "none";
+
+    document.getElementById(
+        "chatWindow"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "messageInputArea"
+    ).style.display = "flex";
+
+    if (window.innerWidth <= 700) {
+
+        closeMobileMenu();
+
         document.getElementById(
-            "searchResults"
-        );
-
-
-    const card =
-        document.createElement(
-            "div"
-        );
-
-
-    card.className =
-        "search-card";
-
-
-    const avatar =
-        document.createElement(
-            "div"
-        );
-
-
-    avatar.className =
-        "avatar";
-
-
-    if (profile.avatar_url) {
-
-        avatar.innerHTML =
-            `<img src="${escapeHtml(profile.avatar_url)}">`;
-
-    } else {
-
-        avatar.textContent =
-            profile.name
-                .charAt(0)
-                .toUpperCase();
+            "mobileBackButton"
+        ).style.display = "flex";
     }
 
+    setAvatar(
+        document.getElementById("chatAvatar"),
+        profile
+    );
 
-    const info =
-        document.createElement(
-            "div"
-        );
+    document.getElementById(
+        "chatName"
+    ).textContent =
+        profile.name;
 
+    document.getElementById(
+        "chatUsername"
+    ).textContent =
+        "@" + profile.username;
 
-    info.className =
-        "search-card-info";
+    await loadMessages();
 
-
-    info.innerHTML = `
-        <div class="contact-name">
-            ${escapeHtml(profile.name)}
-        </div>
-
-        <div class="contact-username">
-            @${escapeHtml(profile.username)}
-        </div>
-    `;
-
-
-    const button =
-        document.createElement(
-            "button"
-        );
-
-
-    button.className =
-        "add-button";
-
-
-    button.textContent =
-        "Добавить";
-
-
-    const {
-        data: existing
-    } = await supabaseClient
-        .from("contacts")
-        .select("id")
-        .eq(
-            "user_id",
-            currentUser.id
-        )
-        .eq(
-            "contact_id",
-            profile.id
-        )
-        .maybeSingle();
-
-
-    if (existing) {
-
-        button.textContent =
-            "Добавлен";
-
-        button.classList.add(
-            "added"
-        );
-
-        button.disabled =
-            true;
-    }
-
-
-    button.onclick =
-        async () => {
-
-            button.disabled =
-                true;
-
-
-            const {
-                error
-            } = await supabaseClient
-                .from("contacts")
-                .insert({
-                    user_id:
-                        currentUser.id,
-
-                    contact_id:
-                        profile.id
-                });
-
-
-            if (error) {
-
-                console.error(error);
-
-                alert(
-                    "Не удалось добавить контакт"
-                );
-
-                button.disabled =
-                    false;
-
-                return;
-            }
-
-
-            button.textContent =
-                "Добавлен";
-
-
-            button.classList.add(
-                "added"
-            );
-
-
-            await loadContacts();
-        };
-
-
-    card.appendChild(avatar);
-
-    card.appendChild(info);
-
-    card.appendChild(button);
-
-
-    results.appendChild(card);
+    subscribeToMessages();
 }
 
 
 /* =========================================
-   OPEN CHAT
+   OPEN CHANNEL
 ========================================= */
 
-async function openChat(
-    profile
-) {
+async function openChannel(channel) {
 
-    currentContact =
-        profile;
+    currentChannel = channel;
+    currentContact = null;
 
+    stopRealtime();
 
     document.getElementById(
         "welcome"
-    ).style.display =
-        "none";
-
+    ).style.display = "none";
 
     document.getElementById(
         "profilePage"
-    ).style.display =
-        "none";
-
+    ).style.display = "none";
 
     document.getElementById(
         "chatWindow"
-    ).style.display =
-        "flex";
+    ).style.display = "flex";
 
-
-    document.getElementById(
-        "messageInputArea"
-    ).style.display =
-        "flex";
-
-
-    if (
-        window.innerWidth <= 700
-    ) {
+    if (window.innerWidth <= 700) {
 
         closeMobileMenu();
 
-
         document.getElementById(
             "mobileBackButton"
-        ).style.display =
-            "flex";
+        ).style.display = "flex";
     }
 
 
@@ -1540,42 +2067,105 @@ async function openChat(
             "chatAvatar"
         );
 
-
-    if (profile.avatar_url) {
-
-        avatar.innerHTML =
-            `<img src="${escapeHtml(profile.avatar_url)}">`;
-
-    } else {
-
-        avatar.textContent =
-            profile.name
-                .charAt(0)
-                .toUpperCase();
-    }
-
+    setChannelAvatar(
+        avatar,
+        channel
+    );
 
     document.getElementById(
         "chatName"
     ).textContent =
-        profile.name;
-
+        channel.name;
 
     document.getElementById(
         "chatUsername"
     ).textContent =
-        "@" + profile.username;
+        channel.username
+            ? "@" + channel.username
+            : "🔒 Частный канал";
 
 
-    await loadMessages();
+    const canWrite =
+        await canWriteToChannel(
+            channel
+        );
 
 
-    subscribeToMessages();
+    if (canWrite) {
+
+        document.getElementById(
+            "messageInputArea"
+        ).style.display =
+            "flex";
+
+        document.getElementById(
+            "messageInput"
+        ).placeholder =
+            "Написать в канал...";
+
+    } else {
+
+        document.getElementById(
+            "messageInputArea"
+        ).style.display =
+            "none";
+    }
+
+
+    await loadChannelMessages();
+
+    subscribeToChannelMessages();
 }
 
 
 /* =========================================
-   LOAD MESSAGES
+   CHECK CHANNEL WRITE
+========================================= */
+
+async function canWriteToChannel(channel) {
+
+    if (
+        channel.owner_id ===
+        currentUser.id
+    ) {
+
+        return true;
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("channel_members")
+        .select("role")
+        .eq(
+            "channel_id",
+            channel.id
+        )
+        .eq(
+            "user_id",
+            currentUser.id
+        )
+        .maybeSingle();
+
+
+    if (error || !data) {
+
+        return false;
+    }
+
+
+    return (
+        data.role === "admin"
+        ||
+        data.role === "owner"
+    );
+}
+
+
+/* =========================================
+   LOAD PERSONAL MESSAGES
 ========================================= */
 
 async function loadMessages() {
@@ -1585,10 +2175,7 @@ async function loadMessages() {
             "messages"
         );
 
-
-    messages.innerHTML =
-        "";
-
+    messages.innerHTML = "";
 
     const {
         data,
@@ -1606,6 +2193,54 @@ async function loadMessages() {
             }
         );
 
+    if (error) {
+
+        console.error(error);
+
+        return;
+    }
+
+    for (
+        const message of data
+    ) {
+
+        displayMessage(message);
+    }
+
+    messages.scrollTop =
+        messages.scrollHeight;
+}
+
+
+/* =========================================
+   LOAD CHANNEL MESSAGES
+========================================= */
+
+async function loadChannelMessages() {
+
+    const messages =
+        document.getElementById(
+            "messages"
+        );
+
+    messages.innerHTML = "";
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("channel_messages")
+        .select("*")
+        .eq(
+            "channel_id",
+            currentChannel.id
+        )
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
 
     if (error) {
 
@@ -1614,16 +2249,12 @@ async function loadMessages() {
         return;
     }
 
-
     for (
         const message of data
     ) {
 
-        displayMessage(
-            message
-        );
+        displayChannelMessage(message);
     }
-
 
     messages.scrollTop =
         messages.scrollHeight;
@@ -1634,21 +2265,17 @@ async function loadMessages() {
    DISPLAY MESSAGE
 ========================================= */
 
-function displayMessage(
-    message
-) {
+function displayMessage(message) {
 
     const container =
         document.getElementById(
             "messages"
         );
 
-
     const element =
         document.createElement(
             "div"
         );
-
 
     element.className =
         "message " +
@@ -1659,6 +2286,8 @@ function displayMessage(
                 : "theirs"
         );
 
+    element.dataset.id =
+        String(message.id);
 
     const time =
         new Date(
@@ -1671,6 +2300,55 @@ function displayMessage(
             }
         );
 
+    element.innerHTML = `
+        <div>
+            ${escapeHtml(message.content)}
+        </div>
+
+        <div class="message-time">
+            ${time}
+        </div>
+    `;
+
+    container.appendChild(element);
+
+    container.scrollTop =
+        container.scrollHeight;
+}
+
+
+/* =========================================
+   DISPLAY CHANNEL MESSAGE
+========================================= */
+
+function displayChannelMessage(message) {
+
+    const container =
+        document.getElementById(
+            "messages"
+        );
+
+    const element =
+        document.createElement(
+            "div"
+        );
+
+    element.className =
+        "message mine";
+
+    element.dataset.id =
+        String(message.id);
+
+    const time =
+        new Date(
+            message.created_at
+        ).toLocaleTimeString(
+            "ru-RU",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
 
     element.innerHTML = `
         <div>
@@ -1682,11 +2360,7 @@ function displayMessage(
         </div>
     `;
 
-
-    container.appendChild(
-        element
-    );
-
+    container.appendChild(element);
 
     container.scrollTop =
         container.scrollHeight;
@@ -1702,7 +2376,6 @@ const messageInput =
         "messageInput"
     );
 
-
 const sendButton =
     document.getElementById(
         "sendButton"
@@ -1714,46 +2387,90 @@ async function sendMessage() {
     const text =
         messageInput.value.trim();
 
+    if (!text) {
+        return;
+    }
 
-    if (
-        !text ||
-        !currentContact
-    ) {
+
+    if (currentContact) {
+
+        messageInput.value = "";
+
+        const {
+            error
+        } = await supabaseClient
+            .from("messages")
+            .insert({
+                sender_id:
+                    currentUser.id,
+
+                receiver_id:
+                    currentContact.id,
+
+                content:
+                    text
+            });
+
+        if (error) {
+
+            console.error(error);
+
+            alert(
+                "Сообщение не отправилось"
+            );
+
+            messageInput.value =
+                text;
+        }
 
         return;
     }
 
 
-    messageInput.value =
-        "";
+    if (currentChannel) {
 
+        const canWrite =
+            await canWriteToChannel(
+                currentChannel
+            );
 
-    const {
-        error
-    } = await supabaseClient
-        .from("messages")
-        .insert({
-            sender_id:
-                currentUser.id,
+        if (!canWrite) {
 
-            receiver_id:
-                currentContact.id,
+            alert(
+                "Только владелец и администраторы могут писать в этот канал"
+            );
 
-            content:
-                text
-        });
+            return;
+        }
 
+        messageInput.value = "";
 
-    if (error) {
+        const {
+            error
+        } = await supabaseClient
+            .from("channel_messages")
+            .insert({
+                channel_id:
+                    currentChannel.id,
 
-        console.error(error);
+                sender_id:
+                    currentUser.id,
 
-        alert(
-            "Сообщение не отправилось"
-        );
+                content:
+                    text
+            });
 
-        messageInput.value =
-            text;
+        if (error) {
+
+            console.error(error);
+
+            alert(
+                "Сообщение не отправилось"
+            );
+
+            messageInput.value =
+                text;
+        }
     }
 }
 
@@ -1766,7 +2483,7 @@ sendButton.addEventListener(
 
 messageInput.addEventListener(
     "keydown",
-    function (event) {
+    event => {
 
         if (
             event.key ===
@@ -1783,18 +2500,12 @@ messageInput.addEventListener(
 
 
 /* =========================================
-   REALTIME
+   REALTIME PERSONAL
 ========================================= */
 
 function subscribeToMessages() {
 
-    if (realtimeChannel) {
-
-        supabaseClient.removeChannel(
-            realtimeChannel
-        );
-    }
-
+    stopRealtime();
 
     realtimeChannel =
         supabaseClient
@@ -1808,80 +2519,98 @@ function subscribeToMessages() {
                 "postgres_changes",
                 {
                     event: "INSERT",
-
                     schema: "public",
-
                     table: "messages"
                 },
-
                 payload => {
 
                     const message =
                         payload.new;
 
-
-                    if (
-                        !currentContact
-                    ) {
-
+                    if (!currentContact) {
                         return;
                     }
 
-
-                    const belongsToChat =
+                    const belongs =
                         (
-                            message.sender_id ===
-                            currentUser.id &&
-
-                            message.receiver_id ===
-                            currentContact.id
+                            message.sender_id === currentUser.id
+                            &&
+                            message.receiver_id === currentContact.id
                         )
                         ||
                         (
-                            message.sender_id ===
-                            currentContact.id &&
-
-                            message.receiver_id ===
-                            currentUser.id
+                            message.sender_id === currentContact.id
+                            &&
+                            message.receiver_id === currentUser.id
                         );
 
-
-                    if (
-                        !belongsToChat
-                    ) {
-
+                    if (!belongs) {
                         return;
                     }
 
-
-                    /*
-                       Не добавляем сообщение
-                       второй раз, если оно
-                       уже отображено.
-                    */
-
-                    const existingMessages =
-                        document.querySelectorAll(
-                            "#messages .message"
+                    const existing =
+                        document.querySelector(
+                            `#messages .message[data-id="${message.id}"]`
                         );
 
-
-                    for (
-                        const existing of
-                        existingMessages
-                    ) {
-
-                        if (
-                            existing.dataset.id ===
-                            String(message.id)
-                        ) {
-
-                            return;
-                        }
+                    if (existing) {
+                        return;
                     }
 
+                    displayMessage(message);
+                }
+            )
+            .subscribe();
+}
 
-                    displayMessage(
+
+/* =========================================
+   REALTIME CHANNEL
+========================================= */
+
+function subscribeToChannelMessages() {
+
+    stopRealtime();
+
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                "channel-" +
+                currentChannel.id
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "channel_messages"
+                },
+                payload => {
+
+                    const message =
+                        payload.new;
+
+                    if (!currentChannel) {
+                        return;
+                    }
+
+                    if (
+                        message.channel_id !==
+                        currentChannel.id
+                    ) {
+                        return;
+                    }
+
+                    const existing =
+                        document.querySelector(
+                            `#messages .message[data-id="${message.id}"]`
+                        );
+
+                    if (existing) {
+                        return;
+                    }
+
+                    displayChannelMessage(
                         message
                     );
                 }
@@ -1891,7 +2620,702 @@ function subscribeToMessages() {
 
 
 /* =========================================
-   NAVIGATION — CHATS
+   STOP REALTIME
+========================================= */
+
+function stopRealtime() {
+
+    if (realtimeChannel) {
+
+        supabaseClient.removeChannel(
+            realtimeChannel
+        );
+
+        realtimeChannel = null;
+    }
+}
+
+
+/* =========================================
+   PLUS MENU
+========================================= */
+
+document.getElementById(
+    "plusButton"
+).onclick = () => {
+
+    document.getElementById(
+        "plusModal"
+    ).classList.add("active");
+};
+
+
+document.getElementById(
+    "closePlusButton"
+).onclick = () => {
+
+    document.getElementById(
+        "plusModal"
+    ).classList.remove("active");
+};
+
+
+document.getElementById(
+    "newContactButton"
+).onclick = () => {
+
+    document.getElementById(
+        "plusModal"
+    ).classList.remove("active");
+
+    searchInput.focus();
+};
+
+
+/* =========================================
+   NEW CHANNEL
+========================================= */
+
+document.getElementById(
+    "newChannelButton"
+).onclick = () => {
+
+    document.getElementById(
+        "plusModal"
+    ).classList.remove("active");
+
+    openCreateChannel();
+};
+
+
+function openCreateChannel() {
+
+    selectedChannelType =
+        "private";
+
+    selectedChannelFile =
+        null;
+
+    document.getElementById(
+        "channelNameInput"
+    ).value = "";
+
+    document.getElementById(
+        "channelDescriptionInput"
+    ).value = "";
+
+    document.getElementById(
+        "channelUsernameInput"
+    ).value = "";
+
+    document.getElementById(
+        "publicUsernameBlock"
+    ).style.display = "none";
+
+    document.getElementById(
+        "privateType"
+    ).classList.add("selected");
+
+    document.getElementById(
+        "publicType"
+    ).classList.remove("selected");
+
+    document.getElementById(
+        "channelPhotoPreview"
+    ).innerHTML = "📷";
+
+    document.getElementById(
+        "createChannelModal"
+    ).classList.add("active");
+}
+
+
+/* =========================================
+   CHANNEL PHOTO
+========================================= */
+
+document.getElementById(
+    "channelPhotoPreview"
+).onclick = () => {
+
+    document.getElementById(
+        "channelPhotoInput"
+    ).click();
+};
+
+
+document.getElementById(
+    "channelPhotoInput"
+).addEventListener(
+    "change",
+    event => {
+
+        const file =
+            event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        selectedChannelFile =
+            file;
+
+        const reader =
+            new FileReader();
+
+        reader.onload = () => {
+
+            document.getElementById(
+                "channelPhotoPreview"
+            ).innerHTML =
+                `<img src="${reader.result}">`;
+        };
+
+        reader.readAsDataURL(file);
+    }
+);
+
+
+/* =========================================
+   CHANNEL TYPE
+========================================= */
+
+document.getElementById(
+    "privateType"
+).onclick = () => {
+
+    selectedChannelType =
+        "private";
+
+    document.getElementById(
+        "privateType"
+    ).classList.add("selected");
+
+    document.getElementById(
+        "publicType"
+    ).classList.remove("selected");
+
+    document.getElementById(
+        "publicUsernameBlock"
+    ).style.display = "none";
+};
+
+
+document.getElementById(
+    "publicType"
+).onclick = () => {
+
+    selectedChannelType =
+        "public";
+
+    document.getElementById(
+        "publicType"
+    ).classList.add("selected");
+
+    document.getElementById(
+        "privateType"
+    ).classList.remove("selected");
+
+    document.getElementById(
+        "publicUsernameBlock"
+    ).style.display = "block";
+};
+
+
+/* =========================================
+   CANCEL CREATE
+========================================= */
+
+document.getElementById(
+    "cancelChannelButton"
+).onclick = () => {
+
+    document.getElementById(
+        "createChannelModal"
+    ).classList.remove("active");
+};
+
+
+/* =========================================
+   CREATE CHANNEL
+========================================= */
+
+document.getElementById(
+    "createChannelButton"
+).onclick =
+    async () => {
+
+        const button =
+            document.getElementById(
+                "createChannelButton"
+            );
+
+        const name =
+            document.getElementById(
+                "channelNameInput"
+            ).value.trim();
+
+        const description =
+            document.getElementById(
+                "channelDescriptionInput"
+            ).value.trim();
+
+        let username =
+            document.getElementById(
+                "channelUsernameInput"
+            ).value
+                .trim()
+                .toLowerCase();
+
+
+        if (!name) {
+
+            alert(
+                "Введите название канала"
+            );
+
+            return;
+        }
+
+
+        if (name.length < 2) {
+
+            alert(
+                "Название слишком короткое"
+            );
+
+            return;
+        }
+
+
+        if (
+            selectedChannelType ===
+            "public"
+        ) {
+
+            if (!username) {
+
+                alert(
+                    "Введите ссылку публичного канала"
+                );
+
+                return;
+            }
+
+
+            if (
+                !/^[a-z0-9_]{3,40}$/.test(
+                    username
+                )
+            ) {
+
+                alert(
+                    "Username может содержать только английские буквы, цифры и _"
+                );
+
+                return;
+            }
+
+
+            const {
+                data: existingUsername
+            } = await supabaseClient
+                .from("channels")
+                .select("id")
+                .eq(
+                    "username",
+                    username
+                )
+                .maybeSingle();
+
+            if (existingUsername) {
+
+                alert(
+                    "Такая ссылка уже занята"
+                );
+
+                return;
+            }
+        }
+
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "Создание...";
+
+
+        try {
+
+            let avatarUrl = null;
+
+
+            /* UPLOAD PHOTO */
+
+            if (selectedChannelFile) {
+
+                const extension =
+                    selectedChannelFile.name
+                        .split(".")
+                        .pop()
+                        .toLowerCase();
+
+                const filePath =
+                    currentUser.id +
+                    "/" +
+                    crypto.randomUUID() +
+                    "." +
+                    extension;
+
+
+                const {
+                    error: uploadError
+                } = await supabaseClient
+                    .storage
+                    .from("channel-avatars")
+                    .upload(
+                        filePath,
+                        selectedChannelFile,
+                        {
+                            cacheControl:
+                                "3600",
+
+                            upsert:
+                                false
+                        }
+                    );
+
+
+                if (uploadError) {
+
+                    console.error(
+                        uploadError
+                    );
+
+                    throw new Error(
+                        "Не удалось загрузить фотографию"
+                    );
+                }
+
+
+                const {
+                    data: publicUrl
+                } = supabaseClient
+                    .storage
+                    .from("channel-avatars")
+                    .getPublicUrl(
+                        filePath
+                    );
+
+
+                avatarUrl =
+                    publicUrl.publicUrl;
+            }
+
+
+            /* PRIVATE INVITE CODE */
+
+            let inviteCode = null;
+
+            if (
+                selectedChannelType ===
+                "private"
+            ) {
+
+                inviteCode =
+                    generateInviteCode();
+            }
+
+
+            /* CREATE */
+
+            const {
+                data: channel,
+                error
+            } = await supabaseClient
+                .from("channels")
+                .insert({
+                    owner_id:
+                        currentUser.id,
+
+                    name:
+                        name,
+
+                    description:
+                        description || null,
+
+                    avatar_url:
+                        avatarUrl,
+
+                    type:
+                        selectedChannelType,
+
+                    username:
+                        selectedChannelType ===
+                        "public"
+                            ? username
+                            : null,
+
+                    invite_code:
+                        inviteCode
+                })
+                .select()
+                .single();
+
+
+            if (error) {
+
+                console.error(error);
+
+                throw new Error(
+                    error.message
+                );
+            }
+
+
+            /* ADD OWNER */
+
+            const {
+                error: memberError
+            } = await supabaseClient
+                .from("channel_members")
+                .insert({
+                    channel_id:
+                        channel.id,
+
+                    user_id:
+                        currentUser.id,
+
+                    role:
+                        "owner"
+                });
+
+
+            if (memberError) {
+
+                console.error(
+                    memberError
+                );
+
+                alert(
+                    "Канал создан, но не удалось добавить владельца"
+                );
+            }
+
+
+            document.getElementById(
+                "createChannelModal"
+            ).classList.remove(
+                "active"
+            );
+
+
+            await loadChats();
+
+
+            openChannel(
+                channel
+            );
+
+
+            if (
+                selectedChannelType ===
+                "private"
+            ) {
+
+                setTimeout(
+                    () => {
+
+                        alert(
+                            "Канал создан!\n\nПриватная ссылка:\n" +
+                            getChannelLink(channel)
+                        );
+
+                    },
+                    300
+                );
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Ошибка создания канала:\n" +
+                error.message
+            );
+
+        } finally {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "Создать";
+        }
+    };
+
+
+/* =========================================
+   CHANNEL INFO
+========================================= */
+
+function openChannelInfo(channel) {
+
+    const avatar =
+        document.getElementById(
+            "infoChannelAvatar"
+        );
+
+    setChannelAvatar(
+        avatar,
+        channel
+    );
+
+    document.getElementById(
+        "infoChannelName"
+    ).textContent =
+        channel.name;
+
+    document.getElementById(
+        "infoChannelDescription"
+    ).textContent =
+        channel.description ||
+        "Описание отсутствует";
+
+    document.getElementById(
+        "infoChannelLink"
+    ).textContent =
+        getChannelLink(channel);
+
+    document.getElementById(
+        "infoChannelType"
+    ).textContent =
+        channel.type === "public"
+            ? "🌐 Публичный канал"
+            : "🔒 Частный канал";
+
+    document.getElementById(
+        "channelInfoModal"
+    ).classList.add("active");
+}
+
+
+document.getElementById(
+    "closeChannelInfoButton"
+).onclick = () => {
+
+    document.getElementById(
+        "channelInfoModal"
+    ).classList.remove("active");
+};
+
+
+/* =========================================
+   CHANNEL LINK
+========================================= */
+
+function getChannelLink(channel) {
+
+    if (
+        channel.type ===
+        "public"
+    ) {
+
+        return (
+            window.location.origin +
+            "/" +
+            channel.username
+        );
+    }
+
+
+    return (
+        window.location.origin +
+        "/join/" +
+        channel.invite_code
+    );
+}
+
+
+/* =========================================
+   INVITE CODE
+========================================= */
+
+function generateInviteCode() {
+
+    const characters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    let result = "";
+
+    for (
+        let i = 0;
+        i < 32;
+        i++
+    ) {
+
+        result +=
+            characters.charAt(
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            );
+    }
+
+    return result;
+}
+
+
+/* =========================================
+   AVATARS
+========================================= */
+
+function setAvatar(
+    element,
+    profile
+) {
+
+    if (profile.avatar_url) {
+
+        element.innerHTML =
+            `<img src="${escapeHtml(profile.avatar_url)}">`;
+
+    } else {
+
+        element.textContent =
+            profile.name
+                .charAt(0)
+                .toUpperCase();
+    }
+}
+
+
+function setChannelAvatar(
+    element,
+    channel
+) {
+
+    if (channel.avatar_url) {
+
+        element.innerHTML =
+            `<img src="${escapeHtml(channel.avatar_url)}">`;
+
+    } else {
+
+        element.textContent =
+            channel.name
+                .charAt(0)
+                .toUpperCase();
+    }
+}
+
+
+/* =========================================
+   CHATS
 ========================================= */
 
 document.getElementById(
@@ -1901,64 +3325,25 @@ document.getElementById(
 
         closeMobileMenu();
 
-
         setActiveButton(
             "chatsButton"
         );
 
-
-        document.getElementById(
-            "profilePage"
-        ).style.display =
-            "none";
-
+        hideAllPages();
 
         document.getElementById(
             "chatList"
         ).style.display =
             "block";
 
+        searchInput.value = "";
 
-        document.getElementById(
-            "searchResults"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "chatWindow"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "welcome"
-        ).style.display =
-            "flex";
-
-
-        document.getElementById(
-            "messageInputArea"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "mobileBackButton"
-        ).style.display =
-            "none";
-
-
-        searchInput.value =
-            "";
-
-
-        await loadContacts();
+        await loadChats();
     };
 
 
 /* =========================================
-   NAVIGATION — CONTACTS
+   CONTACTS
 ========================================= */
 
 document.getElementById(
@@ -1968,133 +3353,140 @@ document.getElementById(
 
         closeMobileMenu();
 
-
         setActiveButton(
             "contactsButton"
         );
 
+        hideAllPages();
 
-        document.getElementById(
-            "profilePage"
-        ).style.display =
-            "none";
+        const list =
+            document.getElementById(
+                "chatList"
+            );
 
+        list.innerHTML = "";
 
-        document.getElementById(
-            "chatList"
-        ).style.display =
-            "block";
+        const {
+            data: contacts
+        } = await supabaseClient
+            .from("contacts")
+            .select("contact_id")
+            .eq(
+                "user_id",
+                currentUser.id
+            );
 
+        if (
+            !contacts ||
+            contacts.length === 0
+        ) {
 
-        document.getElementById(
-            "searchResults"
-        ).style.display =
-            "none";
+            list.innerHTML =
+                `<div class="empty">
+                    У вас пока нет контактов
+                </div>`;
 
+            return;
+        }
 
-        document.getElementById(
-            "chatWindow"
-        ).style.display =
-            "none";
+        for (
+            const contact of contacts
+        ) {
 
+            const {
+                data: profile
+            } = await supabaseClient
+                .from("profiles")
+                .select("*")
+                .eq(
+                    "id",
+                    contact.contact_id
+                )
+                .single();
 
-        document.getElementById(
-            "welcome"
-        ).style.display =
-            "flex";
+            if (profile) {
 
-
-        document.getElementById(
-            "messageInputArea"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "mobileBackButton"
-        ).style.display =
-            "none";
-
-
-        searchInput.value =
-            "";
-
-
-        await loadContacts();
+                createContactElement(
+                    profile
+                );
+            }
+        }
     };
 
 
 /* =========================================
-   NAVIGATION — PROFILE
+   PROFILE
 ========================================= */
 
 document.getElementById(
     "profileButton"
-).onclick =
-    () => {
+).onclick = () => {
 
-        closeMobileMenu();
+    closeMobileMenu();
 
+    setActiveButton(
+        "profileButton"
+    );
 
-        setActiveButton(
-            "profileButton"
-        );
+    hideAllPages();
 
+    document.getElementById(
+        "profilePage"
+    ).style.display =
+        "block";
 
-        document.getElementById(
-            "chatList"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "searchResults"
-        ).style.display =
-            "none";
+    searchInput.value = "";
+};
 
 
-        document.getElementById(
-            "chatWindow"
-        ).style.display =
-            "none";
+/* =========================================
+   HIDE PAGES
+========================================= */
 
+function hideAllPages() {
 
-        document.getElementById(
-            "welcome"
-        ).style.display =
-            "none";
+    document.getElementById(
+        "profilePage"
+    ).style.display =
+        "none";
 
+    document.getElementById(
+        "chatWindow"
+    ).style.display =
+        "none";
 
-        document.getElementById(
-            "messageInputArea"
-        ).style.display =
-            "none";
+    document.getElementById(
+        "welcome"
+    ).style.display =
+        "flex";
 
+    document.getElementById(
+        "messageInputArea"
+    ).style.display =
+        "none";
 
-        document.getElementById(
-            "mobileBackButton"
-        ).style.display =
-            "none";
+    document.getElementById(
+        "searchResults"
+    ).style.display =
+        "none";
 
+    document.getElementById(
+        "mobileBackButton"
+    ).style.display =
+        "none";
 
-        document.getElementById(
-            "profilePage"
-        ).style.display =
-            "block";
+    currentContact = null;
+    currentChannel = null;
 
-
-        searchInput.value =
-            "";
-    };
+    stopRealtime();
+}
 
 
 /* =========================================
    ACTIVE BUTTON
 ========================================= */
 
-function setActiveButton(
-    id
-) {
+function setActiveButton(id) {
 
     document
         .querySelectorAll(
@@ -2108,7 +3500,6 @@ function setActiveButton(
                 );
             }
         );
-
 
     document.getElementById(
         id
@@ -2133,16 +3524,12 @@ document.getElementById(
                 currentProfile.name
             );
 
-
         if (!newName) {
-
             return;
         }
 
-
         const cleanName =
             newName.trim();
-
 
         if (
             cleanName.length < 2
@@ -2154,7 +3541,6 @@ document.getElementById(
 
             return;
         }
-
 
         const {
             error
@@ -2169,7 +3555,6 @@ document.getElementById(
                 currentUser.id
             );
 
-
         if (error) {
 
             console.error(error);
@@ -2181,10 +3566,8 @@ document.getElementById(
             return;
         }
 
-
         currentProfile.name =
             cleanName;
-
 
         document.getElementById(
             "profileName"
@@ -2206,11 +3589,9 @@ document.getElementById(
             .auth
             .signOut();
 
-
         localStorage.removeItem(
             "kleivy_logged_in"
         );
-
 
         window.location.href =
             "login.html";
@@ -2226,12 +3607,10 @@ const mobileMenuButton =
         "mobileMenuButton"
     );
 
-
 const mobileOverlay =
     document.getElementById(
         "mobileOverlay"
     );
-
 
 const sidebar =
     document.querySelector(
@@ -2244,15 +3623,12 @@ function openMobileMenu() {
     if (
         window.innerWidth > 700
     ) {
-
         return;
     }
-
 
     sidebar.classList.add(
         "mobile-open"
     );
-
 
     mobileOverlay.classList.add(
         "active"
@@ -2265,7 +3641,6 @@ function closeMobileMenu() {
     sidebar.classList.remove(
         "mobile-open"
     );
-
 
     mobileOverlay.classList.remove(
         "active"
@@ -2289,60 +3664,42 @@ mobileOverlay.addEventListener(
    MOBILE BACK
 ========================================= */
 
-const mobileBackButton =
-    document.getElementById(
-        "mobileBackButton"
-    );
-
-
-mobileBackButton.addEventListener(
+document.getElementById(
+    "mobileBackButton"
+).addEventListener(
     "click",
     () => {
 
         if (
             window.innerWidth > 700
         ) {
-
             return;
         }
 
+        currentContact = null;
+        currentChannel = null;
 
-        currentContact =
-            null;
-
-
-        if (realtimeChannel) {
-
-            supabaseClient.removeChannel(
-                realtimeChannel
-            );
-
-            realtimeChannel =
-                null;
-        }
-
+        stopRealtime();
 
         document.getElementById(
             "chatWindow"
         ).style.display =
             "none";
 
-
         document.getElementById(
             "messageInputArea"
         ).style.display =
             "none";
-
 
         document.getElementById(
             "welcome"
         ).style.display =
             "flex";
 
-
-        mobileBackButton.style.display =
+        document.getElementById(
+            "mobileBackButton"
+        ).style.display =
             "none";
-
 
         document.getElementById(
             "chatList"
@@ -2356,19 +3713,15 @@ mobileBackButton.addEventListener(
    ESCAPE HTML
 ========================================= */
 
-function escapeHtml(
-    text
-) {
+function escapeHtml(text) {
 
     const div =
         document.createElement(
             "div"
         );
 
-
     div.textContent =
         text ?? "";
-
 
     return div.innerHTML;
 }
