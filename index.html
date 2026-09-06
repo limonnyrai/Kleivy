@@ -1,1254 +1,1435 @@
-```html
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-    <title>Клейви Чат</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #080b12;
-            color: white;
-            overflow: hidden;
-        }
-
-        button,
-        input,
-        textarea {
-            font-family: inherit;
-        }
-
-        button {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .app {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-        }
-
-        /* =========================
-           SIDEBAR
-        ========================= */
-
-        .sidebar {
-            width: 330px;
-            background: #0d111b;
-            border-right: 1px solid #1d2638;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            padding: 20px;
-            font-size: 25px;
-            font-weight: bold;
-            color: #168cff;
-        }
-
-        .sidebar-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-right: 15px;
-        }
-
-        .plus-button {
-            width: 42px;
-            height: 42px;
-            border: none;
-            border-radius: 12px;
-            background: #168cff;
-            color: white;
-            font-size: 25px;
-            cursor: pointer;
-        }
-
-        .plus-button:active {
-            transform: scale(.95);
-        }
-
-        .search-box {
-            padding: 0 15px 15px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 12px;
-            border: 1px solid #202c40;
-            outline: none;
-            background: #151c2a;
-            color: white;
-            font-size: 15px;
-        }
-
-        .search-box input::placeholder {
-            color: #7f8ba3;
-        }
-
-        .menu {
-            display: flex;
-            border-top: 1px solid #182235;
-            border-bottom: 1px solid #182235;
-        }
-
-        .menu button {
-            flex: 1;
-            border: none;
-            background: transparent;
-            color: #7f8ba3;
-            padding: 15px 5px;
-            cursor: pointer;
-        }
-
-        .menu button.active {
-            color: #168cff;
-        }
-
-        .chat-list {
-            overflow-y: auto;
-            flex: 1;
-            min-height: 0;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .contact-item,
-        .channel-item {
-            padding: 13px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #141c2a;
-        }
-
-        .contact-item:hover,
-        .channel-item:hover {
-            background: #151d2c;
-        }
-
-        .avatar {
-            width: 48px;
-            height: 48px;
-            min-width: 48px;
-            border-radius: 50%;
-            background: #167cff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .contact-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .contact-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .contact-username {
-            color: #75839c;
-            font-size: 13px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .channel-badge {
-            color: #168cff;
-            font-size: 11px;
-            margin-left: 5px;
-        }
-
-        .empty {
-            color: #718099;
-            text-align: center;
-            padding: 30px 15px;
-        }
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        .main {
-            flex: 1;
-            min-width: 0;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-            background: #080d16;
-            height: 100vh;
-            height: 100dvh;
-        }
-
-        .chat-header {
-            height: 70px;
-            min-height: 70px;
-            padding: 10px 20px;
-            border-bottom: 1px solid #1b2638;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .chat-header-name {
-            font-weight: bold;
-        }
-
-        .chat-header-username {
-            color: #718099;
-            font-size: 13px;
-            margin-top: 3px;
-        }
-
-        .welcome {
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #65738c;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .messages {
-            flex: 1;
-            min-height: 0;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .message {
-            max-width: 65%;
-            padding: 10px 13px;
-            border-radius: 14px;
-            word-wrap: break-word;
-            overflow-wrap: anywhere;
-            position: relative;
-            line-height: 1.35;
-        }
-
-        .message.mine {
-            align-self: flex-end;
-            background: #1267b8;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.theirs {
-            align-self: flex-start;
-            background: #182231;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message-time {
-            font-size: 10px;
-            opacity: .6;
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        .message-input-area {
-            display: none;
-            padding: 12px;
-            border-top: 1px solid #1b2638;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .message-input-area input {
-            flex: 1;
-            min-width: 0;
-            padding: 13px 15px;
-            background: #151d2b;
-            border: 1px solid #243149;
-            border-radius: 14px;
-            color: white;
-            outline: none;
-            font-size: 15px;
-        }
-
-        .send-button {
-            width: 48px;
-            min-width: 48px;
-            height: 48px;
-            border: none;
-            border-radius: 14px;
-            background: #168cff;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        /* =========================
-           SEARCH
-        ========================= */
-
-        .search-results {
-            display: none;
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-        }
-
-        .search-card {
-            padding: 15px;
-            border-bottom: 1px solid #182235;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .search-card-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .add-button {
-            border: none;
-            background: #168cff;
-            color: white;
-            padding: 9px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .add-button.added {
-            background: #263348;
-            color: #8c9ab0;
-            cursor: default;
-        }
-
-        /* =========================
-           PROFILE
-        ========================= */
-
-        .profile-page {
-            display: none;
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding: 40px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .profile-box {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            background: #101725;
-            padding: 30px;
-            border-radius: 20px;
-        }
-
-        .profile-avatar {
-            margin: auto auto 20px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #168cff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 35px;
-            font-weight: bold;
-            overflow: hidden;
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-name {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .profile-username {
-            text-align: center;
-            color: #718099;
-            margin-top: 7px;
-        }
-
-        .profile-button {
-            width: 100%;
-            padding: 13px;
-            margin-top: 12px;
-            border-radius: 12px;
-            border: 1px solid #26344c;
-            background: #151e2e;
-            color: white;
-            cursor: pointer;
-        }
-
-        .logout {
-            background: #2b1720;
-            color: #ff7186;
-        }
-
-        /* =========================
-           MODALS
-        ========================= */
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.72);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            padding: 15px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-box {
-            width: 100%;
-            max-width: 480px;
-            max-height: 90vh;
-            overflow-y: auto;
-            background: #101725;
-            border: 1px solid #26344c;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.5);
-        }
-
-        .modal-title {
-            font-size: 23px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .modal-label {
-            display: block;
-            color: #9ba8bd;
-            font-size: 13px;
-            margin-bottom: 7px;
-            margin-top: 15px;
-        }
-
-        .modal-input,
-        .modal-textarea {
-            width: 100%;
-            padding: 13px;
-            border-radius: 12px;
-            border: 1px solid #26344c;
-            background: #151e2e;
-            color: white;
-            outline: none;
-            font-size: 15px;
-        }
-
-        .modal-textarea {
-            resize: vertical;
-            min-height: 90px;
-        }
-
-        .channel-photo-area {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-
-        .channel-photo-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #168cff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 35px;
-            font-weight: bold;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .channel-photo-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .channel-type {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .type-option {
-            flex: 1;
-            padding: 13px;
-            border: 1px solid #26344c;
-            border-radius: 12px;
-            background: #151e2e;
-            color: #9ba8bd;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .type-option.selected {
-            border-color: #168cff;
-            background: #102d4b;
-            color: white;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 22px;
-        }
-
-        .modal-cancel,
-        .modal-create {
-            flex: 1;
-            padding: 13px;
-            border-radius: 12px;
-            cursor: pointer;
-            border: none;
-        }
-
-        .modal-cancel {
-            background: #202b3e;
-            color: white;
-        }
-
-        .modal-create {
-            background: #168cff;
-            color: white;
-        }
-
-        .channel-info {
-            text-align: center;
-        }
-
-        .channel-info-avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            background: #168cff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            font-weight: bold;
-            overflow: hidden;
-        }
-
-        .channel-info-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .channel-info-name {
-            font-size: 25px;
-            font-weight: bold;
-        }
-
-        .channel-info-description {
-            margin-top: 10px;
-            color: #9ba8bd;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .channel-info-link {
-            margin-top: 18px;
-            padding: 13px;
-            background: #151e2e;
-            border-radius: 12px;
-            color: #168cff;
-            word-break: break-all;
-        }
-
-        .channel-info-type {
-            margin-top: 10px;
-            color: #718099;
-            font-size: 13px;
-        }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        .mobile-topbar {
-            display: none;
-        }
-
-        .mobile-menu-button {
-            border: none;
-            background: transparent;
-            color: white;
-            width: 44px;
-            height: 44px;
-            font-size: 27px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .mobile-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #168cff;
-            margin-left: 5px;
-        }
-
-        .mobile-overlay {
-            display: none;
-        }
-
-        .mobile-back-button {
-            display: none;
-        }
-
-        @media (max-width: 700px) {
-
-            html,
-            body {
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-            }
-
-            body {
-                height: 100dvh;
-            }
-
-            .app {
-                height: 100dvh;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 85%;
-                max-width: 330px;
-                height: 100dvh;
-                transform: translateX(-105%);
-                transition: transform .25s ease;
-                box-shadow: 10px 0 35px rgba(0,0,0,.5);
-                z-index: 1000;
-            }
-
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .logo {
-                padding: 20px 18px 15px;
-            }
-
-            .search-box {
-                padding: 0 12px 12px;
-            }
-
-            .menu button {
-                padding: 15px 4px;
-                font-size: 13px;
-            }
-
-            .mobile-overlay {
-                display: block;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,.65);
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity .25s ease;
-                z-index: 900;
-            }
-
-            .mobile-overlay.active {
-                opacity: 1;
-                pointer-events: auto;
-            }
-
-            .main {
-                width: 100%;
-                height: 100dvh;
-                min-height: 0;
-            }
-
-            .mobile-topbar {
-                display: flex;
-                width: 100%;
-                height: 62px;
-                min-height: 62px;
-                align-items: center;
-                padding: 0 10px;
-                background: #0d111b;
-                border-bottom: 1px solid #1b2638;
-                flex-shrink: 0;
-            }
-
-            #chatWindow {
-                width: 100%;
-                height: calc(100dvh - 62px);
-                min-height: 0;
-                flex: 1;
-            }
-
-            .chat-header {
-                height: 62px;
-                min-height: 62px;
-                padding: 8px 10px;
-                gap: 8px;
-            }
-
-            .mobile-back-button {
-                display: flex;
-                width: 40px;
-                min-width: 40px;
-                height: 42px;
-                align-items: center;
-                justify-content: center;
-                border: none;
-                background: transparent;
-                color: white;
-                font-size: 29px;
-                cursor: pointer;
-            }
-
-            .chat-header .avatar {
-                width: 43px;
-                height: 43px;
-                min-width: 43px;
-            }
-
-            .messages {
-                padding: 12px 9px;
-                min-height: 0;
-            }
-
-            .message {
-                max-width: 84%;
-                font-size: 15px;
-            }
-
-            .message-input-area {
-                padding: 8px;
-                padding-bottom: max(8px, env(safe-area-inset-bottom));
-                min-height: 64px;
-            }
-
-            .message-input-area input {
-                font-size: 16px;
-            }
-
-            .welcome {
-                height: calc(100dvh - 62px);
-                flex: 1;
-                min-height: 0;
-            }
-
-            .chat-list {
-                height: auto;
-                flex: 1;
-                min-height: 0;
-            }
-
-            .search-results {
-                height: auto;
-                flex: 1;
-                min-height: 0;
-            }
-
-            .profile-page {
-                flex: 1;
-                min-height: 0;
-                height: auto;
-                overflow-y: auto;
-                padding: 20px 12px;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .profile-box {
-                width: 100%;
-                max-width: 500px;
-                margin: 0 auto;
-                padding: 25px 18px;
-            }
-
-            .modal {
-                align-items: flex-end;
-                padding: 0;
-            }
-
-            .modal-box {
-                max-width: none;
-                max-height: 94dvh;
-                border-radius: 22px 22px 0 0;
-                padding: 22px 18px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Клейви Чат</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#080b12;
+    color:white;
+    overflow:hidden;
+}
+
+button,input,textarea{font-family:inherit}
+button{-webkit-tap-highlight-color:transparent}
+
+.app{
+    display:flex;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:330px;
+    background:#0d111b;
+    border-right:1px solid #1d2638;
+    display:flex;
+    flex-direction:column;
+    flex-shrink:0;
+    z-index:100;
+}
+
+.logo{
+    padding:20px;
+    font-size:25px;
+    font-weight:bold;
+    color:#168cff;
+}
+
+.sidebar-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-right:15px;
+}
+
+.plus-button{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    background:#168cff;
+    color:white;
+    font-size:25px;
+    cursor:pointer;
+}
+
+.plus-button:active{transform:scale(.95)}
+
+.search-box{
+    padding:0 15px 15px;
+}
+
+.search-box input{
+    width:100%;
+    padding:12px 15px;
+    border-radius:12px;
+    border:1px solid #202c40;
+    outline:none;
+    background:#151c2a;
+    color:white;
+    font-size:15px;
+}
+
+.search-box input::placeholder{color:#7f8ba3}
+
+.menu{
+    display:flex;
+    border-top:1px solid #182235;
+    border-bottom:1px solid #182235;
+}
+
+.menu button{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:#7f8ba3;
+    padding:15px 5px;
+    cursor:pointer;
+}
+
+.menu button.active{color:#168cff}
+
+.chat-list{
+    overflow-y:auto;
+    flex:1;
+    min-height:0;
+    -webkit-overflow-scrolling:touch;
+}
+
+.contact-item,
+.channel-item{
+    padding:13px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    border-bottom:1px solid #141c2a;
+}
+
+.contact-item:hover,
+.channel-item:hover{
+    background:#151d2c;
+}
+
+.avatar{
+    width:48px;
+    height:48px;
+    min-width:48px;
+    border-radius:50%;
+    background:#167cff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:bold;
+    overflow:hidden;
+    flex-shrink:0;
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.contact-info{
+    min-width:0;
+    flex:1;
+}
+
+.contact-name{
+    font-weight:bold;
+    margin-bottom:5px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.contact-username{
+    color:#75839c;
+    font-size:13px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.channel-badge{
+    color:#168cff;
+    font-size:11px;
+    margin-left:5px;
+}
+
+.empty{
+    color:#718099;
+    text-align:center;
+    padding:30px 15px;
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    background:#080d16;
+    height:100vh;
+    height:100dvh;
+}
+
+.chat-header{
+    height:70px;
+    min-height:70px;
+    padding:10px 20px;
+    border-bottom:1px solid #1b2638;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.chat-header-name{font-weight:bold}
+
+.chat-header-username{
+    color:#718099;
+    font-size:13px;
+    margin-top:3px;
+}
+
+.welcome{
+    flex:1;
+    min-height:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:#65738c;
+    text-align:center;
+    padding:30px;
+}
+
+.messages{
+    flex:1;
+    min-height:0;
+    padding:20px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    -webkit-overflow-scrolling:touch;
+}
+
+.message{
+    max-width:65%;
+    padding:10px 13px;
+    border-radius:14px;
+    word-wrap:break-word;
+    overflow-wrap:anywhere;
+    position:relative;
+    line-height:1.35;
+}
+
+.message.mine{
+    align-self:flex-end;
+    background:#1267b8;
+    border-bottom-right-radius:4px;
+}
+
+.message.theirs{
+    align-self:flex-start;
+    background:#182231;
+    border-bottom-left-radius:4px;
+}
+
+.message-time{
+    font-size:10px;
+    opacity:.6;
+    margin-top:4px;
+    text-align:right;
+}
+
+/* MEDIA */
+
+.message-media{
+    margin:-2px -2px 8px;
+}
+
+.message-image{
+    display:block;
+    width:100%;
+    max-width:360px;
+    max-height:420px;
+    object-fit:cover;
+    border-radius:11px;
+    cursor:pointer;
+}
+
+.message-caption{
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.file-card{
+    min-width:220px;
+    max-width:340px;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(0,0,0,.18);
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.file-icon{
+    font-size:30px;
+    flex-shrink:0;
+}
+
+.file-info{
+    min-width:0;
+    flex:1;
+}
+
+.file-name{
+    font-weight:bold;
+    word-break:break-word;
+}
+
+.file-size{
+    color:#aab5c7;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.file-download{
+    border:none;
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#168cff;
+    color:white;
+    cursor:pointer;
+    font-size:18px;
+    flex-shrink:0;
+}
+
+.message-input-area{
+    display:none;
+    padding:12px;
+    border-top:1px solid #1b2638;
+    gap:8px;
+    flex-shrink:0;
+    align-items:center;
+}
+
+.attach-button{
+    width:48px;
+    min-width:48px;
+    height:48px;
+    border:none;
+    border-radius:14px;
+    background:#151d2b;
+    border:1px solid #243149;
+    color:#b8c4d7;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.attach-button:active{
+    transform:scale(.95);
+}
+
+.message-input-area input{
+    flex:1;
+    min-width:0;
+    padding:13px 15px;
+    background:#151d2b;
+    border:1px solid #243149;
+    border-radius:14px;
+    color:white;
+    outline:none;
+    font-size:15px;
+}
+
+.send-button{
+    width:48px;
+    min-width:48px;
+    height:48px;
+    border:none;
+    border-radius:14px;
+    background:#168cff;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+/* FILE PREVIEW */
+
+.file-preview{
+    display:none;
+    padding:8px 12px;
+    border-top:1px solid #1b2638;
+    background:#0e1521;
+    align-items:center;
+    gap:10px;
+}
+
+.file-preview.active{
+    display:flex;
+}
+
+.file-preview-image{
+    width:48px;
+    height:48px;
+    object-fit:cover;
+    border-radius:9px;
+}
+
+.file-preview-icon{
+    width:48px;
+    height:48px;
+    border-radius:9px;
+    background:#182438;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    flex-shrink:0;
+}
+
+.file-preview-info{
+    flex:1;
+    min-width:0;
+}
+
+.file-preview-name{
+    font-weight:bold;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.file-preview-size{
+    color:#718099;
+    font-size:12px;
+    margin-top:3px;
+}
+
+.file-preview-remove{
+    border:none;
+    background:transparent;
+    color:#ff7186;
+    font-size:22px;
+    cursor:pointer;
+}
+
+/* SEARCH */
+
+.search-results{
+    display:none;
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+}
+
+.search-card{
+    padding:15px;
+    border-bottom:1px solid #182235;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.search-card-info{
+    flex:1;
+    min-width:0;
+}
+
+.add-button{
+    border:none;
+    background:#168cff;
+    color:white;
+    padding:9px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.add-button.added{
+    background:#263348;
+    color:#8c9ab0;
+    cursor:default;
+}
+
+/* PROFILE */
+
+.profile-page{
+    display:none;
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding:40px;
+    -webkit-overflow-scrolling:touch;
+}
+
+.profile-box{
+    width:100%;
+    max-width:500px;
+    margin:0 auto;
+    background:#101725;
+    padding:30px;
+    border-radius:20px;
+}
+
+.profile-avatar{
+    margin:auto auto 20px;
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    background:#168cff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:35px;
+    font-weight:bold;
+    overflow:hidden;
+}
+
+.profile-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profile-name{
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.profile-username{
+    text-align:center;
+    color:#718099;
+    margin-top:7px;
+}
+
+.profile-button{
+    width:100%;
+    padding:13px;
+    margin-top:12px;
+    border-radius:12px;
+    border:1px solid #26344c;
+    background:#151e2e;
+    color:white;
+    cursor:pointer;
+}
+
+.logout{
+    background:#2b1720;
+    color:#ff7186;
+}
+
+/* MODALS */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:3000;
+    padding:15px;
+}
+
+.modal.active{display:flex}
+
+.modal-box{
+    width:100%;
+    max-width:480px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#101725;
+    border:1px solid #26344c;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.modal-title{
+    font-size:23px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.modal-label{
+    display:block;
+    color:#9ba8bd;
+    font-size:13px;
+    margin-bottom:7px;
+    margin-top:15px;
+}
+
+.modal-input,
+.modal-textarea{
+    width:100%;
+    padding:13px;
+    border-radius:12px;
+    border:1px solid #26344c;
+    background:#151e2e;
+    color:white;
+    outline:none;
+    font-size:15px;
+}
+
+.modal-textarea{
+    resize:vertical;
+    min-height:90px;
+}
+
+.channel-photo-area{
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
+}
+
+.channel-photo-preview{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    background:#168cff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:35px;
+    font-weight:bold;
+    overflow:hidden;
+    cursor:pointer;
+}
+
+.channel-photo-preview img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.channel-type{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.type-option{
+    flex:1;
+    padding:13px;
+    border:1px solid #26344c;
+    border-radius:12px;
+    background:#151e2e;
+    color:#9ba8bd;
+    cursor:pointer;
+    text-align:center;
+}
+
+.type-option.selected{
+    border-color:#168cff;
+    background:#102d4b;
+    color:white;
+}
+
+.modal-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:22px;
+}
+
+.modal-cancel,
+.modal-create{
+    flex:1;
+    padding:13px;
+    border-radius:12px;
+    cursor:pointer;
+    border:none;
+}
+
+.modal-cancel{
+    background:#202b3e;
+    color:white;
+}
+
+.modal-create{
+    background:#168cff;
+    color:white;
+}
+
+.channel-info{text-align:center}
+
+.channel-info-avatar{
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    margin:0 auto 15px;
+    background:#168cff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:40px;
+    font-weight:bold;
+    overflow:hidden;
+}
+
+.channel-info-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.channel-info-name{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.channel-info-description{
+    margin-top:10px;
+    color:#9ba8bd;
+    line-height:1.5;
+    white-space:pre-wrap;
+}
+
+.channel-info-link{
+    margin-top:18px;
+    padding:13px;
+    background:#151e2e;
+    border-radius:12px;
+    color:#168cff;
+    word-break:break-all;
+}
+
+.channel-info-type{
+    margin-top:10px;
+    color:#718099;
+    font-size:13px;
+}
+
+/* MEDIA VIEWER */
+
+.media-viewer{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.92);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:5000;
+    padding:20px;
+}
+
+.media-viewer.active{
+    display:flex;
+}
+
+.media-viewer-content{
+    max-width:100%;
+    max-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:15px;
+}
+
+.media-viewer img{
+    max-width:95vw;
+    max-height:78vh;
+    object-fit:contain;
+    border-radius:10px;
+}
+
+.media-viewer-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.media-viewer-buttons button{
+    border:none;
+    border-radius:12px;
+    padding:12px 18px;
+    background:#168cff;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.media-viewer-buttons .close-media{
+    background:#263348;
+}
+
+.upload-progress{
+    display:none;
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:3px;
+    background:#168cff;
+}
+
+/* MOBILE */
+
+.mobile-topbar{display:none}
+
+.mobile-menu-button{
+    border:none;
+    background:transparent;
+    color:white;
+    width:44px;
+    height:44px;
+    font-size:27px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.mobile-title{
+    font-size:20px;
+    font-weight:bold;
+    color:#168cff;
+    margin-left:5px;
+}
+
+.mobile-overlay{display:none}
+
+.mobile-back-button{display:none}
+
+@media(max-width:700px){
+
+    html,body{
+        width:100%;
+        height:100%;
+        overflow:hidden;
+    }
+
+    body{height:100dvh}
+
+    .app{
+        height:100dvh;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .sidebar{
+        position:fixed;
+        left:0;
+        top:0;
+        width:85%;
+        max-width:330px;
+        height:100dvh;
+        transform:translateX(-105%);
+        transition:transform .25s ease;
+        box-shadow:10px 0 35px rgba(0,0,0,.5);
+        z-index:1000;
+    }
+
+    .sidebar.mobile-open{
+        transform:translateX(0);
+    }
+
+    .logo{padding:20px 18px 15px}
+
+    .search-box{padding:0 12px 12px}
+
+    .menu button{
+        padding:15px 4px;
+        font-size:13px;
+    }
+
+    .mobile-overlay{
+        display:block;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.65);
+        opacity:0;
+        pointer-events:none;
+        transition:opacity .25s ease;
+        z-index:900;
+    }
+
+    .mobile-overlay.active{
+        opacity:1;
+        pointer-events:auto;
+    }
+
+    .main{
+        width:100%;
+        height:100dvh;
+        min-height:0;
+    }
+
+    .mobile-topbar{
+        display:flex;
+        width:100%;
+        height:62px;
+        min-height:62px;
+        align-items:center;
+        padding:0 10px;
+        background:#0d111b;
+        border-bottom:1px solid #1b2638;
+        flex-shrink:0;
+    }
+
+    #chatWindow{
+        width:100%;
+        height:calc(100dvh - 62px);
+        min-height:0;
+        flex:1;
+    }
+
+    .chat-header{
+        height:62px;
+        min-height:62px;
+        padding:8px 10px;
+        gap:8px;
+    }
+
+    .mobile-back-button{
+        display:flex;
+        width:40px;
+        min-width:40px;
+        height:42px;
+        align-items:center;
+        justify-content:center;
+        border:none;
+        background:transparent;
+        color:white;
+        font-size:29px;
+        cursor:pointer;
+    }
+
+    .chat-header .avatar{
+        width:43px;
+        height:43px;
+        min-width:43px;
+    }
+
+    .messages{
+        padding:12px 9px;
+        min-height:0;
+    }
+
+    .message{
+        max-width:88%;
+        font-size:15px;
+    }
+
+    .message-image{
+        max-width:260px;
+        max-height:360px;
+    }
+
+    .file-card{
+        min-width:190px;
+        max-width:270px;
+    }
+
+    .message-input-area{
+        padding:8px;
+        padding-bottom:max(8px,env(safe-area-inset-bottom));
+        min-height:64px;
+    }
+
+    .message-input-area input{
+        font-size:16px;
+    }
+
+    .attach-button,
+    .send-button{
+        width:44px;
+        min-width:44px;
+        height:44px;
+    }
+
+    .welcome{
+        height:calc(100dvh - 62px);
+        flex:1;
+        min-height:0;
+    }
+
+    .chat-list{
+        height:auto;
+        flex:1;
+        min-height:0;
+    }
+
+    .search-results{
+        height:auto;
+        flex:1;
+        min-height:0;
+    }
+
+    .profile-page{
+        flex:1;
+        min-height:0;
+        height:auto;
+        overflow-y:auto;
+        padding:20px 12px;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .profile-box{
+        width:100%;
+        max-width:500px;
+        margin:0 auto;
+        padding:25px 18px;
+    }
+
+    .modal{
+        align-items:flex-end;
+        padding:0;
+    }
+
+    .modal-box{
+        max-width:none;
+        max-height:94dvh;
+        border-radius:22px 22px 0 0;
+        padding:22px 18px;
+    }
+
+    .media-viewer{
+        padding:10px;
+    }
+}
+</style>
+
 </head>
 
 <body>
 
 <div class="app">
 
-    <aside class="sidebar">
+<aside class="sidebar">
 
-        <div class="sidebar-top">
-            <div class="logo">
-                Клейви Чат
-            </div>
+<div class="sidebar-top">
+<div class="logo">Клейви Чат</div>
 
-            <button id="plusButton" class="plus-button">
-                +
-            </button>
-        </div>
-
-        <div class="search-box">
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Поиск пользователей и каналов..."
-                autocomplete="off"
-            >
-        </div>
-
-        <div class="menu">
-
-            <button id="chatsButton" class="active">
-                💬 Чаты
-            </button>
-
-            <button id="contactsButton">
-                👥 Контакты
-            </button>
-
-            <button id="profileButton">
-                👤 Профиль
-            </button>
-
-        </div>
-
-        <div id="chatList" class="chat-list">
-            <div class="empty">
-                Пока нет чатов
-            </div>
-        </div>
-
-        <div id="searchResults" class="search-results"></div>
-
-    </aside>
-
-    <div id="mobileOverlay" class="mobile-overlay"></div>
-
-    <main class="main">
-
-        <div class="mobile-topbar">
-
-            <button
-                id="mobileMenuButton"
-                class="mobile-menu-button"
-            >
-                ☰
-            </button>
-
-            <div class="mobile-title">
-                Клейви Чат
-            </div>
-
-        </div>
-
-        <div
-            id="chatWindow"
-            style="display:none;height:100%;flex-direction:column;min-height:0;"
-        >
-
-            <div class="chat-header">
-
-                <button
-                    id="mobileBackButton"
-                    class="mobile-back-button"
-                >
-                    ←
-                </button>
-
-                <div id="chatAvatar" class="avatar"></div>
-
-                <div>
-                    <div
-                        id="chatName"
-                        class="chat-header-name"
-                    ></div>
-
-                    <div
-                        id="chatUsername"
-                        class="chat-header-username"
-                    ></div>
-                </div>
-
-            </div>
-
-            <div id="messages" class="messages"></div>
-
-            <div
-                id="messageInputArea"
-                class="message-input-area"
-            >
-
-                <input
-                    id="messageInput"
-                    type="text"
-                    placeholder="Написать сообщение..."
-                    autocomplete="off"
-                >
-
-                <button
-                    id="sendButton"
-                    class="send-button"
-                >
-                    ➤
-                </button>
-
-            </div>
-
-        </div>
-
-        <div id="welcome" class="welcome">
-
-            <div>
-                <h2>Клейви Чат</h2>
-
-                <p>
-                    Выберите контакт или канал
-                </p>
-            </div>
-
-        </div>
-
-        <div id="profilePage" class="profile-page">
-
-            <div class="profile-box">
-
-                <div
-                    id="profileAvatar"
-                    class="profile-avatar"
-                >
-                    ?
-                </div>
-
-                <div
-                    id="profileName"
-                    class="profile-name"
-                >
-                    Загрузка...
-                </div>
-
-                <div
-                    id="profileUsername"
-                    class="profile-username"
-                >
-                    @username
-                </div>
-
-                <button
-                    id="editNameButton"
-                    class="profile-button"
-                >
-                    ✏️ Изменить имя
-                </button>
-
-                <button
-                    id="logoutButton"
-                    class="profile-button logout"
-                >
-                    🚪 Выйти
-                </button>
-
-            </div>
-
-        </div>
-
-    </main>
+<button id="plusButton" class="plus-button">+</button>
 
 </div>
 
+<div class="search-box">
+<input
+id="searchInput"
+type="text"
+placeholder="Поиск пользователей и каналов..."
+autocomplete="off">
+</div>
+
+<div class="menu">
+
+<button id="chatsButton" class="active">💬 Чаты</button>
+
+<button id="contactsButton">👥 Контакты</button>
+
+<button id="profileButton">👤 Профиль</button>
+
+</div>
+
+<div id="chatList" class="chat-list">
+<div class="empty">Пока нет чатов</div>
+</div>
+
+<div id="searchResults" class="search-results"></div>
+
+</aside>
+
+<div id="mobileOverlay" class="mobile-overlay"></div>
+
+<main class="main">
+
+<div class="mobile-topbar">
+
+<button id="mobileMenuButton" class="mobile-menu-button">
+☰
+</button>
+
+<div class="mobile-title">
+Клейви Чат
+</div>
+
+</div>
+
+<div
+id="chatWindow"
+style="display:none;height:100%;flex-direction:column;min-height:0;"
+>
+
+<div class="chat-header">
+
+<button id="mobileBackButton" class="mobile-back-button">
+←
+</button>
+
+<div id="chatAvatar" class="avatar"></div>
+
+<div>
+<div id="chatName" class="chat-header-name"></div>
+
+<div id="chatUsername" class="chat-header-username"></div>
+</div>
+
+</div>
+
+<div id="messages" class="messages"></div>
+
+<div id="filePreview" class="file-preview">
+
+<div id="filePreviewVisual"></div>
+
+<div class="file-preview-info">
+
+<div id="filePreviewName" class="file-preview-name"></div>
+
+<div id="filePreviewSize" class="file-preview-size"></div>
+
+</div>
+
+<button
+id="removeFileButton"
+class="file-preview-remove"
+
+>
+
+× </button>
+
+</div>
+
+<div id="messageInputArea" class="message-input-area">
+
+<input
+id="fileInput"
+type="file"
+style="display:none"
+accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.csv"
+
+>
+
+<button
+id="attachButton"
+class="attach-button"
+title="Прикрепить файл"
+
+>
+
+📎 </button>
+
+<input
+id="messageInput"
+type="text"
+placeholder="Написать сообщение..."
+autocomplete="off"
+
+>
+
+<button
+id="sendButton"
+class="send-button"
+
+>
+
+➤ </button>
+
+</div>
+
+</div>
+
+<div id="welcome" class="welcome">
+
+<div>
+
+<h2>Клейви Чат</h2>
+
+<p>Выберите контакт или канал</p>
+
+</div>
+
+</div>
+
+<div id="profilePage" class="profile-page">
+
+<div class="profile-box">
+
+<div id="profileAvatar" class="profile-avatar">?</div>
+
+<div id="profileName" class="profile-name">
+Загрузка...
+</div>
+
+<div id="profileUsername" class="profile-username">
+@username
+</div>
+
+<button id="editNameButton" class="profile-button">
+✏️ Изменить имя
+</button>
+
+<button id="logoutButton" class="profile-button logout">
+🚪 Выйти
+</button>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
 
 <!-- CREATE CHANNEL -->
 
 <div id="createChannelModal" class="modal">
 
-    <div class="modal-box">
+<div class="modal-box">
 
-        <div class="modal-title">
-            Создать канал
-        </div>
+<div class="modal-title">
+Создать канал
+</div>
 
-        <input
-            id="channelPhotoInput"
-            type="file"
-            accept="image/*"
-            style="display:none"
-        >
+<input
+id="channelPhotoInput"
+type="file"
+accept="image/*"
+style="display:none"
 
-        <div class="channel-photo-area">
+>
 
-            <div
-                id="channelPhotoPreview"
-                class="channel-photo-preview"
-            >
-                📷
-            </div>
+<div class="channel-photo-area">
 
-        </div>
-
-        <div
-            style="text-align:center;color:#718099;font-size:13px;"
-        >
-            Нажмите на фото, чтобы выбрать изображение
-        </div>
-
-        <label class="modal-label">
-            Название канала
-        </label>
-
-        <input
-            id="channelNameInput"
-            class="modal-input"
-            type="text"
-            maxlength="100"
-            placeholder="Например: Новости Клейви"
-        >
-
-        <label class="modal-label">
-            Описание
-        </label>
-
-        <textarea
-            id="channelDescriptionInput"
-            class="modal-textarea"
-            maxlength="500"
-            placeholder="О чём этот канал?"
-        ></textarea>
-
-        <label class="modal-label">
-            Тип канала
-        </label>
-
-        <div class="channel-type">
-
-            <div
-                id="privateType"
-                class="type-option selected"
-            >
-                🔒 Частный
-            </div>
-
-            <div
-                id="publicType"
-                class="type-option"
-            >
-                🌐 Публичный
-            </div>
-
-        </div>
-
-        <div
-            id="publicUsernameBlock"
-            style="display:none;"
-        >
-
-            <label class="modal-label">
-                Публичная ссылка
-            </label>
-
-            <input
-                id="channelUsernameInput"
-                class="modal-input"
-                type="text"
-                maxlength="40"
-                placeholder="например kleivy_news"
-            >
-
-            <div
-                style="color:#718099;font-size:12px;margin-top:6px;"
-            >
-                К этому каналу можно будет перейти по адресу:
-                сайт/username
-            </div>
-
-        </div>
-
-        <div class="modal-buttons">
-
-            <button
-                id="cancelChannelButton"
-                class="modal-cancel"
-            >
-                Отмена
-            </button>
-
-            <button
-                id="createChannelButton"
-                class="modal-create"
-            >
-                Создать
-            </button>
-
-        </div>
-
-    </div>
+<div
+id="channelPhotoPreview"
+class="channel-photo-preview"
+>
+📷
+</div>
 
 </div>
 
+<div style="text-align:center;color:#718099;font-size:13px;">
+Нажмите на фото, чтобы выбрать изображение
+</div>
+
+<label class="modal-label">
+Название канала
+</label>
+
+<input
+id="channelNameInput"
+class="modal-input"
+type="text"
+maxlength="100"
+placeholder="Например: Новости Клейви"
+
+>
+
+<label class="modal-label">
+Описание
+</label>
+
+<textarea
+id="channelDescriptionInput"
+class="modal-textarea"
+maxlength="500"
+placeholder="О чём этот канал?"
+></textarea>
+
+<label class="modal-label">
+Тип канала
+</label>
+
+<div class="channel-type">
+
+<div id="privateType" class="type-option selected">
+🔒 Частный
+</div>
+
+<div id="publicType" class="type-option">
+🌐 Публичный
+</div>
+
+</div>
+
+<div id="publicUsernameBlock" style="display:none;">
+
+<label class="modal-label">
+Публичная ссылка
+</label>
+
+<input
+id="channelUsernameInput"
+class="modal-input"
+type="text"
+maxlength="40"
+placeholder="например kleivy_news"
+
+>
+
+<div style="color:#718099;font-size:12px;margin-top:6px;">
+К этому каналу можно будет перейти по адресу:
+сайт/username
+</div>
+
+</div>
+
+<div class="modal-buttons">
+
+<button id="cancelChannelButton" class="modal-cancel">
+Отмена
+</button>
+
+<button id="createChannelButton" class="modal-create">
+Создать
+</button>
+
+</div>
+
+</div>
+</div>
 
 <!-- PLUS -->
 
 <div id="plusModal" class="modal">
 
-    <div class="modal-box">
+<div class="modal-box">
 
-        <div class="modal-title">
-            Создать
-        </div>
-
-        <button
-            id="newContactButton"
-            class="profile-button"
-            style="margin-top:0;"
-        >
-            👤 Новый контакт
-        </button>
-
-        <button
-            id="newChannelButton"
-            class="profile-button"
-        >
-            📢 Создать канал
-        </button>
-
-        <button
-            id="closePlusButton"
-            class="profile-button"
-        >
-            Отмена
-        </button>
-
-    </div>
-
+<div class="modal-title">
+Создать
 </div>
 
+<button
+id="newContactButton"
+class="profile-button"
+style="margin-top:0;"
+
+>
+
+👤 Новый контакт </button>
+
+<button
+id="newChannelButton"
+class="profile-button"
+
+>
+
+📢 Создать канал </button>
+
+<button
+id="closePlusButton"
+class="profile-button"
+
+>
+
+Отмена </button>
+
+</div>
+</div>
 
 <!-- CHANNEL INFO -->
 
 <div id="channelInfoModal" class="modal">
 
-    <div class="modal-box">
+<div class="modal-box">
 
-        <div class="channel-info">
+<div class="channel-info">
 
-            <div
-                id="infoChannelAvatar"
-                class="channel-info-avatar"
-            ></div>
+<div
+id="infoChannelAvatar"
+class="channel-info-avatar"
+></div>
 
-            <div
-                id="infoChannelName"
-                class="channel-info-name"
-            ></div>
+<div
+id="infoChannelName"
+class="channel-info-name"
+></div>
 
-            <div
-                id="infoChannelDescription"
-                class="channel-info-description"
-            ></div>
+<div
+id="infoChannelDescription"
+class="channel-info-description"
+></div>
 
-            <div
-                id="infoChannelLink"
-                class="channel-info-link"
-            ></div>
+<div
+id="infoChannelLink"
+class="channel-info-link"
+></div>
 
-            <div
-                id="infoChannelType"
-                class="channel-info-type"
-            ></div>
+<div
+id="infoChannelType"
+class="channel-info-type"
+></div>
 
-            <button
-                id="closeChannelInfoButton"
-                class="profile-button"
-            >
-                Закрыть
-            </button>
+<button
+id="closeChannelInfoButton"
+class="profile-button"
 
-        </div>
+>
 
-    </div>
+Закрыть </button>
 
 </div>
 
+</div>
+</div>
+
+<!-- MEDIA VIEWER -->
+
+<div id="mediaViewer" class="media-viewer">
+
+<div class="media-viewer-content">
+
+<img id="mediaViewerImage" src="" alt="">
+
+<div class="media-viewer-buttons">
+
+<button id="saveMediaButton">
+⬇️ Сохранить в галерею
+</button>
+
+<button id="closeMediaButton" class="close-media">
+Закрыть
+</button>
+
+</div>
+
+</div>
+
+</div>
 
 <script>
 
 const SUPABASE_URL =
-    "https://tnzdjjtubeulxrvfrmfr.supabase.co";
+"https://tnzdjjtubeulxrvfrmfr.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_obyiISO1UFNJn6T6JEAiEQ_XLZanE6d";
+"sb_publishable_obyiISO1UFNJn6T6JEAiEQ_XLZanE6d";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
 let currentUser = null;
 let currentProfile = null;
@@ -1259,2157 +1440,1995 @@ let realtimeChannel = null;
 let selectedChannelType = "private";
 let selectedChannelFile = null;
 
+let selectedChatFile = null;
+let selectedViewerUrl = null;
 
-/* =========================
-   AUTH
-========================= */
 
-async function checkAuth() {
+/* AUTH */
 
-    const {
-        data: {
-            session
-        }
-    } = await supabaseClient.auth.getSession();
+async function checkAuth(){
 
-    if (!session) {
-        window.location.href = "login.html";
-        return;
-    }
+const {
+data:{session}
+}=await supabaseClient.auth.getSession();
 
-    currentUser = session.user;
+if(!session){
 
-    await loadProfile();
-    await loadChats();
+window.location.href="login.html";
+return;
+}
+
+currentUser=session.user;
+
+await loadProfile();
+await loadChats();
 }
 
 
-/* =========================
-   PROFILE
-========================= */
+/* PROFILE */
 
-async function loadProfile() {
+async function loadProfile(){
 
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single();
+const {
+data,
+error
+}=await supabaseClient
+.from("profiles")
+.select("*")
+.eq("id",currentUser.id)
+.single();
 
-    if (error) {
-        console.error(error);
-        return;
-    }
+if(error){
 
-    currentProfile = data;
+console.error(error);
+return;
+}
 
-    document.getElementById(
-        "profileName"
-    ).textContent = data.name;
+currentProfile=data;
 
-    document.getElementById(
-        "profileUsername"
-    ).textContent = "@" + data.username;
+document.getElementById("profileName").textContent=data.name;
 
-    const avatar =
-        document.getElementById("profileAvatar");
+document.getElementById("profileUsername").textContent=
+"@"+data.username;
 
-    if (data.avatar_url) {
+const avatar=document.getElementById("profileAvatar");
 
-        avatar.innerHTML =
-            `<img src="${escapeHtml(data.avatar_url)}" alt="">`;
+if(data.avatar_url){
 
-    } else {
+avatar.innerHTML=
+`<img src="${escapeHtml(data.avatar_url)}" alt="">`;
 
-        avatar.textContent =
-            data.name.charAt(0).toUpperCase();
-    }
+}else{
+
+avatar.textContent=
+data.name.charAt(0).toUpperCase();
+
+}
 }
 
 
-/* =========================
-   LOAD CHATS
-========================= */
+/* LOAD CHATS */
 
-async function loadChats() {
+async function loadChats(){
 
-    const list =
-        document.getElementById("chatList");
+const list=document.getElementById("chatList");
 
-    list.innerHTML = "";
+list.innerHTML="";
 
-    let hasSomething = false;
+let hasSomething=false;
 
-    const {
-        data: contacts,
-        error: contactsError
-    } = await supabaseClient
-        .from("contacts")
-        .select("contact_id")
-        .eq("user_id", currentUser.id);
+const {
+data:contacts,
+error:contactsError
+}=await supabaseClient
+.from("contacts")
+.select("contact_id")
+.eq("user_id",currentUser.id);
 
-    if (!contactsError && contacts) {
+if(!contactsError && contacts){
 
-        for (const contact of contacts) {
+for(const contact of contacts){
 
-            const {
-                data: profile
-            } = await supabaseClient
-                .from("profiles")
-                .select("*")
-                .eq("id", contact.contact_id)
-                .single();
+const {data:profile}=await supabaseClient
+.from("profiles")
+.select("*")
+.eq("id",contact.contact_id)
+.single();
 
-            if (!profile) {
-                continue;
-            }
+if(!profile)continue;
 
-            createContactElement(profile);
-            hasSomething = true;
-        }
-    }
+createContactElement(profile);
+hasSomething=true;
+}
+}
 
+const {
+data:channels,
+error:channelsError
+}=await supabaseClient
+.from("channels")
+.select("*")
+.order("created_at",{ascending:false});
 
-    /*
-       Каналы пока оставляем.
-       Если RLS выдаёт ошибку, она НЕ ломает
-       обычные чаты и профиль.
-    */
+if(channelsError){
 
-    const {
-        data: channels,
-        error: channelsError
-    } = await supabaseClient
-        .from("channels")
-        .select("*")
-        .order("created_at", {
-            ascending: false
-        });
+console.warn("Каналы недоступны:",channelsError.message);
 
-    if (channelsError) {
+}else if(channels){
 
-        console.warn(
-            "Каналы недоступны:",
-            channelsError.message
-        );
+for(const channel of channels){
 
-    } else if (channels) {
+const canShow=
+channel.type==="public" ||
+channel.owner_id===currentUser.id;
 
-        for (const channel of channels) {
+if(!canShow)continue;
 
-            const canShow =
-                channel.type === "public" ||
-                channel.owner_id === currentUser.id;
+createChannelElement(channel);
+hasSomething=true;
+}
+}
 
-            if (!canShow) {
-                continue;
-            }
+if(!hasSomething){
 
-            createChannelElement(channel);
-            hasSomething = true;
-        }
-    }
-
-
-    if (!hasSomething) {
-
-        list.innerHTML =
-            `<div class="empty">
-                Пока нет чатов
-            </div>`;
-    }
+list.innerHTML=
+`<div class="empty">Пока нет чатов</div>`;
+}
 }
 
 
-/* =========================
-   CONTACT ELEMENT
-========================= */
+/* CONTACT ELEMENT */
 
-function createContactElement(profile) {
+function createContactElement(profile){
 
-    const list =
-        document.getElementById("chatList");
+const list=document.getElementById("chatList");
 
-    const item =
-        document.createElement("div");
+const item=document.createElement("div");
+item.className="contact-item";
 
-    item.className = "contact-item";
+const avatar=document.createElement("div");
+avatar.className="avatar";
 
-    const avatar =
-        document.createElement("div");
+setAvatar(avatar,profile);
 
-    avatar.className = "avatar";
+const info=document.createElement("div");
+info.className="contact-info";
 
-    setAvatar(avatar, profile);
+info.innerHTML=`
+<div class="contact-name">
+${escapeHtml(profile.name)}
+</div>
 
-    const info =
-        document.createElement("div");
+<div class="contact-username">
+@${escapeHtml(profile.username)}
+</div>
+`;
 
-    info.className = "contact-info";
+item.appendChild(avatar);
+item.appendChild(info);
 
-    info.innerHTML = `
-        <div class="contact-name">
-            ${escapeHtml(profile.name)}
-        </div>
+item.onclick=()=>{
+openChat(profile);
+};
 
-        <div class="contact-username">
-            @${escapeHtml(profile.username)}
-        </div>
-    `;
-
-    item.appendChild(avatar);
-    item.appendChild(info);
-
-    item.onclick = () => {
-        openChat(profile);
-    };
-
-    list.appendChild(item);
+list.appendChild(item);
 }
 
 
-/* =========================
-   CHANNEL ELEMENT
-========================= */
+/* CHANNEL ELEMENT */
 
-function createChannelElement(channel) {
+function createChannelElement(channel){
 
-    const list =
-        document.getElementById("chatList");
+const list=document.getElementById("chatList");
 
-    const item =
-        document.createElement("div");
+const item=document.createElement("div");
+item.className="channel-item";
 
-    item.className = "channel-item";
+const avatar=document.createElement("div");
+avatar.className="avatar";
 
-    const avatar =
-        document.createElement("div");
+setChannelAvatar(avatar,channel);
 
-    avatar.className = "avatar";
+const info=document.createElement("div");
+info.className="contact-info";
 
-    setChannelAvatar(avatar, channel);
+const usernameText=
+channel.username
+?"@"+channel.username
+:"🔒 Частный канал";
 
-    const info =
-        document.createElement("div");
+info.innerHTML=`
+<div class="contact-name">
+${escapeHtml(channel.name)}
+<span class="channel-badge">📢</span>
+</div>
 
-    info.className = "contact-info";
+<div class="contact-username">
+${escapeHtml(usernameText)}
+</div>
+`;
 
-    const usernameText =
-        channel.username
-            ? "@" + channel.username
-            : "🔒 Частный канал";
+item.appendChild(avatar);
+item.appendChild(info);
 
-    info.innerHTML = `
-        <div class="contact-name">
-            ${escapeHtml(channel.name)}
-            <span class="channel-badge">📢</span>
-        </div>
+item.onclick=()=>{
+openChannel(channel);
+};
 
-        <div class="contact-username">
-            ${escapeHtml(usernameText)}
-        </div>
-    `;
+item.oncontextmenu=event=>{
 
-    item.appendChild(avatar);
-    item.appendChild(info);
+event.preventDefault();
+openChannelInfo(channel);
 
-    item.onclick = () => {
-        openChannel(channel);
-    };
+};
 
-    item.oncontextmenu = event => {
-
-        event.preventDefault();
-
-        openChannelInfo(channel);
-    };
-
-    list.appendChild(item);
+list.appendChild(item);
 }
 
 
-/* =========================
-   SEARCH
-========================= */
+/* SEARCH */
 
-const searchInput =
-    document.getElementById("searchInput");
+const searchInput=document.getElementById("searchInput");
 
-searchInput.addEventListener(
-    "input",
-    async function () {
+searchInput.addEventListener("input",async function(){
 
-        const query =
-            this.value
-                .trim()
-                .replace(/^@/, "")
-                .toLowerCase();
+const query=this.value.trim().replace(/^@/,"").toLowerCase();
 
-        const results =
-            document.getElementById("searchResults");
+const results=document.getElementById("searchResults");
+const chatList=document.getElementById("chatList");
 
-        const chatList =
-            document.getElementById("chatList");
+if(!query){
 
-        if (!query) {
+results.style.display="none";
+chatList.style.display="block";
+return;
+}
 
-            results.style.display = "none";
-            chatList.style.display = "block";
+chatList.style.display="none";
+results.style.display="block";
 
-            return;
-        }
+results.innerHTML=
+`<div class="empty">Поиск...</div>`;
 
-        chatList.style.display = "none";
-        results.style.display = "block";
+let found=false;
 
-        results.innerHTML =
-            `<div class="empty">Поиск...</div>`;
+const {
+data:users,
+error:usersError
+}=await supabaseClient
+.from("profiles")
+.select("id,name,username,avatar_url")
+.ilike("username",`${query}%`)
+.neq("id",currentUser.id)
+.limit(10);
 
-        let found = false;
+if(!usersError && users){
 
+for(const profile of users){
 
-        /* USERS */
+found=true;
 
-        const {
-            data: users,
-            error: usersError
-        } = await supabaseClient
-            .from("profiles")
-            .select("id,name,username,avatar_url")
-            .ilike("username", `${query}%`)
-            .neq("id", currentUser.id)
-            .limit(10);
+const card=document.createElement("div");
+card.className="search-card";
 
-        if (!usersError && users) {
+const avatar=document.createElement("div");
+avatar.className="avatar";
 
-            for (const profile of users) {
+setAvatar(avatar,profile);
 
-                found = true;
+const info=document.createElement("div");
+info.className="search-card-info";
 
-                const card =
-                    document.createElement("div");
+info.innerHTML=`
+<div class="contact-name">
+${escapeHtml(profile.name)}
+</div>
 
-                card.className = "search-card";
+<div class="contact-username">
+@${escapeHtml(profile.username)}
+</div>
+`;
 
-                const avatar =
-                    document.createElement("div");
+const button=document.createElement("button");
 
-                avatar.className = "avatar";
+button.className="add-button";
+button.textContent="Добавить";
 
-                setAvatar(avatar, profile);
+const {data:existing}=await supabaseClient
+.from("contacts")
+.select("id")
+.eq("user_id",currentUser.id)
+.eq("contact_id",profile.id)
+.maybeSingle();
 
-                const info =
-                    document.createElement("div");
+if(existing){
 
-                info.className = "search-card-info";
+button.textContent="Добавлен";
+button.classList.add("added");
+button.disabled=true;
+}
 
-                info.innerHTML = `
-                    <div class="contact-name">
-                        ${escapeHtml(profile.name)}
-                    </div>
+button.onclick=async event=>{
 
-                    <div class="contact-username">
-                        @${escapeHtml(profile.username)}
-                    </div>
-                `;
+event.stopPropagation();
 
-                const button =
-                    document.createElement("button");
+const {error}=await supabaseClient
+.from("contacts")
+.insert({
+user_id:currentUser.id,
+contact_id:profile.id
+});
 
-                button.className = "add-button";
-                button.textContent = "Добавить";
+if(error){
 
-                const {
-                    data: existing
-                } = await supabaseClient
-                    .from("contacts")
-                    .select("id")
-                    .eq("user_id", currentUser.id)
-                    .eq("contact_id", profile.id)
-                    .maybeSingle();
+console.error(error);
 
-                if (existing) {
+alert("Не удалось добавить контакт");
+return;
+}
 
-                    button.textContent = "Добавлен";
-                    button.classList.add("added");
-                    button.disabled = true;
-                }
+button.textContent="Добавлен";
+button.classList.add("added");
+button.disabled=true;
 
-                button.onclick =
-                    async event => {
+await loadChats();
+};
 
-                        event.stopPropagation();
+card.appendChild(avatar);
+card.appendChild(info);
+card.appendChild(button);
 
-                        const {
-                            error
-                        } = await supabaseClient
-                            .from("contacts")
-                            .insert({
-                                user_id:
-                                    currentUser.id,
+results.appendChild(card);
+}
+}
 
-                                contact_id:
-                                    profile.id
-                            });
+const {
+data:channels,
+error:channelsError
+}=await supabaseClient
+.from("channels")
+.select("*")
+.eq("type","public")
+.or(`username.ilike.${query}%,name.ilike.%${query}%`)
+.limit(10);
 
-                        if (error) {
+if(!channelsError && channels){
 
-                            console.error(error);
+for(const channel of channels){
 
-                            alert(
-                                "Не удалось добавить контакт"
-                            );
+found=true;
 
-                            return;
-                        }
+const card=document.createElement("div");
+card.className="search-card";
 
-                        button.textContent =
-                            "Добавлен";
+const avatar=document.createElement("div");
+avatar.className="avatar";
 
-                        button.classList.add(
-                            "added"
-                        );
+setChannelAvatar(avatar,channel);
 
-                        button.disabled = true;
+const info=document.createElement("div");
+info.className="search-card-info";
 
-                        await loadChats();
-                    };
+info.innerHTML=`
+<div class="contact-name">
+${escapeHtml(channel.name)}
+<span class="channel-badge">📢</span>
+</div>
 
-                card.appendChild(avatar);
-                card.appendChild(info);
-                card.appendChild(button);
+<div class="contact-username">
+@${escapeHtml(channel.username||"")}
+</div>
+`;
 
-                results.appendChild(card);
-            }
-        }
+const button=document.createElement("button");
 
+button.className="add-button";
+button.textContent="Открыть";
 
-        /* CHANNEL SEARCH */
+button.onclick=()=>{
+openChannel(channel);
+};
 
-        const {
-            data: channels,
-            error: channelsError
-        } = await supabaseClient
-            .from("channels")
-            .select("*")
-            .eq("type", "public")
-            .or(
-                `username.ilike.${query}%,name.ilike.%${query}%`
-            )
-            .limit(10);
+card.appendChild(avatar);
+card.appendChild(info);
+card.appendChild(button);
 
-        if (!channelsError && channels) {
+results.appendChild(card);
+}
+}
 
-            for (const channel of channels) {
+if(!found){
 
-                found = true;
+results.innerHTML=
+`<div class="empty">Ничего не найдено</div>`;
+}
 
-                const card =
-                    document.createElement("div");
+});
 
-                card.className = "search-card";
 
-                const avatar =
-                    document.createElement("div");
+/* OPEN CHAT */
 
-                avatar.className = "avatar";
+async function openChat(profile){
 
-                setChannelAvatar(
-                    avatar,
-                    channel
-                );
+currentContact=profile;
+currentChannel=null;
 
-                const info =
-                    document.createElement("div");
+stopRealtime();
+clearSelectedFile();
+hideContentForChat();
 
-                info.className = "search-card-info";
+document.getElementById("chatWindow").style.display="flex";
+document.getElementById("messageInputArea").style.display="flex";
 
-                info.innerHTML = `
-                    <div class="contact-name">
-                        ${escapeHtml(channel.name)}
-                        <span class="channel-badge">
-                            📢
-                        </span>
-                    </div>
+if(window.innerWidth<=700){
 
-                    <div class="contact-username">
-                        @${escapeHtml(channel.username || "")}
-                    </div>
-                `;
+closeMobileMenu();
 
-                const button =
-                    document.createElement("button");
+document.getElementById("mobileBackButton").style.display="flex";
+}
 
-                button.className = "add-button";
-                button.textContent = "Открыть";
+setAvatar(
+document.getElementById("chatAvatar"),
+profile
+);
 
-                button.onclick = () => {
-                    openChannel(channel);
-                };
+document.getElementById("chatName").textContent=profile.name;
 
-                card.appendChild(avatar);
-                card.appendChild(info);
-                card.appendChild(button);
+document.getElementById("chatUsername").textContent=
+"@"+profile.username;
 
-                results.appendChild(card);
-            }
-        }
+document.getElementById("messageInput").placeholder=
+"Написать сообщение...";
 
-        if (!found) {
+await loadMessages();
 
-            results.innerHTML =
-                `<div class="empty">
-                    Ничего не найдено
-                </div>`;
-        }
-    }
+subscribeToMessages();
+}
+
+
+/* OPEN CHANNEL */
+
+async function openChannel(channel){
+
+currentChannel=channel;
+currentContact=null;
+
+stopRealtime();
+clearSelectedFile();
+hideContentForChat();
+
+document.getElementById("chatWindow").style.display="flex";
+
+if(window.innerWidth<=700){
+
+closeMobileMenu();
+
+document.getElementById("mobileBackButton").style.display="flex";
+}
+
+setChannelAvatar(
+document.getElementById("chatAvatar"),
+channel
+);
+
+document.getElementById("chatName").textContent=channel.name;
+
+document.getElementById("chatUsername").textContent=
+channel.username
+?"@"+channel.username
+:"🔒 Частный канал";
+
+const canWrite=await canWriteToChannel(channel);
+
+if(canWrite){
+
+document.getElementById("messageInputArea").style.display="flex";
+
+document.getElementById("messageInput").placeholder=
+"Написать в канал...";
+
+}else{
+
+document.getElementById("messageInputArea").style.display="none";
+}
+
+await loadChannelMessages();
+
+subscribeToChannelMessages();
+}
+
+
+/* CHECK CHANNEL WRITE */
+
+async function canWriteToChannel(channel){
+
+if(channel.owner_id===currentUser.id){
+return true;
+}
+
+const {
+data,
+error
+}=await supabaseClient
+.from("channel_members")
+.select("role")
+.eq("channel_id",channel.id)
+.eq("user_id",currentUser.id)
+.maybeSingle();
+
+if(error||!data){
+return false;
+}
+
+return data.role==="admin"||data.role==="owner";
+}
+
+
+/* LOAD PERSONAL MESSAGES */
+
+async function loadMessages(){
+
+const messages=document.getElementById("messages");
+
+messages.innerHTML="";
+
+const {
+data,
+error
+}=await supabaseClient
+.from("messages")
+.select("*")
+.or(
+`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
+)
+.order("created_at",{ascending:true});
+
+if(error){
+
+console.error(error);
+return;
+}
+
+for(const message of data){
+displayMessage(message);
+}
+
+messages.scrollTop=messages.scrollHeight;
+}
+
+
+/* LOAD CHANNEL MESSAGES */
+
+async function loadChannelMessages(){
+
+const messages=document.getElementById("messages");
+
+messages.innerHTML="";
+
+const {
+data,
+error
+}=await supabaseClient
+.from("channel_messages")
+.select("*")
+.eq("channel_id",currentChannel.id)
+.order("created_at",{ascending:true});
+
+if(error){
+
+console.error(error);
+return;
+}
+
+for(const message of data){
+displayChannelMessage(message);
+}
+
+messages.scrollTop=messages.scrollHeight;
+}
+
+
+/* DISPLAY PERSONAL MESSAGE */
+
+function displayMessage(message){
+
+const container=document.getElementById("messages");
+
+if(container.querySelector(`[data-id="${message.id}"]`)){
+return;
+}
+
+const element=document.createElement("div");
+
+element.className=
+"message "+
+(message.sender_id===currentUser.id?"mine":"theirs");
+
+element.dataset.id=String(message.id);
+
+const time=new Date(message.created_at)
+.toLocaleTimeString("ru-RU",{
+hour:"2-digit",
+minute:"2-digit"
+});
+
+
+/* MEDIA */
+
+if(message.media_url){
+
+const mediaWrap=document.createElement("div");
+mediaWrap.className="message-media";
+
+if(
+message.media_type &&
+message.media_type.startsWith("image/")
+){
+
+const image=document.createElement("img");
+
+image.className="message-image";
+image.src=message.media_url;
+image.alt=message.media_name||"Изображение";
+image.loading="lazy";
+
+image.onclick=()=>{
+openMediaViewer(message.media_url);
+};
+
+mediaWrap.appendChild(image);
+
+}else{
+
+const fileCard=document.createElement("div");
+fileCard.className="file-card";
+
+const icon=document.createElement("div");
+icon.className="file-icon";
+icon.textContent="📄";
+
+const info=document.createElement("div");
+info.className="file-info";
+
+const name=document.createElement("div");
+name.className="file-name";
+name.textContent=message.media_name||"Файл";
+
+const size=document.createElement("div");
+size.className="file-size";
+size.textContent=formatFileSize(message.media_size);
+
+info.appendChild(name);
+info.appendChild(size);
+
+const download=document.createElement("button");
+
+download.className="file-download";
+download.textContent="⬇️";
+
+download.onclick=()=>{
+downloadFile(
+message.media_url,
+message.media_name||"file"
+);
+};
+
+fileCard.appendChild(icon);
+fileCard.appendChild(info);
+fileCard.appendChild(download);
+
+mediaWrap.appendChild(fileCard);
+}
+
+element.appendChild(mediaWrap);
+}
+
+
+/* CAPTION / TEXT */
+
+if(message.content){
+
+const caption=document.createElement("div");
+
+caption.className="message-caption";
+caption.textContent=message.content;
+
+element.appendChild(caption);
+}
+
+
+const timeElement=document.createElement("div");
+
+timeElement.className="message-time";
+timeElement.textContent=time;
+
+element.appendChild(timeElement);
+
+container.appendChild(element);
+
+container.scrollTop=container.scrollHeight;
+}
+
+
+/* DISPLAY CHANNEL MESSAGE */
+
+function displayChannelMessage(message){
+
+const container=document.getElementById("messages");
+
+if(container.querySelector(`[data-id="${message.id}"]`)){
+return;
+}
+
+const element=document.createElement("div");
+
+element.className="message mine";
+
+element.dataset.id=String(message.id);
+
+const time=new Date(message.created_at)
+.toLocaleTimeString("ru-RU",{
+hour:"2-digit",
+minute:"2-digit"
+});
+
+element.innerHTML=`
+<div>
+${escapeHtml(message.content)}
+</div>
+
+<div class="message-time">
+${time}
+</div>
+`;
+
+container.appendChild(element);
+
+container.scrollTop=container.scrollHeight;
+}
+
+
+/* FILE SELECT */
+
+const fileInput=document.getElementById("fileInput");
+
+document.getElementById("attachButton").onclick=()=>{
+
+if(!currentContact){
+
+alert("Файлы пока можно отправлять только в личных чатах.");
+
+return;
+}
+
+fileInput.click();
+};
+
+
+fileInput.addEventListener("change",event=>{
+
+const file=event.target.files[0];
+
+if(!file){
+return;
+}
+
+const maxSize=50*1024*1024;
+
+if(file.size>maxSize){
+
+alert("Файл слишком большой. Максимальный размер — 50 МБ.");
+
+fileInput.value="";
+return;
+}
+
+selectedChatFile=file;
+
+showFilePreview(file);
+});
+
+
+/* FILE PREVIEW */
+
+function showFilePreview(file){
+
+const preview=document.getElementById("filePreview");
+const visual=document.getElementById("filePreviewVisual");
+
+document.getElementById("filePreviewName").textContent=file.name;
+
+document.getElementById("filePreviewSize").textContent=
+formatFileSize(file.size);
+
+visual.innerHTML="";
+
+if(file.type.startsWith("image/")){
+
+const image=document.createElement("img");
+
+image.className="file-preview-image";
+
+image.src=URL.createObjectURL(file);
+
+visual.appendChild(image);
+
+}else{
+
+const icon=document.createElement("div");
+
+icon.className="file-preview-icon";
+icon.textContent="📄";
+
+visual.appendChild(icon);
+}
+
+preview.classList.add("active");
+}
+
+
+/* REMOVE FILE */
+
+document.getElementById("removeFileButton").onclick=()=>{
+clearSelectedFile();
+};
+
+
+function clearSelectedFile(){
+
+selectedChatFile=null;
+
+fileInput.value="";
+
+document.getElementById("filePreview").classList.remove("active");
+
+document.getElementById("filePreviewVisual").innerHTML="";
+
+document.getElementById("filePreviewName").textContent="";
+
+document.getElementById("filePreviewSize").textContent="";
+}
+
+
+/* SEND MESSAGE */
+
+const messageInput=document.getElementById("messageInput");
+const sendButton=document.getElementById("sendButton");
+
+async function sendMessage(){
+
+const text=messageInput.value.trim();
+
+if(!text && !selectedChatFile){
+return;
+}
+
+
+/* PERSONAL CHAT */
+
+if(currentContact){
+
+const file=selectedChatFile;
+
+messageInput.value="";
+
+sendButton.disabled=true;
+
+try{
+
+let mediaUrl=null;
+let mediaName=null;
+let mediaType=null;
+let mediaSize=null;
+
+
+/* UPLOAD FILE */
+
+if(file){
+
+const extension=
+file.name.includes(".")
+?file.name.split(".").pop().toLowerCase()
+:"";
+
+const filePath=
+currentUser.id+
+"/"+
+crypto.randomUUID()+
+(extension?"."+extension:"");
+
+const {
+error:uploadError
+}=await supabaseClient
+.storage
+.from("chat-media")
+.upload(
+filePath,
+file,
+{
+cacheControl:"3600",
+upsert:false,
+contentType:file.type||"application/octet-stream"
+}
+);
+
+if(uploadError){
+
+console.error(uploadError);
+
+throw new Error(
+"Не удалось загрузить файл: "+
+uploadError.message
+);
+}
+
+const {
+data:publicData
+}=supabaseClient
+.storage
+.from("chat-media")
+.getPublicUrl(filePath);
+
+mediaUrl=publicData.publicUrl;
+mediaName=file.name;
+mediaType=file.type||"application/octet-stream";
+mediaSize=file.size;
+}
+
+
+/* INSERT MESSAGE */
+
+const {
+error
+}=await supabaseClient
+.from("messages")
+.insert({
+
+sender_id:currentUser.id,
+
+receiver_id:currentContact.id,
+
+content:text||null,
+
+media_url:mediaUrl,
+
+media_name:mediaName,
+
+media_type:mediaType,
+
+media_size:mediaSize
+
+});
+
+if(error){
+
+console.error(error);
+
+throw new Error(
+"Сообщение не отправилось: "+
+error.message
+);
+}
+
+clearSelectedFile();
+
+}catch(error){
+
+console.error(error);
+
+alert(error.message);
+
+messageInput.value=text;
+
+}finally{
+
+sendButton.disabled=false;
+
+}
+
+return;
+}
+
+
+/* CHANNEL */
+
+if(currentChannel){
+
+const canWrite=
+await canWriteToChannel(currentChannel);
+
+if(!canWrite){
+
+alert(
+"Только владелец и администраторы могут писать в этот канал"
+);
+
+return;
+}
+
+if(selectedChatFile){
+
+alert("Отправка файлов в каналах будет добавлена позже.");
+
+return;
+}
+
+messageInput.value="";
+
+const {
+error
+}=await supabaseClient
+.from("channel_messages")
+.insert({
+
+channel_id:currentChannel.id,
+
+sender_id:currentUser.id,
+
+content:text
+
+});
+
+if(error){
+
+console.error(error);
+
+alert("Сообщение не отправилось");
+
+messageInput.value=text;
+}
+
+}
+
+}
+
+
+sendButton.addEventListener("click",sendMessage);
+
+messageInput.addEventListener("keydown",event=>{
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+
+sendMessage();
+}
+
+});
+
+
+/* REALTIME PERSONAL */
+
+function subscribeToMessages(){
+
+stopRealtime();
+
+realtimeChannel=
+supabaseClient
+.channel(
+"messages-"+
+currentUser.id+
+"-"+
+currentContact.id
+)
+.on(
+"postgres_changes",
+{
+event:"INSERT",
+schema:"public",
+table:"messages"
+},
+payload=>{
+
+const message=payload.new;
+
+if(!currentContact){
+return;
+}
+
+const belongs=
+(
+message.sender_id===currentUser.id &&
+message.receiver_id===currentContact.id
+)
+||
+(
+message.sender_id===currentContact.id &&
+message.receiver_id===currentUser.id
+);
+
+if(!belongs){
+return;
+}
+
+displayMessage(message);
+
+}
+)
+.subscribe();
+}
+
+
+/* REALTIME CHANNEL */
+
+function subscribeToChannelMessages(){
+
+stopRealtime();
+
+realtimeChannel=
+supabaseClient
+.channel(
+"channel-"+currentChannel.id
+)
+.on(
+"postgres_changes",
+{
+event:"INSERT",
+schema:"public",
+table:"channel_messages"
+},
+payload=>{
+
+const message=payload.new;
+
+if(!currentChannel){
+return;
+}
+
+if(message.channel_id!==currentChannel.id){
+return;
+}
+
+displayChannelMessage(message);
+
+}
+)
+.subscribe();
+}
+
+
+/* STOP REALTIME */
+
+function stopRealtime(){
+
+if(realtimeChannel){
+
+supabaseClient.removeChannel(realtimeChannel);
+
+realtimeChannel=null;
+}
+}
+
+
+/* MEDIA VIEWER */
+
+function openMediaViewer(url){
+
+selectedViewerUrl=url;
+
+document.getElementById("mediaViewerImage").src=url;
+
+document.getElementById("mediaViewer").classList.add("active");
+}
+
+
+document.getElementById("closeMediaButton").onclick=()=>{
+
+document.getElementById("mediaViewer").classList.remove("active");
+
+document.getElementById("mediaViewerImage").src="";
+
+selectedViewerUrl=null;
+};
+
+
+document.getElementById("mediaViewer").onclick=event=>{
+
+if(event.target.id==="mediaViewer"){
+
+document.getElementById("closeMediaButton").click();
+
+}
+
+};
+
+
+document.getElementById("saveMediaButton").onclick=async()=>{
+
+if(!selectedViewerUrl){
+return;
+}
+
+await downloadFile(
+selectedViewerUrl,
+"kleivy-image.jpg"
+);
+
+};
+
+
+/* DOWNLOAD */
+
+async function downloadFile(url,fileName){
+
+try{
+
+const response=await fetch(url);
+
+if(!response.ok){
+throw new Error("Не удалось скачать файл");
+}
+
+const blob=await response.blob();
+
+const blobUrl=URL.createObjectURL(blob);
+
+const link=document.createElement("a");
+
+link.href=blobUrl;
+link.download=fileName;
+
+document.body.appendChild(link);
+
+link.click();
+
+link.remove();
+
+setTimeout(()=>{
+URL.revokeObjectURL(blobUrl);
+},1000);
+
+}catch(error){
+
+console.error(error);
+
+window.open(url,"_blank");
+
+}
+
+}
+
+
+/* FILE SIZE */
+
+function formatFileSize(bytes){
+
+if(!bytes){
+return "";
+}
+
+if(bytes<1024){
+return bytes+" Б";
+}
+
+if(bytes<1024*1024){
+return (bytes/1024).toFixed(1)+" КБ";
+}
+
+if(bytes<1024*1024*1024){
+return (bytes/(1024*1024)).toFixed(1)+" МБ";
+}
+
+return (bytes/(1024*1024*1024)).toFixed(1)+" ГБ";
+}
+
+
+/* HIDE CONTENT */
+
+function hideContentForChat(){
+
+document.getElementById("profilePage").style.display="none";
+
+document.getElementById("welcome").style.display="none";
+
+document.getElementById("searchResults").style.display="none";
+}
+
+
+/* PLUS */
+
+document.getElementById("plusButton").onclick=()=>{
+
+document.getElementById("plusModal").classList.add("active");
+};
+
+
+document.getElementById("closePlusButton").onclick=()=>{
+
+document.getElementById("plusModal").classList.remove("active");
+};
+
+
+document.getElementById("newContactButton").onclick=()=>{
+
+document.getElementById("plusModal").classList.remove("active");
+
+searchInput.focus();
+};
+
+
+/* NEW CHANNEL */
+
+document.getElementById("newChannelButton").onclick=()=>{
+
+document.getElementById("plusModal").classList.remove("active");
+
+openCreateChannel();
+};
+
+
+function openCreateChannel(){
+
+selectedChannelType="private";
+selectedChannelFile=null;
+
+document.getElementById("channelNameInput").value="";
+document.getElementById("channelDescriptionInput").value="";
+document.getElementById("channelUsernameInput").value="";
+
+document.getElementById("publicUsernameBlock").style.display="none";
+
+document.getElementById("privateType").classList.add("selected");
+document.getElementById("publicType").classList.remove("selected");
+
+document.getElementById("channelPhotoPreview").innerHTML="📷";
+
+document.getElementById("channelPhotoInput").value="";
+
+document.getElementById("createChannelModal").classList.add("active");
+}
+
+
+/* CHANNEL PHOTO */
+
+document.getElementById("channelPhotoPreview").onclick=()=>{
+
+document.getElementById("channelPhotoInput").click();
+};
+
+
+document.getElementById("channelPhotoInput").addEventListener(
+"change",
+event=>{
+
+const file=event.target.files[0];
+
+if(!file)return;
+
+selectedChannelFile=file;
+
+const reader=new FileReader();
+
+reader.onload=()=>{
+
+document.getElementById("channelPhotoPreview").innerHTML=
+`<img src="${reader.result}" alt="">`;
+
+};
+
+reader.readAsDataURL(file);
+
+}
 );
 
 
-/* =========================
-   OPEN CHAT
-========================= */
+/* CHANNEL TYPE */
 
-async function openChat(profile) {
+document.getElementById("privateType").onclick=()=>{
 
-    currentContact = profile;
-    currentChannel = null;
+selectedChannelType="private";
 
-    stopRealtime();
+document.getElementById("privateType").classList.add("selected");
 
-    hideContentForChat();
+document.getElementById("publicType").classList.remove("selected");
 
-    document.getElementById(
-        "chatWindow"
-    ).style.display = "flex";
+document.getElementById("publicUsernameBlock").style.display="none";
+};
 
-    document.getElementById(
-        "messageInputArea"
-    ).style.display = "flex";
 
-    if (window.innerWidth <= 700) {
+document.getElementById("publicType").onclick=()=>{
 
-        closeMobileMenu();
+selectedChannelType="public";
 
-        document.getElementById(
-            "mobileBackButton"
-        ).style.display = "flex";
-    }
+document.getElementById("publicType").classList.add("selected");
 
-    setAvatar(
-        document.getElementById("chatAvatar"),
-        profile
-    );
+document.getElementById("privateType").classList.remove("selected");
 
-    document.getElementById(
-        "chatName"
-    ).textContent = profile.name;
+document.getElementById("publicUsernameBlock").style.display="block";
+};
 
-    document.getElementById(
-        "chatUsername"
-    ).textContent =
-        "@" + profile.username;
 
-    document.getElementById(
-        "messageInput"
-    ).placeholder =
-        "Написать сообщение...";
+/* CANCEL CHANNEL */
 
-    await loadMessages();
+document.getElementById("cancelChannelButton").onclick=()=>{
 
-    subscribeToMessages();
+document.getElementById("createChannelModal").classList.remove("active");
+};
+
+
+/* CREATE CHANNEL */
+
+document.getElementById("createChannelButton").onclick=async()=>{
+
+const button=document.getElementById("createChannelButton");
+
+const name=document.getElementById("channelNameInput").value.trim();
+
+const description=document.getElementById("channelDescriptionInput").value.trim();
+
+let username=document.getElementById("channelUsernameInput").value.trim().toLowerCase();
+
+if(!name){
+
+alert("Введите название канала");
+return;
 }
 
+if(name.length<2){
 
-/* =========================
-   OPEN CHANNEL
-========================= */
-
-async function openChannel(channel) {
-
-    currentChannel = channel;
-    currentContact = null;
-
-    stopRealtime();
-
-    hideContentForChat();
-
-    document.getElementById(
-        "chatWindow"
-    ).style.display = "flex";
-
-    if (window.innerWidth <= 700) {
-
-        closeMobileMenu();
-
-        document.getElementById(
-            "mobileBackButton"
-        ).style.display = "flex";
-    }
-
-    setChannelAvatar(
-        document.getElementById("chatAvatar"),
-        channel
-    );
-
-    document.getElementById(
-        "chatName"
-    ).textContent = channel.name;
-
-    document.getElementById(
-        "chatUsername"
-    ).textContent =
-        channel.username
-            ? "@" + channel.username
-            : "🔒 Частный канал";
-
-    const canWrite =
-        await canWriteToChannel(channel);
-
-    if (canWrite) {
-
-        document.getElementById(
-            "messageInputArea"
-        ).style.display = "flex";
-
-        document.getElementById(
-            "messageInput"
-        ).placeholder =
-            "Написать в канал...";
-
-    } else {
-
-        document.getElementById(
-            "messageInputArea"
-        ).style.display = "none";
-    }
-
-    await loadChannelMessages();
-
-    subscribeToChannelMessages();
+alert("Название слишком короткое");
+return;
 }
 
+if(selectedChannelType==="public"){
 
-/* =========================
-   CHECK CHANNEL WRITE
-========================= */
+if(!username){
 
-async function canWriteToChannel(channel) {
-
-    if (
-        channel.owner_id === currentUser.id
-    ) {
-        return true;
-    }
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("channel_members")
-        .select("role")
-        .eq("channel_id", channel.id)
-        .eq("user_id", currentUser.id)
-        .maybeSingle();
-
-    if (error || !data) {
-        return false;
-    }
-
-    return (
-        data.role === "admin" ||
-        data.role === "owner"
-    );
+alert("Введите ссылку публичного канала");
+return;
 }
 
+if(!/^[a-z0-9_]{3,40}$/.test(username)){
 
-/* =========================
-   LOAD PERSONAL MESSAGES
-========================= */
-
-async function loadMessages() {
-
-    const messages =
-        document.getElementById("messages");
-
-    messages.innerHTML = "";
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("messages")
-        .select("*")
-        .or(
-            `and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
-        )
-        .order("created_at", {
-            ascending: true
-        });
-
-    if (error) {
-
-        console.error(error);
-
-        return;
-    }
-
-    for (const message of data) {
-        displayMessage(message);
-    }
-
-    messages.scrollTop =
-        messages.scrollHeight;
-}
-
-
-/* =========================
-   LOAD CHANNEL MESSAGES
-========================= */
-
-async function loadChannelMessages() {
-
-    const messages =
-        document.getElementById("messages");
-
-    messages.innerHTML = "";
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("channel_messages")
-        .select("*")
-        .eq(
-            "channel_id",
-            currentChannel.id
-        )
-        .order("created_at", {
-            ascending: true
-        });
-
-    if (error) {
-
-        console.error(error);
-
-        return;
-    }
-
-    for (const message of data) {
-        displayChannelMessage(message);
-    }
-
-    messages.scrollTop =
-        messages.scrollHeight;
-}
-
-
-/* =========================
-   DISPLAY MESSAGE
-========================= */
-
-function displayMessage(message) {
-
-    const container =
-        document.getElementById("messages");
-
-    if (
-        container.querySelector(
-            `[data-id="${message.id}"]`
-        )
-    ) {
-        return;
-    }
-
-    const element =
-        document.createElement("div");
-
-    element.className =
-        "message " +
-        (
-            message.sender_id === currentUser.id
-                ? "mine"
-                : "theirs"
-        );
-
-    element.dataset.id =
-        String(message.id);
-
-    const time =
-        new Date(
-            message.created_at
-        ).toLocaleTimeString(
-            "ru-RU",
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-    element.innerHTML = `
-        <div>
-            ${escapeHtml(message.content)}
-        </div>
-
-        <div class="message-time">
-            ${time}
-        </div>
-    `;
-
-    container.appendChild(element);
-
-    container.scrollTop =
-        container.scrollHeight;
-}
-
-
-/* =========================
-   DISPLAY CHANNEL MESSAGE
-========================= */
-
-function displayChannelMessage(message) {
-
-    const container =
-        document.getElementById("messages");
-
-    if (
-        container.querySelector(
-            `[data-id="${message.id}"]`
-        )
-    ) {
-        return;
-    }
-
-    const element =
-        document.createElement("div");
-
-    element.className = "message mine";
-
-    element.dataset.id =
-        String(message.id);
-
-    const time =
-        new Date(
-            message.created_at
-        ).toLocaleTimeString(
-            "ru-RU",
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-    element.innerHTML = `
-        <div>
-            ${escapeHtml(message.content)}
-        </div>
-
-        <div class="message-time">
-            ${time}
-        </div>
-    `;
-
-    container.appendChild(element);
-
-    container.scrollTop =
-        container.scrollHeight;
-}
-
-
-/* =========================
-   SEND MESSAGE
-========================= */
-
-const messageInput =
-    document.getElementById("messageInput");
-
-const sendButton =
-    document.getElementById("sendButton");
-
-
-async function sendMessage() {
-
-    const text =
-        messageInput.value.trim();
-
-    if (!text) {
-        return;
-    }
-
-
-    if (currentContact) {
-
-        messageInput.value = "";
-
-        const {
-            error
-        } = await supabaseClient
-            .from("messages")
-            .insert({
-                sender_id:
-                    currentUser.id,
-
-                receiver_id:
-                    currentContact.id,
-
-                content:
-                    text
-            });
-
-        if (error) {
-
-            console.error(error);
-
-            alert(
-                "Сообщение не отправилось"
-            );
-
-            messageInput.value = text;
-        }
-
-        return;
-    }
-
-
-    if (currentChannel) {
-
-        const canWrite =
-            await canWriteToChannel(
-                currentChannel
-            );
-
-        if (!canWrite) {
-
-            alert(
-                "Только владелец и администраторы могут писать в этот канал"
-            );
-
-            return;
-        }
-
-        messageInput.value = "";
-
-        const {
-            error
-        } = await supabaseClient
-            .from("channel_messages")
-            .insert({
-                channel_id:
-                    currentChannel.id,
-
-                sender_id:
-                    currentUser.id,
-
-                content:
-                    text
-            });
-
-        if (error) {
-
-            console.error(error);
-
-            alert(
-                "Сообщение не отправилось"
-            );
-
-            messageInput.value = text;
-        }
-    }
-}
-
-
-sendButton.addEventListener(
-    "click",
-    sendMessage
+alert(
+"Username может содержать только английские буквы, цифры и _"
 );
 
+return;
+}
 
-messageInput.addEventListener(
-    "keydown",
-    event => {
+const {data:existingUsername}=await supabaseClient
+.from("channels")
+.select("id")
+.eq("username",username)
+.maybeSingle();
 
-        if (event.key === "Enter") {
+if(existingUsername){
 
-            event.preventDefault();
+alert("Такая ссылка уже занята");
+return;
+}
+}
 
-            sendMessage();
-        }
-    }
+button.disabled=true;
+button.textContent="Создание...";
+
+try{
+
+let avatarUrl=null;
+
+if(selectedChannelFile){
+
+const extension=
+selectedChannelFile.name
+.split(".")
+.pop()
+.toLowerCase();
+
+const filePath=
+currentUser.id+
+"/"+
+crypto.randomUUID()+
+"."+
+extension;
+
+const {
+error:uploadError
+}=await supabaseClient
+.storage
+.from("channel-avatars")
+.upload(
+filePath,
+selectedChannelFile,
+{
+cacheControl:"3600",
+upsert:false
+}
 );
 
+if(uploadError){
 
-/* =========================
-   REALTIME PERSONAL
-========================= */
+console.error(uploadError);
 
-function subscribeToMessages() {
-
-    stopRealtime();
-
-    realtimeChannel =
-        supabaseClient
-            .channel(
-                "messages-" +
-                currentUser.id +
-                "-" +
-                currentContact.id
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "messages"
-                },
-                payload => {
-
-                    const message =
-                        payload.new;
-
-                    if (!currentContact) {
-                        return;
-                    }
-
-                    const belongs =
-                        (
-                            message.sender_id ===
-                            currentUser.id &&
-                            message.receiver_id ===
-                            currentContact.id
-                        )
-                        ||
-                        (
-                            message.sender_id ===
-                            currentContact.id &&
-                            message.receiver_id ===
-                            currentUser.id
-                        );
-
-                    if (!belongs) {
-                        return;
-                    }
-
-                    displayMessage(message);
-                }
-            )
-            .subscribe();
+throw new Error(
+"Не удалось загрузить фотографию"
+);
 }
 
+const {data:publicUrl}=
+supabaseClient
+.storage
+.from("channel-avatars")
+.getPublicUrl(filePath);
 
-/* =========================
-   REALTIME CHANNEL
-========================= */
-
-function subscribeToChannelMessages() {
-
-    stopRealtime();
-
-    realtimeChannel =
-        supabaseClient
-            .channel(
-                "channel-" +
-                currentChannel.id
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "channel_messages"
-                },
-                payload => {
-
-                    const message =
-                        payload.new;
-
-                    if (!currentChannel) {
-                        return;
-                    }
-
-                    if (
-                        message.channel_id !==
-                        currentChannel.id
-                    ) {
-                        return;
-                    }
-
-                    displayChannelMessage(
-                        message
-                    );
-                }
-            )
-            .subscribe();
+avatarUrl=publicUrl.publicUrl;
 }
 
+let inviteCode=null;
 
-/* =========================
-   STOP REALTIME
-========================= */
+if(selectedChannelType==="private"){
 
-function stopRealtime() {
-
-    if (realtimeChannel) {
-
-        supabaseClient.removeChannel(
-            realtimeChannel
-        );
-
-        realtimeChannel = null;
-    }
+inviteCode=generateInviteCode();
 }
 
+const {
+data:channel,
+error
+}=await supabaseClient
+.from("channels")
+.insert({
 
-/* =========================
-   HIDE CONTENT
-========================= */
+owner_id:currentUser.id,
 
-function hideContentForChat() {
+name:name,
 
-    document.getElementById(
-        "profilePage"
-    ).style.display = "none";
+description:description||null,
 
-    document.getElementById(
-        "welcome"
-    ).style.display = "none";
+avatar_url:avatarUrl,
 
-    document.getElementById(
-        "searchResults"
-    ).style.display = "none";
+type:selectedChannelType,
+
+username:
+selectedChannelType==="public"
+?username
+:null,
+
+invite_code:inviteCode
+
+})
+.select()
+.single();
+
+if(error){
+
+console.error(error);
+
+throw new Error(error.message);
 }
 
+const {error:memberError}=await supabaseClient
+.from("channel_members")
+.insert({
 
-/* =========================
-   PLUS
-========================= */
+channel_id:channel.id,
 
-document.getElementById(
-    "plusButton"
-).onclick = () => {
+user_id:currentUser.id,
 
-    document.getElementById(
-        "plusModal"
-    ).classList.add("active");
-};
+role:"owner"
 
+});
 
-document.getElementById(
-    "closePlusButton"
-).onclick = () => {
+if(memberError){
 
-    document.getElementById(
-        "plusModal"
-    ).classList.remove("active");
-};
+console.error(memberError);
 
-
-document.getElementById(
-    "newContactButton"
-).onclick = () => {
-
-    document.getElementById(
-        "plusModal"
-    ).classList.remove("active");
-
-    searchInput.focus();
-};
-
-
-/* =========================
-   NEW CHANNEL
-========================= */
-
-document.getElementById(
-    "newChannelButton"
-).onclick = () => {
-
-    document.getElementById(
-        "plusModal"
-    ).classList.remove("active");
-
-    openCreateChannel();
-};
-
-
-function openCreateChannel() {
-
-    selectedChannelType = "private";
-    selectedChannelFile = null;
-
-    document.getElementById(
-        "channelNameInput"
-    ).value = "";
-
-    document.getElementById(
-        "channelDescriptionInput"
-    ).value = "";
-
-    document.getElementById(
-        "channelUsernameInput"
-    ).value = "";
-
-    document.getElementById(
-        "publicUsernameBlock"
-    ).style.display = "none";
-
-    document.getElementById(
-        "privateType"
-    ).classList.add("selected");
-
-    document.getElementById(
-        "publicType"
-    ).classList.remove("selected");
-
-    document.getElementById(
-        "channelPhotoPreview"
-    ).innerHTML = "📷";
-
-    document.getElementById(
-        "channelPhotoInput"
-    ).value = "";
-
-    document.getElementById(
-        "createChannelModal"
-    ).classList.add("active");
+alert(
+"Канал создан, но не удалось добавить владельца"
+);
 }
 
+document.getElementById("createChannelModal").classList.remove("active");
 
-/* =========================
-   CHANNEL PHOTO
-========================= */
+await loadChats();
 
-document.getElementById(
-    "channelPhotoPreview"
-).onclick = () => {
+openChannel(channel);
 
-    document.getElementById(
-        "channelPhotoInput"
-    ).click();
-};
+if(selectedChannelType==="private"){
 
+setTimeout(()=>{
 
-document.getElementById(
-    "channelPhotoInput"
-).addEventListener(
-    "change",
-    event => {
-
-        const file =
-            event.target.files[0];
-
-        if (!file) {
-            return;
-        }
-
-        selectedChannelFile = file;
-
-        const reader =
-            new FileReader();
-
-        reader.onload = () => {
-
-            document.getElementById(
-                "channelPhotoPreview"
-            ).innerHTML =
-                `<img src="${reader.result}" alt="">`;
-        };
-
-        reader.readAsDataURL(file);
-    }
+alert(
+"Канал создан!\n\nПриватная ссылка:\n"+
+getChannelLink(channel)
 );
 
+},300);
+}
 
-/* =========================
-   CHANNEL TYPE
-========================= */
+}catch(error){
 
-document.getElementById(
-    "privateType"
-).onclick = () => {
+console.error(error);
 
-    selectedChannelType = "private";
+alert(
+"Ошибка создания канала:\n"+
+error.message
+);
 
-    document.getElementById(
-        "privateType"
-    ).classList.add("selected");
+}finally{
 
-    document.getElementById(
-        "publicType"
-    ).classList.remove("selected");
+button.disabled=false;
+button.textContent="Создать";
 
-    document.getElementById(
-        "publicUsernameBlock"
-    ).style.display = "none";
+}
+
 };
 
 
-document.getElementById(
-    "publicType"
-).onclick = () => {
+/* CHANNEL INFO */
 
-    selectedChannelType = "public";
+function openChannelInfo(channel){
 
-    document.getElementById(
-        "publicType"
-    ).classList.add("selected");
+const avatar=document.getElementById("infoChannelAvatar");
 
-    document.getElementById(
-        "privateType"
-    ).classList.remove("selected");
+setChannelAvatar(avatar,channel);
 
-    document.getElementById(
-        "publicUsernameBlock"
-    ).style.display = "block";
+document.getElementById("infoChannelName").textContent=
+channel.name;
+
+document.getElementById("infoChannelDescription").textContent=
+channel.description||"Описание отсутствует";
+
+document.getElementById("infoChannelLink").textContent=
+getChannelLink(channel);
+
+document.getElementById("infoChannelType").textContent=
+channel.type==="public"
+?"🌐 Публичный канал"
+:"🔒 Частный канал";
+
+document.getElementById("channelInfoModal").classList.add("active");
+}
+
+
+document.getElementById("closeChannelInfoButton").onclick=()=>{
+
+document.getElementById("channelInfoModal").classList.remove("active");
 };
 
 
-/* =========================
-   CANCEL CHANNEL
-========================= */
+/* CHANNEL LINK */
 
-document.getElementById(
-    "cancelChannelButton"
-).onclick = () => {
+function getChannelLink(channel){
 
-    document.getElementById(
-        "createChannelModal"
-    ).classList.remove("active");
+if(channel.type==="public"){
+
+return window.location.origin+"/"+channel.username;
+}
+
+return window.location.origin+
+"/join/"+
+channel.invite_code;
+}
+
+
+/* INVITE */
+
+function generateInviteCode(){
+
+const characters=
+"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+let result="";
+
+for(let i=0;i<32;i++){
+
+result+=characters.charAt(
+Math.floor(Math.random()*characters.length)
+);
+
+}
+
+return result;
+}
+
+
+/* AVATARS */
+
+function setAvatar(element,profile){
+
+if(profile.avatar_url){
+
+element.innerHTML=
+`<img src="${escapeHtml(profile.avatar_url)}" alt="">`;
+
+}else{
+
+element.textContent=
+profile.name.charAt(0).toUpperCase();
+
+}
+}
+
+
+function setChannelAvatar(element,channel){
+
+if(channel.avatar_url){
+
+element.innerHTML=
+`<img src="${escapeHtml(channel.avatar_url)}" alt="">`;
+
+}else{
+
+element.textContent=
+channel.name.charAt(0).toUpperCase();
+
+}
+}
+
+
+/* CHATS BUTTON */
+
+document.getElementById("chatsButton").onclick=async()=>{
+
+closeMobileMenu();
+
+setActiveButton("chatsButton");
+
+hideAllPages();
+
+document.getElementById("chatList").style.display="block";
+
+searchInput.value="";
+
+await loadChats();
 };
 
 
-/* =========================
-   CREATE CHANNEL
-========================= */
+/* CONTACTS BUTTON */
 
-document.getElementById(
-    "createChannelButton"
-).onclick =
-    async () => {
+document.getElementById("contactsButton").onclick=async()=>{
 
-        const button =
-            document.getElementById(
-                "createChannelButton"
-            );
+closeMobileMenu();
 
-        const name =
-            document.getElementById(
-                "channelNameInput"
-            ).value.trim();
+setActiveButton("contactsButton");
 
-        const description =
-            document.getElementById(
-                "channelDescriptionInput"
-            ).value.trim();
+hideAllPages();
 
-        let username =
-            document.getElementById(
-                "channelUsernameInput"
-            ).value.trim().toLowerCase();
+const list=document.getElementById("chatList");
 
+list.style.display="block";
+list.innerHTML="";
 
-        if (!name) {
+const {
+data:contacts,
+error
+}=await supabaseClient
+.from("contacts")
+.select("contact_id")
+.eq("user_id",currentUser.id);
 
-            alert(
-                "Введите название канала"
-            );
+if(error){
 
-            return;
-        }
+console.error(error);
 
+list.innerHTML=
+`<div class="empty">
+Не удалось загрузить контакты
+</div>`;
 
-        if (name.length < 2) {
-
-            alert(
-                "Название слишком короткое"
-            );
-
-            return;
-        }
-
-
-        if (
-            selectedChannelType === "public"
-        ) {
-
-            if (!username) {
-
-                alert(
-                    "Введите ссылку публичного канала"
-                );
-
-                return;
-            }
-
-            if (
-                !/^[a-z0-9_]{3,40}$/.test(
-                    username
-                )
-            ) {
-
-                alert(
-                    "Username может содержать только английские буквы, цифры и _"
-                );
-
-                return;
-            }
-
-
-            const {
-                data: existingUsername
-            } = await supabaseClient
-                .from("channels")
-                .select("id")
-                .eq("username", username)
-                .maybeSingle();
-
-            if (existingUsername) {
-
-                alert(
-                    "Такая ссылка уже занята"
-                );
-
-                return;
-            }
-        }
-
-
-        button.disabled = true;
-        button.textContent = "Создание...";
-
-
-        try {
-
-            let avatarUrl = null;
-
-
-            if (selectedChannelFile) {
-
-                const extension =
-                    selectedChannelFile.name
-                        .split(".")
-                        .pop()
-                        .toLowerCase();
-
-                const filePath =
-                    currentUser.id +
-                    "/" +
-                    crypto.randomUUID() +
-                    "." +
-                    extension;
-
-
-                const {
-                    error: uploadError
-                } = await supabaseClient
-                    .storage
-                    .from("channel-avatars")
-                    .upload(
-                        filePath,
-                        selectedChannelFile,
-                        {
-                            cacheControl: "3600",
-                            upsert: false
-                        }
-                    );
-
-
-                if (uploadError) {
-
-                    console.error(
-                        uploadError
-                    );
-
-                    throw new Error(
-                        "Не удалось загрузить фотографию"
-                    );
-                }
-
-
-                const {
-                    data: publicUrl
-                } = supabaseClient
-                    .storage
-                    .from("channel-avatars")
-                    .getPublicUrl(
-                        filePath
-                    );
-
-                avatarUrl =
-                    publicUrl.publicUrl;
-            }
-
-
-            let inviteCode = null;
-
-            if (
-                selectedChannelType === "private"
-            ) {
-
-                inviteCode =
-                    generateInviteCode();
-            }
-
-
-            const {
-                data: channel,
-                error
-            } = await supabaseClient
-                .from("channels")
-                .insert({
-                    owner_id:
-                        currentUser.id,
-
-                    name:
-                        name,
-
-                    description:
-                        description || null,
-
-                    avatar_url:
-                        avatarUrl,
-
-                    type:
-                        selectedChannelType,
-
-                    username:
-                        selectedChannelType === "public"
-                            ? username
-                            : null,
-
-                    invite_code:
-                        inviteCode
-                })
-                .select()
-                .single();
-
-
-            if (error) {
-
-                console.error(error);
-
-                throw new Error(
-                    error.message
-                );
-            }
-
-
-            const {
-                error: memberError
-            } = await supabaseClient
-                .from("channel_members")
-                .insert({
-                    channel_id:
-                        channel.id,
-
-                    user_id:
-                        currentUser.id,
-
-                    role:
-                        "owner"
-                });
-
-
-            if (memberError) {
-
-                console.error(
-                    memberError
-                );
-
-                alert(
-                    "Канал создан, но не удалось добавить владельца"
-                );
-            }
-
-
-            document.getElementById(
-                "createChannelModal"
-            ).classList.remove("active");
-
-
-            await loadChats();
-
-            openChannel(channel);
-
-
-            if (
-                selectedChannelType === "private"
-            ) {
-
-                setTimeout(() => {
-
-                    alert(
-                        "Канал создан!\n\nПриватная ссылка:\n" +
-                        getChannelLink(channel)
-                    );
-
-                }, 300);
-            }
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            alert(
-                "Ошибка создания канала:\n" +
-                error.message
-            );
-
-        } finally {
-
-            button.disabled = false;
-            button.textContent = "Создать";
-        }
-    };
-
-
-/* =========================
-   CHANNEL INFO
-========================= */
-
-function openChannelInfo(channel) {
-
-    const avatar =
-        document.getElementById(
-            "infoChannelAvatar"
-        );
-
-    setChannelAvatar(
-        avatar,
-        channel
-    );
-
-    document.getElementById(
-        "infoChannelName"
-    ).textContent =
-        channel.name;
-
-    document.getElementById(
-        "infoChannelDescription"
-    ).textContent =
-        channel.description ||
-        "Описание отсутствует";
-
-    document.getElementById(
-        "infoChannelLink"
-    ).textContent =
-        getChannelLink(channel);
-
-    document.getElementById(
-        "infoChannelType"
-    ).textContent =
-        channel.type === "public"
-            ? "🌐 Публичный канал"
-            : "🔒 Частный канал";
-
-    document.getElementById(
-        "channelInfoModal"
-    ).classList.add("active");
+return;
 }
 
+if(!contacts||contacts.length===0){
 
-document.getElementById(
-    "closeChannelInfoButton"
-).onclick = () => {
+list.innerHTML=
+`<div class="empty">
+У вас пока нет контактов
+</div>`;
 
-    document.getElementById(
-        "channelInfoModal"
-    ).classList.remove("active");
+return;
+}
+
+for(const contact of contacts){
+
+const {data:profile}=await supabaseClient
+.from("profiles")
+.select("*")
+.eq("id",contact.contact_id)
+.single();
+
+if(profile){
+createContactElement(profile);
+}
+
+}
 };
 
 
-/* =========================
-   CHANNEL LINK
-========================= */
+/* PROFILE BUTTON */
 
-function getChannelLink(channel) {
+document.getElementById("profileButton").onclick=()=>{
 
-    if (channel.type === "public") {
+closeMobileMenu();
 
-        return (
-            window.location.origin +
-            "/" +
-            channel.username
-        );
-    }
+setActiveButton("profileButton");
 
-    return (
-        window.location.origin +
-        "/join/" +
-        channel.invite_code
-    );
-}
+hideAllPages();
 
+const profilePage=document.getElementById("profilePage");
 
-/* =========================
-   INVITE
-========================= */
+profilePage.style.display="block";
 
-function generateInviteCode() {
+profilePage.scrollTop=0;
 
-    const characters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    let result = "";
-
-    for (let i = 0; i < 32; i++) {
-
-        result +=
-            characters.charAt(
-                Math.floor(
-                    Math.random() *
-                    characters.length
-                )
-            );
-    }
-
-    return result;
-}
-
-
-/* =========================
-   AVATARS
-========================= */
-
-function setAvatar(element, profile) {
-
-    if (profile.avatar_url) {
-
-        element.innerHTML =
-            `<img src="${escapeHtml(profile.avatar_url)}" alt="">`;
-
-    } else {
-
-        element.textContent =
-            profile.name
-                .charAt(0)
-                .toUpperCase();
-    }
-}
-
-
-function setChannelAvatar(element, channel) {
-
-    if (channel.avatar_url) {
-
-        element.innerHTML =
-            `<img src="${escapeHtml(channel.avatar_url)}" alt="">`;
-
-    } else {
-
-        element.textContent =
-            channel.name
-                .charAt(0)
-                .toUpperCase();
-    }
-}
-
-
-/* =========================
-   CHATS BUTTON
-========================= */
-
-document.getElementById(
-    "chatsButton"
-).onclick =
-    async () => {
-
-        closeMobileMenu();
-
-        setActiveButton(
-            "chatsButton"
-        );
-
-        hideAllPages();
-
-        document.getElementById(
-            "chatList"
-        ).style.display = "block";
-
-        searchInput.value = "";
-
-        await loadChats();
-    };
-
-
-/* =========================
-   CONTACTS BUTTON
-========================= */
-
-document.getElementById(
-    "contactsButton"
-).onclick =
-    async () => {
-
-        closeMobileMenu();
-
-        setActiveButton(
-            "contactsButton"
-        );
-
-        hideAllPages();
-
-        const list =
-            document.getElementById(
-                "chatList"
-            );
-
-        list.style.display = "block";
-        list.innerHTML = "";
-
-        const {
-            data: contacts,
-            error
-        } = await supabaseClient
-            .from("contacts")
-            .select("contact_id")
-            .eq(
-                "user_id",
-                currentUser.id
-            );
-
-        if (error) {
-
-            console.error(error);
-
-            list.innerHTML =
-                `<div class="empty">
-                    Не удалось загрузить контакты
-                </div>`;
-
-            return;
-        }
-
-        if (
-            !contacts ||
-            contacts.length === 0
-        ) {
-
-            list.innerHTML =
-                `<div class="empty">
-                    У вас пока нет контактов
-                </div>`;
-
-            return;
-        }
-
-        for (const contact of contacts) {
-
-            const {
-                data: profile
-            } = await supabaseClient
-                .from("profiles")
-                .select("*")
-                .eq(
-                    "id",
-                    contact.contact_id
-                )
-                .single();
-
-            if (profile) {
-                createContactElement(profile);
-            }
-        }
-    };
-
-
-/* =========================
-   PROFILE BUTTON
-========================= */
-
-document.getElementById(
-    "profileButton"
-).onclick = () => {
-
-    closeMobileMenu();
-
-    setActiveButton(
-        "profileButton"
-    );
-
-    hideAllPages();
-
-    const profilePage =
-        document.getElementById(
-            "profilePage"
-        );
-
-    profilePage.style.display = "block";
-
-    profilePage.scrollTop = 0;
-
-    searchInput.value = "";
+searchInput.value="";
 };
 
 
-/* =========================
-   HIDE ALL PAGES
-========================= */
+/* HIDE ALL */
 
-function hideAllPages() {
+function hideAllPages(){
 
-    document.getElementById(
-        "profilePage"
-    ).style.display = "none";
+document.getElementById("profilePage").style.display="none";
 
-    document.getElementById(
-        "chatWindow"
-    ).style.display = "none";
+document.getElementById("chatWindow").style.display="none";
 
-    document.getElementById(
-        "welcome"
-    ).style.display = "none";
+document.getElementById("welcome").style.display="none";
 
-    document.getElementById(
-        "messageInputArea"
-    ).style.display = "none";
+document.getElementById("messageInputArea").style.display="none";
 
-    document.getElementById(
-        "searchResults"
-    ).style.display = "none";
+document.getElementById("searchResults").style.display="none";
 
-    document.getElementById(
-        "mobileBackButton"
-    ).style.display = "none";
+document.getElementById("mobileBackButton").style.display="none";
 
-    currentContact = null;
-    currentChannel = null;
+clearSelectedFile();
 
-    stopRealtime();
+currentContact=null;
+currentChannel=null;
+
+stopRealtime();
 }
 
 
-/* =========================
-   ACTIVE BUTTON
-========================= */
+/* ACTIVE BUTTON */
 
-function setActiveButton(id) {
+function setActiveButton(id){
 
-    document
-        .querySelectorAll(".menu button")
-        .forEach(button => {
+document.querySelectorAll(".menu button").forEach(button=>{
 
-            button.classList.remove(
-                "active"
-            );
-        });
+button.classList.remove("active");
 
-    document.getElementById(
-        id
-    ).classList.add("active");
+});
+
+document.getElementById(id).classList.add("active");
 }
 
 
-/* =========================
-   EDIT NAME
-========================= */
+/* EDIT NAME */
 
-document.getElementById(
-    "editNameButton"
-).onclick =
-    async () => {
+document.getElementById("editNameButton").onclick=async()=>{
 
-        const newName =
-            prompt(
-                "Введите новое имя:",
-                currentProfile.name
-            );
+const newName=prompt(
+"Введите новое имя:",
+currentProfile.name
+);
 
-        if (!newName) {
-            return;
-        }
+if(!newName)return;
 
-        const cleanName =
-            newName.trim();
+const cleanName=newName.trim();
 
-        if (cleanName.length < 2) {
+if(cleanName.length<2){
 
-            alert(
-                "Имя должно содержать минимум 2 символа"
-            );
+alert(
+"Имя должно содержать минимум 2 символа"
+);
 
-            return;
-        }
+return;
+}
 
-        const {
-            error
-        } = await supabaseClient
-            .from("profiles")
-            .update({
-                name: cleanName
-            })
-            .eq(
-                "id",
-                currentUser.id
-            );
+const {error}=await supabaseClient
+.from("profiles")
+.update({
+name:cleanName
+})
+.eq("id",currentUser.id);
 
-        if (error) {
+if(error){
 
-            console.error(error);
+console.error(error);
 
-            alert(
-                "Не удалось изменить имя"
-            );
+alert("Не удалось изменить имя");
+return;
+}
 
-            return;
-        }
+currentProfile.name=cleanName;
 
-        currentProfile.name =
-            cleanName;
-
-        document.getElementById(
-            "profileName"
-        ).textContent =
-            cleanName;
-    };
+document.getElementById("profileName").textContent=
+cleanName;
+};
 
 
-/* =========================
-   LOGOUT
-========================= */
+/* LOGOUT */
 
-document.getElementById(
-    "logoutButton"
-).onclick =
-    async () => {
+document.getElementById("logoutButton").onclick=async()=>{
 
-        await supabaseClient
-            .auth
-            .signOut();
+await supabaseClient.auth.signOut();
 
-        localStorage.removeItem(
-            "kleivy_logged_in"
-        );
+localStorage.removeItem("kleivy_logged_in");
 
-        window.location.href =
-            "login.html";
-    };
+window.location.href="login.html";
+};
 
 
-/* =========================
-   MOBILE MENU
-========================= */
+/* MOBILE */
 
-const mobileMenuButton =
-    document.getElementById(
-        "mobileMenuButton"
-    );
+const mobileMenuButton=document.getElementById("mobileMenuButton");
 
-const mobileOverlay =
-    document.getElementById(
-        "mobileOverlay"
-    );
+const mobileOverlay=document.getElementById("mobileOverlay");
 
-const sidebar =
-    document.querySelector(
-        ".sidebar"
-    );
+const sidebar=document.querySelector(".sidebar");
 
 
-function openMobileMenu() {
+function openMobileMenu(){
 
-    if (window.innerWidth > 700) {
-        return;
-    }
+if(window.innerWidth>700)return;
 
-    sidebar.classList.add(
-        "mobile-open"
-    );
+sidebar.classList.add("mobile-open");
 
-    mobileOverlay.classList.add(
-        "active"
-    );
+mobileOverlay.classList.add("active");
 }
 
 
-function closeMobileMenu() {
+function closeMobileMenu(){
 
-    sidebar.classList.remove(
-        "mobile-open"
-    );
+sidebar.classList.remove("mobile-open");
 
-    mobileOverlay.classList.remove(
-        "active"
-    );
+mobileOverlay.classList.remove("active");
 }
 
 
 mobileMenuButton.addEventListener(
-    "click",
-    openMobileMenu
+"click",
+openMobileMenu
 );
-
 
 mobileOverlay.addEventListener(
-    "click",
-    closeMobileMenu
+"click",
+closeMobileMenu
 );
 
 
-/* =========================
-   MOBILE BACK
-========================= */
+/* MOBILE BACK */
 
-document.getElementById(
-    "mobileBackButton"
-).addEventListener(
-    "click",
-    () => {
+document.getElementById("mobileBackButton").addEventListener(
+"click",
+()=>{
 
-        if (window.innerWidth > 700) {
-            return;
-        }
+if(window.innerWidth>700)return;
 
-        currentContact = null;
-        currentChannel = null;
+currentContact=null;
+currentChannel=null;
 
-        stopRealtime();
+clearSelectedFile();
 
-        document.getElementById(
-            "chatWindow"
-        ).style.display = "none";
+stopRealtime();
 
-        document.getElementById(
-            "messageInputArea"
-        ).style.display = "none";
+document.getElementById("chatWindow").style.display="none";
 
-        document.getElementById(
-            "welcome"
-        ).style.display = "flex";
+document.getElementById("messageInputArea").style.display="none";
 
-        document.getElementById(
-            "mobileBackButton"
-        ).style.display = "none";
+document.getElementById("welcome").style.display="flex";
 
-        document.getElementById(
-            "chatList"
-        ).style.display = "block";
-    }
+document.getElementById("mobileBackButton").style.display="none";
+
+document.getElementById("chatList").style.display="block";
+}
 );
 
 
-/* =========================
-   ESCAPE HTML
-========================= */
+/* ESCAPE */
 
-function escapeHtml(text) {
+function escapeHtml(text){
 
-    const div =
-        document.createElement("div");
+const div=document.createElement("div");
 
-    div.textContent =
-        text ?? "";
+div.textContent=text??"";
 
-    return div.innerHTML;
+return div.innerHTML;
 }
 
 
-/* =========================
-   START
-========================= */
+/* START */
 
 checkAuth();
 
@@ -3417,4 +3436,3 @@ checkAuth();
 
 </body>
 </html>
-```
