@@ -1,373 +1,475 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Клейви Чат</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #080b12;
+            color: white;
+            overflow: hidden;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 330px;
+            background: #0d111b;
+            border-right: 1px solid #1d2638;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 20px;
+            font-size: 25px;
+            font-weight: bold;
+            color: #168cff;
+        }
+
+        .search-box {
+            padding: 0 15px 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid #202c40;
+            outline: none;
+            background: #151c2a;
+            color: white;
+        }
+
+        .search-box input::placeholder {
+            color: #7f8ba3;
+        }
+
+        .menu {
+            display: flex;
+            border-top: 1px solid #182235;
+            border-bottom: 1px solid #182235;
+        }
+
+        .menu button {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: #7f8ba3;
+            padding: 15px 5px;
+            cursor: pointer;
+        }
+
+        .menu button.active {
+            color: #168cff;
+        }
+
+        .chat-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .contact-item {
+            padding: 13px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #141c2a;
+        }
+
+        .contact-item:hover {
+            background: #151d2c;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #167cff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .contact-info {
+            min-width: 0;
+        }
+
+        .contact-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .contact-username {
+            color: #75839c;
+            font-size: 13px;
+        }
+
+        .empty {
+            color: #718099;
+            text-align: center;
+            padding: 30px 15px;
+        }
+
+        /* MAIN */
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #080d16;
+        }
+
+        .chat-header {
+            height: 70px;
+            padding: 10px 20px;
+            border-bottom: 1px solid #1b2638;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header-info {
+            display: none;
+        }
+
+        .chat-header-name {
+            font-weight: bold;
+        }
+
+        .chat-header-username {
+            color: #718099;
+            font-size: 13px;
+            margin-top: 3px;
+        }
+
+        .welcome {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #65738c;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 65%;
+            padding: 10px 13px;
+            border-radius: 14px;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message.mine {
+            align-self: flex-end;
+            background: #1267b8;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.theirs {
+            align-self: flex-start;
+            background: #182231;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message-input-area {
+            display: none;
+            padding: 12px;
+            border-top: 1px solid #1b2638;
+            gap: 10px;
+        }
+
+        .message-input-area input {
+            flex: 1;
+            padding: 13px 15px;
+            background: #151d2b;
+            border: 1px solid #243149;
+            border-radius: 14px;
+            color: white;
+            outline: none;
+        }
+
+        .send-button {
+            width: 48px;
+            border: none;
+            border-radius: 14px;
+            background: #168cff;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* SEARCH */
+
+        .search-results {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .search-card {
+            padding: 15px;
+            border-bottom: 1px solid #182235;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-card-info {
+            flex: 1;
+        }
+
+        .add-button {
+            border: none;
+            background: #168cff;
+            color: white;
+            padding: 9px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .add-button.added {
+            background: #263348;
+            color: #8c9ab0;
+            cursor: default;
+        }
+
+        /* PROFILE */
+
+        .profile-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .profile-box {
+            max-width: 500px;
+            margin: auto;
+            background: #101725;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .profile-avatar {
+            margin: auto auto 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #168cff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .profile-name {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .profile-username {
+            text-align: center;
+            color: #718099;
+            margin-top: 7px;
+        }
+
+        .profile-button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+            border-radius: 12px;
+            border: 1px solid #26344c;
+            background: #151e2e;
+            color: white;
+            cursor: pointer;
+        }
+
+        .logout {
+            background: #2b1720;
+            color: #ff7186;
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .message {
+                max-width: 80%;
+            }
+        }
+    </style>
+</head>
 
 <body>
 
 <div class="app">
 
     <!-- SIDEBAR -->
-
     <aside class="sidebar">
 
         <div class="logo">
-            <div class="logo-icon">K</div>
-
-            <span>
-                Клейви Чат
-            </span>
+            Клейви Чат
         </div>
 
+        <div class="search-box">
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Поиск пользователей..."
+                autocomplete="off"
+            >
+        </div>
 
-        <button
-            class="menu-button active"
-            id="chatsButton"
-        >
-            💬
-            <span>Чаты</span>
-        </button>
+        <div class="menu">
+            <button id="chatsButton" class="active">
+                💬 Чаты
+            </button>
 
+            <button id="contactsButton">
+                👥 Контакты
+            </button>
 
-        <button
-            class="menu-button"
-            id="contactsButton"
-        >
-            👥
-            <span>Контакты</span>
-        </button>
+            <button id="profileButton">
+                👤 Профиль
+            </button>
+        </div>
 
+        <div id="chatList" class="chat-list">
+            <div class="empty">
+                Пока нет чатов
+            </div>
+        </div>
 
-        <button
-            class="menu-button"
-            id="profileButton"
-        >
-            👤
-            <span>Профиль</span>
-        </button>
+        <div id="searchResults" class="search-results"></div>
 
     </aside>
 
 
-    <!-- СПИСОК ЧАТОВ -->
+    <!-- MAIN -->
+    <main class="main">
 
-    <section
-        class="chat-list"
-        id="chatList"
-    >
+        <div id="chatWindow" style="display:none; height:100%; flex-direction:column;">
 
-        <div class="chat-list-header">
+            <div class="chat-header">
 
-            <h2>Чаты</h2>
+                <div id="chatAvatar" class="avatar"></div>
 
-            <button class="new-chat">
-                +
-            </button>
-
-        </div>
-
-
-        <input
-            class="search"
-            type="text"
-            placeholder="Поиск"
-        >
-
-
-        <div class="chat active-chat">
-
-            <div
-                class="avatar"
-                id="chatAvatar"
-            >
-                K
-            </div>
-
-
-            <div class="chat-info">
-
-                <strong id="userName">
-                    Пользователь
-                </strong>
-
-                <p>
-                    Добро пожаловать! 👋
-                </p>
-
-            </div>
-
-
-            <span class="time">
-                сейчас
-            </span>
-
-        </div>
-
-    </section>
-
-
-    <!-- ОКНО ЧАТА -->
-
-    <main
-        class="messages"
-        id="chatWindow"
-    >
-
-        <header class="messages-header">
-
-            <div
-                class="avatar"
-                id="headerAvatar"
-            >
-                K
-            </div>
-
-
-            <div>
-
-                <strong id="chatUserName">
-                    Пользователь
-                </strong>
-
-                <p>
-                    онлайн
-                </p>
-
-            </div>
-
-        </header>
-
-
-        <div class="message-area">
-
-            <div class="welcome">
-
-                <h1>
-                    Добро пожаловать! 👋
-                </h1>
-
-                <p>
-                    Это твой новый мессенджер — Клейви Чат.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="message-input">
-
-            <input
-                id="messageInput"
-                type="text"
-                placeholder="Написать сообщение..."
-                autocomplete="off"
-            >
-
-            <button id="sendButton">
-                ➤
-            </button>
-
-        </div>
-
-    </main>
-
-
-    <!-- ПРОФИЛЬ -->
-
-    <main
-        class="profile-page"
-        id="profilePage"
-        style="display: none;"
-    >
-
-        <div class="profile-card">
-
-
-            <!-- ФОТО -->
-
-            <label class="profile-avatar-wrapper">
-
-                <img
-                    id="profileAvatar"
-                    class="profile-avatar-image"
-                    src=""
-                    alt="Фото профиля"
-                >
-
-
-                <div
-                    id="avatarPlaceholder"
-                    class="profile-avatar-placeholder"
-                >
-                    K
+                <div>
+                    <div id="chatName" class="chat-header-name"></div>
+                    <div id="chatUsername" class="chat-header-username"></div>
                 </div>
 
+            </div>
 
-                <div class="avatar-edit">
-                    📷
-                </div>
+            <div id="messages" class="messages"></div>
 
+            <div id="messageInputArea" class="message-input-area">
 
                 <input
-                    id="avatarInput"
-                    type="file"
-                    accept="image/*"
-                    hidden
+                    id="messageInput"
+                    type="text"
+                    placeholder="Написать сообщение..."
+                    autocomplete="off"
                 >
 
-            </label>
-
-
-            <!-- ИМЯ -->
-
-            <div class="profile-name-container">
-
-                <h1 id="profileName">
-                    Пользователь
-                </h1>
-
-
-                <button id="editNameButton">
-                    ✏️
+                <button id="sendButton" class="send-button">
+                    ➤
                 </button>
 
             </div>
 
-
-            <!-- USERNAME -->
-
-            <p
-                id="profileUsername"
-                class="profile-username"
-            >
-                @username
-            </p>
+        </div>
 
 
-            <!-- ИНФОРМАЦИЯ -->
-
-            <div class="profile-info">
-
-                <div class="profile-row">
-
-                    <div>
-
-                        <span>
-                            Имя
-                        </span>
-
-                        <strong id="profileNameInfo">
-                            —
-                        </strong>
-
-                    </div>
+        <div id="welcome" class="welcome">
+            <div>
+                <h2>Клейви Чат</h2>
+                <p>
+                    Выберите контакт, чтобы начать общение
+                </p>
+            </div>
+        </div>
 
 
-                    <button id="editNameButton2">
-                        ✏️
-                    </button>
+        <!-- PROFILE -->
 
+        <div id="profilePage" class="profile-page">
+
+            <div class="profile-box">
+
+                <div id="profileAvatar" class="profile-avatar">
+                    ?
                 </div>
 
-
-                <div class="profile-row">
-
-                    <div>
-
-                        <span>
-                            Username
-                        </span>
-
-                        <strong id="profileUsernameInfo">
-                            —
-                        </strong>
-
-                    </div>
-
-
-                    <button id="editUsernameButton">
-                        ✏️
-                    </button>
-
+                <div id="profileName" class="profile-name">
+                    Загрузка...
                 </div>
+
+                <div id="profileUsername" class="profile-username">
+                    @username
+                </div>
+
+                <button id="editNameButton" class="profile-button">
+                    ✏️ Изменить имя
+                </button>
+
+                <button id="logoutButton" class="profile-button logout">
+                    🚪 Выйти
+                </button>
 
             </div>
-
-
-            <p
-                id="usernameWarning"
-                class="username-warning"
-            ></p>
-
-
-            <!-- ТЕМА -->
-
-            <div class="theme-section">
-
-                <span class="theme-title">
-                    Тема оформления
-                </span>
-
-
-                <div class="theme-buttons">
-
-                    <button
-                        class="theme-button"
-                        id="darkThemeButton"
-                    >
-                        🌙 Тёмная
-                    </button>
-
-
-                    <button
-                        class="theme-button"
-                        id="lightThemeButton"
-                    >
-                        ☀️ Светлая
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- ВЫХОД -->
-
-            <button
-                class="logout-button"
-                id="logoutButton"
-            >
-                🚪 Выйти из аккаунта
-            </button>
-
-
-            <!-- УДАЛЕНИЕ -->
-
-            <button
-                class="delete-account-button"
-                id="deleteAccountButton"
-            >
-                🗑️ Удалить аккаунт
-            </button>
 
         </div>
 
@@ -376,24 +478,12 @@
 </div>
 
 
-<!-- ОСНОВНОЙ SCRIPT -->
-
-<script src="script.js"></script>
-
-
 <script>
 
-/* =========================================
-   SUPABASE
-========================================= */
-
-const SUPABASE_URL =
-    "https://tnzdjjtubeulxrvfrmfr.supabase.co";
-
+const SUPABASE_URL = "https://tnzdjjtubeulxrvfrmfr.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_obyiISO1UFNJn6T6JEAiEQ_XLZanE6d";
-
 
 const supabaseClient =
     window.supabase.createClient(
@@ -402,664 +492,885 @@ const supabaseClient =
     );
 
 
+let currentUser = null;
+let currentProfile = null;
+let currentContact = null;
+let realtimeChannel = null;
+
+
 /* =========================================
-   ПРОВЕРКА АВТОРИЗАЦИИ
+   AUTH
 ========================================= */
 
 async function checkAuth() {
 
     const {
-        data,
-        error
-    } =
-        await supabaseClient.auth.getSession();
+        data: {
+            session
+        }
+    } = await supabaseClient.auth.getSession();
 
+    if (!session) {
 
-    if (error) {
-
-        console.error(
-            "Ошибка проверки авторизации:",
-            error
-        );
-
-        window.location.replace(
-            "register.html"
-        );
+        window.location.href = "login.html";
 
         return;
     }
 
-
-    if (!data.session) {
-
-        window.location.replace(
-            "register.html"
-        );
-
-        return;
-    }
-
-
-    console.log(
-        "Пользователь авторизован:",
-        data.session.user.email
-    );
-
+    currentUser = session.user;
 
     await loadProfile();
+
+    await loadContacts();
 }
 
 
 /* =========================================
-   ЗАГРУЗКА ПРОФИЛЯ
+   PROFILE
 ========================================= */
 
 async function loadProfile() {
 
     const {
-        data: {
-            user
-        }
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-        return;
-    }
-
-
-    const {
-        data: profile,
+        data,
         error
-    } =
-        await supabaseClient
-            .from("profiles")
-            .select(
-                "id, name, username, avatar_url"
-            )
-            .eq(
-                "id",
-                user.id
-            )
-            .maybeSingle();
-
+    } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
 
     if (error) {
 
-        console.error(
-            "Ошибка загрузки профиля:",
-            error
-        );
+        console.error(error);
 
         return;
     }
 
+    currentProfile = data;
 
-    if (!profile) {
+    document.getElementById("profileName").textContent =
+        data.name;
 
-        console.error(
-            "Профиль не найден"
-        );
+    document.getElementById("profileUsername").textContent =
+        "@" + data.username;
 
-        return;
-    }
+    const avatar =
+        document.getElementById("profileAvatar");
 
+    if (data.avatar_url) {
 
-    /* ИМЯ */
+        avatar.innerHTML =
+            `<img src="${data.avatar_url}">`;
 
-    const name =
-        profile.name ||
-        "Пользователь";
+    } else {
 
-
-    document.getElementById(
-        "userName"
-    ).textContent =
-        name;
-
-
-    document.getElementById(
-        "chatUserName"
-    ).textContent =
-        name;
-
-
-    document.getElementById(
-        "profileName"
-    ).textContent =
-        name;
-
-
-    document.getElementById(
-        "profileNameInfo"
-    ).textContent =
-        name;
-
-
-    /* USERNAME */
-
-    const username =
-        profile.username ||
-        "username";
-
-
-    document.getElementById(
-        "profileUsername"
-    ).textContent =
-        "@" + username;
-
-
-    document.getElementById(
-        "profileUsernameInfo"
-    ).textContent =
-        "@" + username;
-
-
-    /* АВАТАР */
-
-    if (
-        profile.avatar_url
-    ) {
-
-        setAvatar(
-            profile.avatar_url
-        );
-
+        avatar.textContent =
+            data.name.charAt(0).toUpperCase();
     }
 }
 
 
 /* =========================================
-   АВАТАР
+   CONTACTS
 ========================================= */
 
-function setAvatar(url) {
+async function loadContacts() {
 
-    const profileAvatar =
-        document.getElementById(
-            "profileAvatar"
-        );
+    const {
+        data: contacts,
+        error
+    } = await supabaseClient
+        .from("contacts")
+        .select("contact_id")
+        .eq("user_id", currentUser.id);
 
+    if (error) {
 
-    const placeholder =
-        document.getElementById(
-            "avatarPlaceholder"
-        );
+        console.error(error);
 
+        return;
+    }
 
-    const chatAvatar =
-        document.getElementById(
-            "chatAvatar"
-        );
+    const list =
+        document.getElementById("chatList");
 
+    list.innerHTML = "";
 
-    const headerAvatar =
-        document.getElementById(
-            "headerAvatar"
-        );
+    if (!contacts || contacts.length === 0) {
 
+        list.innerHTML =
+            `<div class="empty">
+                У вас пока нет контактов
+            </div>`;
 
-    profileAvatar.src =
-        url;
-
-
-    profileAvatar.style.display =
-        "block";
-
-
-    placeholder.style.display =
-        "none";
+        return;
+    }
 
 
-    chatAvatar.style.backgroundImage =
-        "url('" + url + "')";
+    for (const contact of contacts) {
 
+        const {
+            data: profile
+        } = await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("id", contact.contact_id)
+            .single();
 
-    chatAvatar.style.backgroundSize =
-        "cover";
+        if (!profile) continue;
 
-
-    chatAvatar.style.backgroundPosition =
-        "center";
-
-
-    chatAvatar.textContent =
-        "";
-
-
-    headerAvatar.style.backgroundImage =
-        "url('" + url + "')";
-
-
-    headerAvatar.style.backgroundSize =
-        "cover";
-
-
-    headerAvatar.style.backgroundPosition =
-        "center";
-
-
-    headerAvatar.textContent =
-        "";
-
+        createContactElement(profile);
+    }
 }
 
 
 /* =========================================
-   НАВИГАЦИЯ
+   CONTACT ELEMENT
 ========================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+function createContactElement(profile) {
 
-        const profileButton =
-            document.getElementById(
-                "profileButton"
-            );
+    const list =
+        document.getElementById("chatList");
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "contact-item";
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "avatar";
+
+    if (profile.avatar_url) {
+
+        avatar.innerHTML =
+            `<img src="${profile.avatar_url}">`;
+
+    } else {
+
+        avatar.textContent =
+            profile.name.charAt(0).toUpperCase();
+    }
 
 
-        const chatsButton =
-            document.getElementById(
-                "chatsButton"
-            );
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "contact-info";
+
+    info.innerHTML = `
+        <div class="contact-name">
+            ${escapeHtml(profile.name)}
+        </div>
+
+        <div class="contact-username">
+            @${escapeHtml(profile.username)}
+        </div>
+    `;
 
 
-        const contactsButton =
-            document.getElementById(
-                "contactsButton"
-            );
+    item.appendChild(avatar);
+    item.appendChild(info);
 
 
-        const profilePage =
-            document.getElementById(
-                "profilePage"
-            );
+    item.onclick = () => {
 
+        openChat(profile);
+
+    };
+
+
+    list.appendChild(item);
+}
+
+
+/* =========================================
+   SEARCH
+========================================= */
+
+const searchInput =
+    document.getElementById("searchInput");
+
+searchInput.addEventListener(
+    "input",
+    async function () {
+
+        const query =
+            this.value.trim().replace("@", "");
+
+        const results =
+            document.getElementById("searchResults");
 
         const chatList =
-            document.getElementById(
-                "chatList"
-            );
+            document.getElementById("chatList");
 
 
-        const chatWindow =
-            document.getElementById(
-                "chatWindow"
-            );
+        if (!query) {
 
+            results.style.display = "none";
+            chatList.style.display = "block";
 
-        /* ПРОФИЛЬ */
-
-        function openProfile() {
-
-            chatList.style.display =
-                "none";
-
-
-            chatWindow.style.display =
-                "none";
-
-
-            profilePage.style.display =
-                "flex";
-
-
-            document
-                .querySelectorAll(
-                    ".menu-button"
-                )
-                .forEach(
-                    function (button) {
-
-                        button.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
-
-
-            profileButton.classList.add(
-                "active"
-            );
-
+            return;
         }
 
 
-        /* ЧАТЫ */
+        chatList.style.display = "none";
+        results.style.display = "block";
 
-        function openChats() {
-
-            profilePage.style.display =
-                "none";
-
-
-            chatList.style.display =
-                "block";
+        results.innerHTML =
+            `<div class="empty">
+                Поиск...
+            </div>`;
 
 
-            chatWindow.style.display =
-                "flex";
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("profiles")
+            .select("id,name,username,avatar_url")
+            .ilike("username", `${query}%`)
+            .neq("id", currentUser.id)
+            .limit(10);
 
 
-            document
-                .querySelectorAll(
-                    ".menu-button"
-                )
-                .forEach(
-                    function (button) {
+        if (error) {
 
-                        button.classList.remove(
-                            "active"
-                        );
+            console.error(error);
 
-                    }
-                );
+            results.innerHTML =
+                `<div class="empty">
+                    Ошибка поиска
+                </div>`;
 
-
-            chatsButton.classList.add(
-                "active"
-            );
-
+            return;
         }
 
 
-        /* КОНТАКТЫ */
+        results.innerHTML = "";
 
-        function openContacts() {
 
-            alert(
-                "Контакты пока в разработке."
-            );
+        if (!data || data.length === 0) {
 
+            results.innerHTML =
+                `<div class="empty">
+                    Пользователь не найден
+                </div>`;
+
+            return;
         }
 
 
-        profileButton.addEventListener(
-            "click",
-            openProfile
-        );
+        for (const profile of data) {
 
+            await createSearchCard(profile);
 
-        chatsButton.addEventListener(
-            "click",
-            openChats
-        );
-
-
-        contactsButton.addEventListener(
-            "click",
-            openContacts
-        );
+        }
 
     }
 );
 
 
 /* =========================================
-   ИЗМЕНЕНИЕ ИМЕНИ
+   SEARCH CARD
 ========================================= */
 
-async function editName() {
+async function createSearchCard(profile) {
 
-    const {
-        data: {
-            user
-        }
-    } =
-        await supabaseClient.auth.getUser();
+    const results =
+        document.getElementById("searchResults");
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "search-card";
 
 
-    if (!user) {
-        return;
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "avatar";
+
+    if (profile.avatar_url) {
+
+        avatar.innerHTML =
+            `<img src="${profile.avatar_url}">`;
+
+    } else {
+
+        avatar.textContent =
+            profile.name.charAt(0).toUpperCase();
     }
 
 
-    const currentName =
-        document.getElementById(
-            "profileNameInfo"
-        ).textContent;
+    const info =
+        document.createElement("div");
+
+    info.className =
+        "search-card-info";
+
+    info.innerHTML = `
+        <div class="contact-name">
+            ${escapeHtml(profile.name)}
+        </div>
+
+        <div class="contact-username">
+            @${escapeHtml(profile.username)}
+        </div>
+    `;
 
 
-    const newName =
-        prompt(
-            "Введите новое имя:",
-            currentName
-        );
+    const button =
+        document.createElement("button");
 
+    button.className =
+        "add-button";
 
-    if (
-        newName === null ||
-        newName.trim() === ""
-    ) {
-        return;
-    }
-
-
-    const name =
-        newName.trim();
+    button.textContent =
+        "Добавить";
 
 
     const {
+        data: existing
+    } = await supabaseClient
+        .from("contacts")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .eq("contact_id", profile.id)
+        .maybeSingle();
+
+
+    if (existing) {
+
+        button.textContent =
+            "Добавлен";
+
+        button.classList.add("added");
+
+        button.disabled = true;
+    }
+
+
+    button.onclick =
+        async () => {
+
+            button.disabled = true;
+
+            const {
+                error
+            } = await supabaseClient
+                .from("contacts")
+                .insert({
+                    user_id: currentUser.id,
+                    contact_id: profile.id
+                });
+
+
+            if (error) {
+
+                console.error(error);
+
+                alert(
+                    "Не удалось добавить контакт"
+                );
+
+                button.disabled = false;
+
+                return;
+            }
+
+
+            button.textContent =
+                "Добавлен";
+
+            button.classList.add("added");
+
+
+            await loadContacts();
+
+        };
+
+
+    card.appendChild(avatar);
+    card.appendChild(info);
+    card.appendChild(button);
+
+    results.appendChild(card);
+}
+
+
+/* =========================================
+   OPEN CHAT
+========================================= */
+
+async function openChat(profile) {
+
+    currentContact = profile;
+
+
+    document.getElementById("welcome")
+        .style.display = "none";
+
+    document.getElementById("profilePage")
+        .style.display = "none";
+
+    document.getElementById("chatWindow")
+        .style.display = "flex";
+
+    document.getElementById("messageInputArea")
+        .style.display = "flex";
+
+
+    const avatar =
+        document.getElementById("chatAvatar");
+
+
+    if (profile.avatar_url) {
+
+        avatar.innerHTML =
+            `<img src="${profile.avatar_url}">`;
+
+    } else {
+
+        avatar.textContent =
+            profile.name.charAt(0).toUpperCase();
+    }
+
+
+    document.getElementById("chatName")
+        .textContent = profile.name;
+
+    document.getElementById("chatUsername")
+        .textContent = "@" + profile.username;
+
+
+    await loadMessages();
+
+    subscribeToMessages();
+}
+
+
+/* =========================================
+   LOAD MESSAGES
+========================================= */
+
+async function loadMessages() {
+
+    const messages =
+        document.getElementById("messages");
+
+    messages.innerHTML = "";
+
+
+    const {
+        data,
         error
-    } =
-        await supabaseClient
-            .from("profiles")
-            .update({
-                name: name
-            })
-            .eq(
-                "id",
-                user.id
-            );
+    } = await supabaseClient
+        .from("messages")
+        .select("*")
+        .or(
+            `and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
+        )
+        .order("created_at", {
+            ascending: true
+        });
 
 
     if (error) {
 
-        alert(
-            "Ошибка сохранения имени:\n" +
-            error.message
-        );
+        console.error(error);
 
         return;
     }
 
 
-    document.getElementById(
-        "userName"
-    ).textContent =
-        name;
+    for (const message of data) {
+
+        displayMessage(message);
+
+    }
 
 
-    document.getElementById(
-        "chatUserName"
-    ).textContent =
-        name;
-
-
-    document.getElementById(
-        "profileName"
-    ).textContent =
-        name;
-
-
-    document.getElementById(
-        "profileNameInfo"
-    ).textContent =
-        name;
-
+    messages.scrollTop =
+        messages.scrollHeight;
 }
 
 
-/* КНОПКИ ИЗМЕНЕНИЯ ИМЕНИ */
+/* =========================================
+   DISPLAY MESSAGE
+========================================= */
 
-document
-    .getElementById(
-        "editNameButton"
-    )
-    .addEventListener(
-        "click",
-        editName
-    );
+function displayMessage(message) {
+
+    const container =
+        document.getElementById("messages");
 
 
-document
-    .getElementById(
-        "editNameButton2"
-    )
-    .addEventListener(
-        "click",
-        editName
-    );
+    const element =
+        document.createElement("div");
+
+
+    element.className =
+        "message " +
+        (
+            message.sender_id === currentUser.id
+                ? "mine"
+                : "theirs"
+        );
+
+
+    const time =
+        new Date(
+            message.created_at
+        ).toLocaleTimeString(
+            "ru-RU",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+
+    element.innerHTML = `
+        <div>
+            ${escapeHtml(message.content)}
+        </div>
+
+        <div class="message-time">
+            ${time}
+        </div>
+    `;
+
+
+    container.appendChild(element);
+
+    container.scrollTop =
+        container.scrollHeight;
+}
 
 
 /* =========================================
-   ВЫХОД
+   SEND MESSAGE
 ========================================= */
 
-document
-    .getElementById(
-        "logoutButton"
-    )
-    .addEventListener(
-        "click",
-        async function () {
+const messageInput =
+    document.getElementById("messageInput");
 
-            const {
-                error
-            } =
-                await supabaseClient.auth.signOut();
+const sendButton =
+    document.getElementById("sendButton");
 
 
-            if (error) {
+async function sendMessage() {
 
-                alert(
-                    "Ошибка выхода:\n" +
-                    error.message
-                );
-
-                return;
-            }
+    const text =
+        messageInput.value.trim();
 
 
-            localStorage.removeItem(
-                "kleivy_logged_in"
-            );
+    if (!text || !currentContact) {
+
+        return;
+    }
 
 
-            localStorage.removeItem(
-                "username"
-            );
+    messageInput.value = "";
 
 
-            window.location.replace(
-                "login.html"
-            );
+    const {
+        error
+    } = await supabaseClient
+        .from("messages")
+        .insert({
+            sender_id: currentUser.id,
+            receiver_id: currentContact.id,
+            content: text
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Сообщение не отправилось"
+        );
+
+        messageInput.value = text;
+    }
+}
+
+
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+messageInput.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key === "Enter") {
+
+            sendMessage();
 
         }
-    );
+
+    }
+);
 
 
 /* =========================================
-   УДАЛЕНИЕ АККАУНТА
+   REALTIME
 ========================================= */
 
-document
-    .getElementById(
-        "deleteAccountButton"
-    )
-    .addEventListener(
-        "click",
-        async function () {
+function subscribeToMessages() {
 
-            const confirmed =
-                confirm(
-                    "ВНИМАНИЕ!\n\n" +
-                    "Аккаунт будет полностью удалён.\n" +
-                    "Профиль и данные аккаунта будут удалены.\n\n" +
-                    "Продолжить?"
-                );
+    if (realtimeChannel) {
+
+        supabaseClient.removeChannel(
+            realtimeChannel
+        );
+    }
 
 
-            if (!confirmed) {
-                return;
-            }
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                "messages-" +
+                currentUser.id +
+                "-" +
+                currentContact.id
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "messages"
+                },
+                payload => {
+
+                    const message =
+                        payload.new;
 
 
-            const secondConfirm =
-                prompt(
-                    "Для подтверждения удаления напиши: УДАЛИТЬ"
-                );
+                    const belongsToChat =
+                        (
+                            message.sender_id === currentUser.id &&
+                            message.receiver_id === currentContact.id
+                        )
+                        ||
+                        (
+                            message.sender_id === currentContact.id &&
+                            message.receiver_id === currentUser.id
+                        );
 
 
-            if (
-                secondConfirm !==
-                "УДАЛИТЬ"
-            ) {
+                    if (!belongsToChat) {
 
-                alert(
-                    "Удаление отменено."
-                );
-
-                return;
-            }
+                        return;
+                    }
 
 
-            const {
-                error
-            } =
-                await supabaseClient.rpc(
-                    "delete_my_account"
-                );
+                    displayMessage(message);
+
+                }
+            )
+            .subscribe();
+}
 
 
-            if (error) {
+/* =========================================
+   NAVIGATION
+========================================= */
 
-                console.error(
-                    "Ошибка удаления:",
-                    error
-                );
+document.getElementById("chatsButton")
+    .onclick = async () => {
+
+        setActiveButton("chatsButton");
+
+        document.getElementById("profilePage")
+            .style.display = "none";
+
+        document.getElementById("chatList")
+            .style.display = "block";
+
+        document.getElementById("searchResults")
+            .style.display = "none";
+
+        document.getElementById("chatWindow")
+            .style.display = "none";
+
+        document.getElementById("welcome")
+            .style.display = "flex";
+
+        searchInput.value = "";
+
+        await loadContacts();
+    };
 
 
-                alert(
-                    "Не удалось удалить аккаунт:\n" +
-                    error.message
-                );
+document.getElementById("contactsButton")
+    .onclick = async () => {
 
-                return;
-            }
+        setActiveButton("contactsButton");
+
+        document.getElementById("profilePage")
+            .style.display = "none";
+
+        document.getElementById("chatList")
+            .style.display = "block";
+
+        document.getElementById("searchResults")
+            .style.display = "none";
+
+        document.getElementById("chatWindow")
+            .style.display = "none";
+
+        document.getElementById("welcome")
+            .style.display = "flex";
+
+        searchInput.value = "";
+
+        await loadContacts();
+    };
 
 
-            await supabaseClient.auth.signOut();
+document.getElementById("profileButton")
+    .onclick = () => {
+
+        setActiveButton("profileButton");
+
+        document.getElementById("chatList")
+            .style.display = "none";
+
+        document.getElementById("searchResults")
+            .style.display = "none";
+
+        document.getElementById("chatWindow")
+            .style.display = "none";
+
+        document.getElementById("welcome")
+            .style.display = "none";
+
+        document.getElementById("profilePage")
+            .style.display = "block";
+
+        searchInput.value = "";
+
+    };
 
 
-            localStorage.removeItem(
-                "kleivy_logged_in"
+function setActiveButton(id) {
+
+    document
+        .querySelectorAll(".menu button")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+}
+
+
+/* =========================================
+   EDIT NAME
+========================================= */
+
+document.getElementById("editNameButton")
+    .onclick = async () => {
+
+        const newName =
+            prompt(
+                "Введите новое имя:",
+                currentProfile.name
             );
 
 
-            localStorage.removeItem(
-                "username"
-            );
+        if (!newName) {
 
+            return;
+        }
+
+
+        const {
+            error
+        } = await supabaseClient
+            .from("profiles")
+            .update({
+                name: newName
+            })
+            .eq("id", currentUser.id);
+
+
+        if (error) {
 
             alert(
-                "Аккаунт успешно удалён."
+                "Не удалось изменить имя"
             );
 
-
-            window.location.replace(
-                "register.html"
-            );
-
+            return;
         }
-    );
+
+
+        currentProfile.name =
+            newName;
+
+        document.getElementById("profileName")
+            .textContent = newName;
+
+    };
 
 
 /* =========================================
-   ЗАПУСК
+   LOGOUT
+========================================= */
+
+document.getElementById("logoutButton")
+    .onclick = async () => {
+
+        await supabaseClient.auth.signOut();
+
+        localStorage.removeItem(
+            "kleivy_logged_in"
+        );
+
+        window.location.href =
+            "login.html";
+    };
+
+
+/* =========================================
+   SECURITY
+========================================= */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+}
+
+
+/* =========================================
+   START
 ========================================= */
 
 checkAuth();
@@ -1067,6 +1378,4 @@ checkAuth();
 </script>
 
 </body>
-
 </html>
-```
