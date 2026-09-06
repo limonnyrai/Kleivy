@@ -450,25 +450,12 @@ localStorage.setItem(
     "true"
 );
 
-window.location.replace("index.html");
+setTimeout(function () {
 
+    window.location.href =
+        "index.html";
 
-    message.textContent =
-        "Аккаунт успешно создан! 🎉";
-
-
-    localStorage.setItem(
-        "kleivy_logged_in",
-        "true"
-    );
-
-
-    setTimeout(function () {
-
-        window.location.href =
-            "index.html";
-
-    }, 1000);
+}, 1000);
 
 });
 
