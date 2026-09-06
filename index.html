@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,7 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -45,9 +45,9 @@
             height: 100dvh;
         }
 
-        /* =========================================
+        /* =========================
            SIDEBAR
-        ========================================= */
+        ========================= */
 
         .sidebar {
             width: 330px;
@@ -129,6 +129,7 @@
         .chat-list {
             overflow-y: auto;
             flex: 1;
+            min-height: 0;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -200,13 +201,14 @@
             padding: 30px 15px;
         }
 
-        /* =========================================
+        /* =========================
            MAIN
-        ========================================= */
+        ========================= */
 
         .main {
             flex: 1;
             min-width: 0;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             background: #080d16;
@@ -236,6 +238,7 @@
 
         .welcome {
             flex: 1;
+            min-height: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -246,6 +249,7 @@
 
         .messages {
             flex: 1;
+            min-height: 0;
             padding: 20px;
             overflow-y: auto;
             display: flex;
@@ -288,6 +292,7 @@
             padding: 12px;
             border-top: 1px solid #1b2638;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .message-input-area input {
@@ -314,13 +319,14 @@
             cursor: pointer;
         }
 
-        /* =========================================
+        /* =========================
            SEARCH
-        ========================================= */
+        ========================= */
 
         .search-results {
             display: none;
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
         }
 
@@ -353,20 +359,23 @@
             cursor: default;
         }
 
-        /* =========================================
+        /* =========================
            PROFILE
-        ========================================= */
+        ========================= */
 
         .profile-page {
             display: none;
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
             padding: 40px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .profile-box {
+            width: 100%;
             max-width: 500px;
-            margin: auto;
+            margin: 0 auto;
             background: #101725;
             padding: 30px;
             border-radius: 20px;
@@ -420,9 +429,9 @@
             color: #ff7186;
         }
 
-        /* =========================================
-           CREATE CHANNEL MODAL
-        ========================================= */
+        /* =========================
+           MODALS
+        ========================= */
 
         .modal {
             position: fixed;
@@ -607,9 +616,9 @@
             font-size: 13px;
         }
 
-        /* =========================================
+        /* =========================
            MOBILE
-        ========================================= */
+        ========================= */
 
         .mobile-topbar {
             display: none;
@@ -645,9 +654,15 @@
 
         @media (max-width: 700px) {
 
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+
             body {
                 height: 100dvh;
-                overflow: hidden;
             }
 
             .app {
@@ -705,6 +720,7 @@
             .main {
                 width: 100%;
                 height: 100dvh;
+                min-height: 0;
             }
 
             .mobile-topbar {
@@ -716,11 +732,14 @@
                 padding: 0 10px;
                 background: #0d111b;
                 border-bottom: 1px solid #1b2638;
+                flex-shrink: 0;
             }
 
             #chatWindow {
                 width: 100%;
-                height: calc(100dvh - 62px) !important;
+                height: calc(100dvh - 62px);
+                min-height: 0;
+                flex: 1;
             }
 
             .chat-header {
@@ -747,10 +766,12 @@
             .chat-header .avatar {
                 width: 43px;
                 height: 43px;
+                min-width: 43px;
             }
 
             .messages {
                 padding: 12px 9px;
+                min-height: 0;
             }
 
             .message {
@@ -770,24 +791,35 @@
 
             .welcome {
                 height: calc(100dvh - 62px);
-                flex: none;
+                flex: 1;
+                min-height: 0;
             }
 
             .chat-list {
-                height: calc(100dvh - 62px);
+                height: auto;
+                flex: 1;
+                min-height: 0;
             }
 
             .search-results {
-                height: calc(100dvh - 62px);
+                height: auto;
+                flex: 1;
+                min-height: 0;
             }
 
             .profile-page {
-                height: calc(100dvh - 62px);
+                flex: 1;
+                min-height: 0;
+                height: auto;
+                overflow-y: auto;
                 padding: 20px 12px;
+                -webkit-overflow-scrolling: touch;
             }
 
             .profile-box {
                 width: 100%;
+                max-width: 500px;
+                margin: 0 auto;
                 padding: 25px 18px;
             }
 
@@ -803,7 +835,6 @@
                 padding: 22px 18px;
             }
         }
-
     </style>
 </head>
 
@@ -811,87 +842,54 @@
 
 <div class="app">
 
-    <!-- SIDEBAR -->
-
     <aside class="sidebar">
 
         <div class="sidebar-top">
-
             <div class="logo">
                 Клейви Чат
             </div>
 
-            <button
-                id="plusButton"
-                class="plus-button"
-            >
+            <button id="plusButton" class="plus-button">
                 +
             </button>
-
         </div>
 
         <div class="search-box">
-
             <input
                 id="searchInput"
                 type="text"
                 placeholder="Поиск пользователей и каналов..."
                 autocomplete="off"
             >
-
         </div>
 
         <div class="menu">
 
-            <button
-                id="chatsButton"
-                class="active"
-            >
+            <button id="chatsButton" class="active">
                 💬 Чаты
             </button>
 
-            <button
-                id="contactsButton"
-            >
+            <button id="contactsButton">
                 👥 Контакты
             </button>
 
-            <button
-                id="profileButton"
-            >
+            <button id="profileButton">
                 👤 Профиль
             </button>
 
         </div>
 
-        <div
-            id="chatList"
-            class="chat-list"
-        >
-
+        <div id="chatList" class="chat-list">
             <div class="empty">
                 Пока нет чатов
             </div>
-
         </div>
 
-        <div
-            id="searchResults"
-            class="search-results"
-        ></div>
+        <div id="searchResults" class="search-results"></div>
 
     </aside>
 
-
-    <!-- MOBILE OVERLAY -->
-
-    <div
-        id="mobileOverlay"
-        class="mobile-overlay"
-    ></div>
-
-
-    <!-- MAIN -->
+    <div id="mobileOverlay" class="mobile-overlay"></div>
 
     <main class="main">
 
@@ -910,12 +908,9 @@
 
         </div>
 
-
-        <!-- CHAT -->
-
         <div
             id="chatWindow"
-            style="display:none;height:100%;flex-direction:column;"
+            style="display:none;height:100%;flex-direction:column;min-height:0;"
         >
 
             <div class="chat-header">
@@ -927,13 +922,9 @@
                     ←
                 </button>
 
-                <div
-                    id="chatAvatar"
-                    class="avatar"
-                ></div>
+                <div id="chatAvatar" class="avatar"></div>
 
                 <div>
-
                     <div
                         id="chatName"
                         class="chat-header-name"
@@ -943,15 +934,11 @@
                         id="chatUsername"
                         class="chat-header-username"
                     ></div>
-
                 </div>
 
             </div>
 
-            <div
-                id="messages"
-                class="messages"
-            ></div>
+            <div id="messages" class="messages"></div>
 
             <div
                 id="messageInputArea"
@@ -976,35 +963,19 @@
 
         </div>
 
-
-        <!-- WELCOME -->
-
-        <div
-            id="welcome"
-            class="welcome"
-        >
+        <div id="welcome" class="welcome">
 
             <div>
-
-                <h2>
-                    Клейви Чат
-                </h2>
+                <h2>Клейви Чат</h2>
 
                 <p>
                     Выберите контакт или канал
                 </p>
-
             </div>
 
         </div>
 
-
-        <!-- PROFILE -->
-
-        <div
-            id="profilePage"
-            class="profile-page"
-        >
+        <div id="profilePage" class="profile-page">
 
             <div class="profile-box">
 
@@ -1052,14 +1023,9 @@
 </div>
 
 
-<!-- =========================================
-     CREATE CHANNEL MODAL
-========================================= -->
+<!-- CREATE CHANNEL -->
 
-<div
-    id="createChannelModal"
-    class="modal"
->
+<div id="createChannelModal" class="modal">
 
     <div class="modal-box">
 
@@ -1185,14 +1151,9 @@
 </div>
 
 
-<!-- =========================================
-     PLUS MENU
-========================================= -->
+<!-- PLUS -->
 
-<div
-    id="plusModal"
-    class="modal"
->
+<div id="plusModal" class="modal">
 
     <div class="modal-box">
 
@@ -1227,14 +1188,9 @@
 </div>
 
 
-<!-- =========================================
-     CHANNEL INFO
-========================================= -->
+<!-- CHANNEL INFO -->
 
-<div
-    id="channelInfoModal"
-    class="modal"
->
+<div id="channelInfoModal" class="modal">
 
     <div class="modal-box">
 
@@ -1281,10 +1237,6 @@
 
 <script>
 
-/* =========================================
-   SUPABASE
-========================================= */
-
 const SUPABASE_URL =
     "https://tnzdjjtubeulxrvfrmfr.supabase.co";
 
@@ -1298,24 +1250,19 @@ const supabaseClient =
     );
 
 
-/* =========================================
-   VARIABLES
-========================================= */
-
 let currentUser = null;
 let currentProfile = null;
 let currentContact = null;
 let currentChannel = null;
-
 let realtimeChannel = null;
 
 let selectedChannelType = "private";
 let selectedChannelFile = null;
 
 
-/* =========================================
+/* =========================
    AUTH
-========================================= */
+========================= */
 
 async function checkAuth() {
 
@@ -1326,23 +1273,20 @@ async function checkAuth() {
     } = await supabaseClient.auth.getSession();
 
     if (!session) {
-
         window.location.href = "login.html";
-
         return;
     }
 
     currentUser = session.user;
 
     await loadProfile();
-
     await loadChats();
 }
 
 
-/* =========================================
+/* =========================
    PROFILE
-========================================= */
+========================= */
 
 async function loadProfile() {
 
@@ -1356,9 +1300,7 @@ async function loadProfile() {
         .single();
 
     if (error) {
-
         console.error(error);
-
         return;
     }
 
@@ -1373,42 +1315,33 @@ async function loadProfile() {
     ).textContent = "@" + data.username;
 
     const avatar =
-        document.getElementById(
-            "profileAvatar"
-        );
+        document.getElementById("profileAvatar");
 
     if (data.avatar_url) {
 
         avatar.innerHTML =
-            `<img src="${escapeHtml(data.avatar_url)}">`;
+            `<img src="${escapeHtml(data.avatar_url)}" alt="">`;
 
     } else {
 
         avatar.textContent =
-            data.name
-                .charAt(0)
-                .toUpperCase();
+            data.name.charAt(0).toUpperCase();
     }
 }
 
 
-/* =========================================
+/* =========================
    LOAD CHATS
-========================================= */
+========================= */
 
 async function loadChats() {
 
     const list =
-        document.getElementById(
-            "chatList"
-        );
+        document.getElementById("chatList");
 
     list.innerHTML = "";
 
     let hasSomething = false;
-
-
-    /* CONTACTS */
 
     const {
         data: contacts,
@@ -1416,26 +1349,18 @@ async function loadChats() {
     } = await supabaseClient
         .from("contacts")
         .select("contact_id")
-        .eq(
-            "user_id",
-            currentUser.id
-        );
+        .eq("user_id", currentUser.id);
 
     if (!contactsError && contacts) {
 
-        for (
-            const contact of contacts
-        ) {
+        for (const contact of contacts) {
 
             const {
                 data: profile
             } = await supabaseClient
                 .from("profiles")
                 .select("*")
-                .eq(
-                    "id",
-                    contact.contact_id
-                )
+                .eq("id", contact.contact_id)
                 .single();
 
             if (!profile) {
@@ -1443,13 +1368,16 @@ async function loadChats() {
             }
 
             createContactElement(profile);
-
             hasSomething = true;
         }
     }
 
 
-    /* CHANNELS */
+    /*
+       Каналы пока оставляем.
+       Если RLS выдаёт ошибку, она НЕ ломает
+       обычные чаты и профиль.
+    */
 
     const {
         data: channels,
@@ -1457,22 +1385,23 @@ async function loadChats() {
     } = await supabaseClient
         .from("channels")
         .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
+        .order("created_at", {
+            ascending: false
+        });
+
+    if (channelsError) {
+
+        console.warn(
+            "Каналы недоступны:",
+            channelsError.message
         );
 
-    if (!channelsError && channels) {
+    } else if (channels) {
 
-        for (
-            const channel of channels
-        ) {
+        for (const channel of channels) {
 
             const canShow =
-                channel.type === "public"
-                ||
+                channel.type === "public" ||
                 channel.owner_id === currentUser.id;
 
             if (!canShow) {
@@ -1480,7 +1409,6 @@ async function loadChats() {
             }
 
             createChannelElement(channel);
-
             hasSomething = true;
         }
     }
@@ -1496,47 +1424,31 @@ async function loadChats() {
 }
 
 
-/* =========================================
+/* =========================
    CONTACT ELEMENT
-========================================= */
+========================= */
 
 function createContactElement(profile) {
 
     const list =
-        document.getElementById(
-            "chatList"
-        );
+        document.getElementById("chatList");
 
     const item =
         document.createElement("div");
 
-    item.className =
-        "contact-item";
+    item.className = "contact-item";
 
     const avatar =
         document.createElement("div");
 
-    avatar.className =
-        "avatar";
+    avatar.className = "avatar";
 
-    if (profile.avatar_url) {
-
-        avatar.innerHTML =
-            `<img src="${escapeHtml(profile.avatar_url)}">`;
-
-    } else {
-
-        avatar.textContent =
-            profile.name
-                .charAt(0)
-                .toUpperCase();
-    }
+    setAvatar(avatar, profile);
 
     const info =
         document.createElement("div");
 
-    info.className =
-        "contact-info";
+    info.className = "contact-info";
 
     info.innerHTML = `
         <div class="contact-name">
@@ -1552,56 +1464,38 @@ function createContactElement(profile) {
     item.appendChild(info);
 
     item.onclick = () => {
-
         openChat(profile);
-
     };
 
     list.appendChild(item);
 }
 
 
-/* =========================================
+/* =========================
    CHANNEL ELEMENT
-========================================= */
+========================= */
 
 function createChannelElement(channel) {
 
     const list =
-        document.getElementById(
-            "chatList"
-        );
+        document.getElementById("chatList");
 
     const item =
         document.createElement("div");
 
-    item.className =
-        "channel-item";
+    item.className = "channel-item";
 
     const avatar =
         document.createElement("div");
 
-    avatar.className =
-        "avatar";
+    avatar.className = "avatar";
 
-    if (channel.avatar_url) {
-
-        avatar.innerHTML =
-            `<img src="${escapeHtml(channel.avatar_url)}">`;
-
-    } else {
-
-        avatar.textContent =
-            channel.name
-                .charAt(0)
-                .toUpperCase();
-    }
+    setChannelAvatar(avatar, channel);
 
     const info =
         document.createElement("div");
 
-    info.className =
-        "contact-info";
+    info.className = "contact-info";
 
     const usernameText =
         channel.username
@@ -1611,9 +1505,7 @@ function createChannelElement(channel) {
     info.innerHTML = `
         <div class="contact-name">
             ${escapeHtml(channel.name)}
-            <span class="channel-badge">
-                📢
-            </span>
+            <span class="channel-badge">📢</span>
         </div>
 
         <div class="contact-username">
@@ -1625,9 +1517,7 @@ function createChannelElement(channel) {
     item.appendChild(info);
 
     item.onclick = () => {
-
         openChannel(channel);
-
     };
 
     item.oncontextmenu = event => {
@@ -1635,21 +1525,18 @@ function createChannelElement(channel) {
         event.preventDefault();
 
         openChannelInfo(channel);
-
     };
 
     list.appendChild(item);
 }
 
 
-/* =========================================
+/* =========================
    SEARCH
-========================================= */
+========================= */
 
 const searchInput =
-    document.getElementById(
-        "searchInput"
-    );
+    document.getElementById("searchInput");
 
 searchInput.addEventListener(
     "input",
@@ -1662,39 +1549,27 @@ searchInput.addEventListener(
                 .toLowerCase();
 
         const results =
-            document.getElementById(
-                "searchResults"
-            );
+            document.getElementById("searchResults");
 
         const chatList =
-            document.getElementById(
-                "chatList"
-            );
+            document.getElementById("chatList");
 
         if (!query) {
 
-            results.style.display =
-                "none";
-
-            chatList.style.display =
-                "block";
+            results.style.display = "none";
+            chatList.style.display = "block";
 
             return;
         }
 
-        chatList.style.display =
-            "none";
-
-        results.style.display =
-            "block";
+        chatList.style.display = "none";
+        results.style.display = "block";
 
         results.innerHTML =
-            `<div class="empty">
-                Поиск...
-            </div>`;
+            `<div class="empty">Поиск...</div>`;
 
+        let found = false;
 
-        let html = "";
 
         /* USERS */
 
@@ -1703,61 +1578,33 @@ searchInput.addEventListener(
             error: usersError
         } = await supabaseClient
             .from("profiles")
-            .select(
-                "id,name,username,avatar_url"
-            )
-            .ilike(
-                "username",
-                `${query}%`
-            )
-            .neq(
-                "id",
-                currentUser.id
-            )
+            .select("id,name,username,avatar_url")
+            .ilike("username", `${query}%`)
+            .neq("id", currentUser.id)
             .limit(10);
 
         if (!usersError && users) {
 
-            for (
-                const profile of users
-            ) {
+            for (const profile of users) {
+
+                found = true;
 
                 const card =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                card.className =
-                    "search-card";
+                card.className = "search-card";
 
                 const avatar =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                avatar.className =
-                    "avatar";
+                avatar.className = "avatar";
 
-                if (profile.avatar_url) {
-
-                    avatar.innerHTML =
-                        `<img src="${escapeHtml(profile.avatar_url)}">`;
-
-                } else {
-
-                    avatar.textContent =
-                        profile.name
-                            .charAt(0)
-                            .toUpperCase();
-                }
+                setAvatar(avatar, profile);
 
                 const info =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                info.className =
-                    "search-card-info";
+                info.className = "search-card-info";
 
                 info.innerHTML = `
                     <div class="contact-name">
@@ -1770,42 +1617,25 @@ searchInput.addEventListener(
                 `;
 
                 const button =
-                    document.createElement(
-                        "button"
-                    );
+                    document.createElement("button");
 
-                button.className =
-                    "add-button";
-
-                button.textContent =
-                    "Добавить";
+                button.className = "add-button";
+                button.textContent = "Добавить";
 
                 const {
                     data: existing
                 } = await supabaseClient
                     .from("contacts")
                     .select("id")
-                    .eq(
-                        "user_id",
-                        currentUser.id
-                    )
-                    .eq(
-                        "contact_id",
-                        profile.id
-                    )
+                    .eq("user_id", currentUser.id)
+                    .eq("contact_id", profile.id)
                     .maybeSingle();
 
                 if (existing) {
 
-                    button.textContent =
-                        "Добавлен";
-
-                    button.classList.add(
-                        "added"
-                    );
-
-                    button.disabled =
-                        true;
+                    button.textContent = "Добавлен";
+                    button.classList.add("added");
+                    button.disabled = true;
                 }
 
                 button.onclick =
@@ -1827,6 +1657,8 @@ searchInput.addEventListener(
 
                         if (error) {
 
+                            console.error(error);
+
                             alert(
                                 "Не удалось добавить контакт"
                             );
@@ -1841,8 +1673,7 @@ searchInput.addEventListener(
                             "added"
                         );
 
-                        button.disabled =
-                            true;
+                        button.disabled = true;
 
                         await loadChats();
                     };
@@ -1856,7 +1687,7 @@ searchInput.addEventListener(
         }
 
 
-        /* CHANNELS */
+        /* CHANNEL SEARCH */
 
         const {
             data: channels,
@@ -1864,10 +1695,7 @@ searchInput.addEventListener(
         } = await supabaseClient
             .from("channels")
             .select("*")
-            .eq(
-                "type",
-                "public"
-            )
+            .eq("type", "public")
             .or(
                 `username.ilike.${query}%,name.ilike.%${query}%`
             )
@@ -1875,46 +1703,29 @@ searchInput.addEventListener(
 
         if (!channelsError && channels) {
 
-            for (
-                const channel of channels
-            ) {
+            for (const channel of channels) {
+
+                found = true;
 
                 const card =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                card.className =
-                    "search-card";
+                card.className = "search-card";
 
                 const avatar =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                avatar.className =
-                    "avatar";
+                avatar.className = "avatar";
 
-                if (channel.avatar_url) {
-
-                    avatar.innerHTML =
-                        `<img src="${escapeHtml(channel.avatar_url)}">`;
-
-                } else {
-
-                    avatar.textContent =
-                        channel.name
-                            .charAt(0)
-                            .toUpperCase();
-                }
+                setChannelAvatar(
+                    avatar,
+                    channel
+                );
 
                 const info =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
-                info.className =
-                    "search-card-info";
+                info.className = "search-card-info";
 
                 info.innerHTML = `
                     <div class="contact-name">
@@ -1930,22 +1741,14 @@ searchInput.addEventListener(
                 `;
 
                 const button =
-                    document.createElement(
-                        "button"
-                    );
+                    document.createElement("button");
 
-                button.className =
-                    "add-button";
+                button.className = "add-button";
+                button.textContent = "Открыть";
 
-                button.textContent =
-                    "Открыть";
-
-                button.onclick =
-                    () => {
-
-                        openChannel(channel);
-
-                    };
+                button.onclick = () => {
+                    openChannel(channel);
+                };
 
                 card.appendChild(avatar);
                 card.appendChild(info);
@@ -1955,26 +1758,20 @@ searchInput.addEventListener(
             }
         }
 
-
-        if (
-            (!users || users.length === 0)
-            &&
-            (!channels || channels.length === 0)
-        ) {
+        if (!found) {
 
             results.innerHTML =
                 `<div class="empty">
                     Ничего не найдено
                 </div>`;
         }
-
     }
 );
 
 
-/* =========================================
+/* =========================
    OPEN CHAT
-========================================= */
+========================= */
 
 async function openChat(profile) {
 
@@ -1983,13 +1780,7 @@ async function openChat(profile) {
 
     stopRealtime();
 
-    document.getElementById(
-        "welcome"
-    ).style.display = "none";
-
-    document.getElementById(
-        "profilePage"
-    ).style.display = "none";
+    hideContentForChat();
 
     document.getElementById(
         "chatWindow"
@@ -2015,13 +1806,17 @@ async function openChat(profile) {
 
     document.getElementById(
         "chatName"
-    ).textContent =
-        profile.name;
+    ).textContent = profile.name;
 
     document.getElementById(
         "chatUsername"
     ).textContent =
         "@" + profile.username;
+
+    document.getElementById(
+        "messageInput"
+    ).placeholder =
+        "Написать сообщение...";
 
     await loadMessages();
 
@@ -2029,9 +1824,9 @@ async function openChat(profile) {
 }
 
 
-/* =========================================
+/* =========================
    OPEN CHANNEL
-========================================= */
+========================= */
 
 async function openChannel(channel) {
 
@@ -2040,13 +1835,7 @@ async function openChannel(channel) {
 
     stopRealtime();
 
-    document.getElementById(
-        "welcome"
-    ).style.display = "none";
-
-    document.getElementById(
-        "profilePage"
-    ).style.display = "none";
+    hideContentForChat();
 
     document.getElementById(
         "chatWindow"
@@ -2061,21 +1850,14 @@ async function openChannel(channel) {
         ).style.display = "flex";
     }
 
-
-    const avatar =
-        document.getElementById(
-            "chatAvatar"
-        );
-
     setChannelAvatar(
-        avatar,
+        document.getElementById("chatAvatar"),
         channel
     );
 
     document.getElementById(
         "chatName"
-    ).textContent =
-        channel.name;
+    ).textContent = channel.name;
 
     document.getElementById(
         "chatUsername"
@@ -2084,19 +1866,14 @@ async function openChannel(channel) {
             ? "@" + channel.username
             : "🔒 Частный канал";
 
-
     const canWrite =
-        await canWriteToChannel(
-            channel
-        );
-
+        await canWriteToChannel(channel);
 
     if (canWrite) {
 
         document.getElementById(
             "messageInputArea"
-        ).style.display =
-            "flex";
+        ).style.display = "flex";
 
         document.getElementById(
             "messageInput"
@@ -2107,10 +1884,8 @@ async function openChannel(channel) {
 
         document.getElementById(
             "messageInputArea"
-        ).style.display =
-            "none";
+        ).style.display = "none";
     }
-
 
     await loadChannelMessages();
 
@@ -2118,20 +1893,17 @@ async function openChannel(channel) {
 }
 
 
-/* =========================================
+/* =========================
    CHECK CHANNEL WRITE
-========================================= */
+========================= */
 
 async function canWriteToChannel(channel) {
 
     if (
-        channel.owner_id ===
-        currentUser.id
+        channel.owner_id === currentUser.id
     ) {
-
         return true;
     }
-
 
     const {
         data,
@@ -2139,41 +1911,29 @@ async function canWriteToChannel(channel) {
     } = await supabaseClient
         .from("channel_members")
         .select("role")
-        .eq(
-            "channel_id",
-            channel.id
-        )
-        .eq(
-            "user_id",
-            currentUser.id
-        )
+        .eq("channel_id", channel.id)
+        .eq("user_id", currentUser.id)
         .maybeSingle();
 
-
     if (error || !data) {
-
         return false;
     }
 
-
     return (
-        data.role === "admin"
-        ||
+        data.role === "admin" ||
         data.role === "owner"
     );
 }
 
 
-/* =========================================
+/* =========================
    LOAD PERSONAL MESSAGES
-========================================= */
+========================= */
 
 async function loadMessages() {
 
     const messages =
-        document.getElementById(
-            "messages"
-        );
+        document.getElementById("messages");
 
     messages.innerHTML = "";
 
@@ -2186,12 +1946,9 @@ async function loadMessages() {
         .or(
             `and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
         )
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
-        );
+        .order("created_at", {
+            ascending: true
+        });
 
     if (error) {
 
@@ -2200,10 +1957,7 @@ async function loadMessages() {
         return;
     }
 
-    for (
-        const message of data
-    ) {
-
+    for (const message of data) {
         displayMessage(message);
     }
 
@@ -2212,16 +1966,14 @@ async function loadMessages() {
 }
 
 
-/* =========================================
+/* =========================
    LOAD CHANNEL MESSAGES
-========================================= */
+========================= */
 
 async function loadChannelMessages() {
 
     const messages =
-        document.getElementById(
-            "messages"
-        );
+        document.getElementById("messages");
 
     messages.innerHTML = "";
 
@@ -2235,12 +1987,9 @@ async function loadChannelMessages() {
             "channel_id",
             currentChannel.id
         )
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
-        );
+        .order("created_at", {
+            ascending: true
+        });
 
     if (error) {
 
@@ -2249,10 +1998,7 @@ async function loadChannelMessages() {
         return;
     }
 
-    for (
-        const message of data
-    ) {
-
+    for (const message of data) {
         displayChannelMessage(message);
     }
 
@@ -2261,27 +2007,30 @@ async function loadChannelMessages() {
 }
 
 
-/* =========================================
+/* =========================
    DISPLAY MESSAGE
-========================================= */
+========================= */
 
 function displayMessage(message) {
 
     const container =
-        document.getElementById(
-            "messages"
-        );
+        document.getElementById("messages");
+
+    if (
+        container.querySelector(
+            `[data-id="${message.id}"]`
+        )
+    ) {
+        return;
+    }
 
     const element =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     element.className =
         "message " +
         (
-            message.sender_id ===
-            currentUser.id
+            message.sender_id === currentUser.id
                 ? "mine"
                 : "theirs"
         );
@@ -2317,24 +2066,27 @@ function displayMessage(message) {
 }
 
 
-/* =========================================
+/* =========================
    DISPLAY CHANNEL MESSAGE
-========================================= */
+========================= */
 
 function displayChannelMessage(message) {
 
     const container =
-        document.getElementById(
-            "messages"
-        );
+        document.getElementById("messages");
+
+    if (
+        container.querySelector(
+            `[data-id="${message.id}"]`
+        )
+    ) {
+        return;
+    }
 
     const element =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-    element.className =
-        "message mine";
+    element.className = "message mine";
 
     element.dataset.id =
         String(message.id);
@@ -2367,19 +2119,15 @@ function displayChannelMessage(message) {
 }
 
 
-/* =========================================
+/* =========================
    SEND MESSAGE
-========================================= */
+========================= */
 
 const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
+    document.getElementById("messageInput");
 
 const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
+    document.getElementById("sendButton");
 
 
 async function sendMessage() {
@@ -2419,8 +2167,7 @@ async function sendMessage() {
                 "Сообщение не отправилось"
             );
 
-            messageInput.value =
-                text;
+            messageInput.value = text;
         }
 
         return;
@@ -2468,8 +2215,7 @@ async function sendMessage() {
                 "Сообщение не отправилось"
             );
 
-            messageInput.value =
-                text;
+            messageInput.value = text;
         }
     }
 }
@@ -2485,23 +2231,19 @@ messageInput.addEventListener(
     "keydown",
     event => {
 
-        if (
-            event.key ===
-            "Enter"
-        ) {
+        if (event.key === "Enter") {
 
             event.preventDefault();
 
             sendMessage();
         }
-
     }
 );
 
 
-/* =========================================
+/* =========================
    REALTIME PERSONAL
-========================================= */
+========================= */
 
 function subscribeToMessages() {
 
@@ -2533,27 +2275,20 @@ function subscribeToMessages() {
 
                     const belongs =
                         (
-                            message.sender_id === currentUser.id
-                            &&
-                            message.receiver_id === currentContact.id
+                            message.sender_id ===
+                            currentUser.id &&
+                            message.receiver_id ===
+                            currentContact.id
                         )
                         ||
                         (
-                            message.sender_id === currentContact.id
-                            &&
-                            message.receiver_id === currentUser.id
+                            message.sender_id ===
+                            currentContact.id &&
+                            message.receiver_id ===
+                            currentUser.id
                         );
 
                     if (!belongs) {
-                        return;
-                    }
-
-                    const existing =
-                        document.querySelector(
-                            `#messages .message[data-id="${message.id}"]`
-                        );
-
-                    if (existing) {
                         return;
                     }
 
@@ -2564,9 +2299,9 @@ function subscribeToMessages() {
 }
 
 
-/* =========================================
+/* =========================
    REALTIME CHANNEL
-========================================= */
+========================= */
 
 function subscribeToChannelMessages() {
 
@@ -2601,15 +2336,6 @@ function subscribeToChannelMessages() {
                         return;
                     }
 
-                    const existing =
-                        document.querySelector(
-                            `#messages .message[data-id="${message.id}"]`
-                        );
-
-                    if (existing) {
-                        return;
-                    }
-
                     displayChannelMessage(
                         message
                     );
@@ -2619,9 +2345,9 @@ function subscribeToChannelMessages() {
 }
 
 
-/* =========================================
+/* =========================
    STOP REALTIME
-========================================= */
+========================= */
 
 function stopRealtime() {
 
@@ -2636,9 +2362,29 @@ function stopRealtime() {
 }
 
 
-/* =========================================
-   PLUS MENU
-========================================= */
+/* =========================
+   HIDE CONTENT
+========================= */
+
+function hideContentForChat() {
+
+    document.getElementById(
+        "profilePage"
+    ).style.display = "none";
+
+    document.getElementById(
+        "welcome"
+    ).style.display = "none";
+
+    document.getElementById(
+        "searchResults"
+    ).style.display = "none";
+}
+
+
+/* =========================
+   PLUS
+========================= */
 
 document.getElementById(
     "plusButton"
@@ -2672,9 +2418,9 @@ document.getElementById(
 };
 
 
-/* =========================================
+/* =========================
    NEW CHANNEL
-========================================= */
+========================= */
 
 document.getElementById(
     "newChannelButton"
@@ -2690,11 +2436,8 @@ document.getElementById(
 
 function openCreateChannel() {
 
-    selectedChannelType =
-        "private";
-
-    selectedChannelFile =
-        null;
+    selectedChannelType = "private";
+    selectedChannelFile = null;
 
     document.getElementById(
         "channelNameInput"
@@ -2725,14 +2468,18 @@ function openCreateChannel() {
     ).innerHTML = "📷";
 
     document.getElementById(
+        "channelPhotoInput"
+    ).value = "";
+
+    document.getElementById(
         "createChannelModal"
     ).classList.add("active");
 }
 
 
-/* =========================================
+/* =========================
    CHANNEL PHOTO
-========================================= */
+========================= */
 
 document.getElementById(
     "channelPhotoPreview"
@@ -2757,8 +2504,7 @@ document.getElementById(
             return;
         }
 
-        selectedChannelFile =
-            file;
+        selectedChannelFile = file;
 
         const reader =
             new FileReader();
@@ -2768,7 +2514,7 @@ document.getElementById(
             document.getElementById(
                 "channelPhotoPreview"
             ).innerHTML =
-                `<img src="${reader.result}">`;
+                `<img src="${reader.result}" alt="">`;
         };
 
         reader.readAsDataURL(file);
@@ -2776,16 +2522,15 @@ document.getElementById(
 );
 
 
-/* =========================================
+/* =========================
    CHANNEL TYPE
-========================================= */
+========================= */
 
 document.getElementById(
     "privateType"
 ).onclick = () => {
 
-    selectedChannelType =
-        "private";
+    selectedChannelType = "private";
 
     document.getElementById(
         "privateType"
@@ -2805,8 +2550,7 @@ document.getElementById(
     "publicType"
 ).onclick = () => {
 
-    selectedChannelType =
-        "public";
+    selectedChannelType = "public";
 
     document.getElementById(
         "publicType"
@@ -2822,9 +2566,9 @@ document.getElementById(
 };
 
 
-/* =========================================
-   CANCEL CREATE
-========================================= */
+/* =========================
+   CANCEL CHANNEL
+========================= */
 
 document.getElementById(
     "cancelChannelButton"
@@ -2836,9 +2580,9 @@ document.getElementById(
 };
 
 
-/* =========================================
+/* =========================
    CREATE CHANNEL
-========================================= */
+========================= */
 
 document.getElementById(
     "createChannelButton"
@@ -2863,9 +2607,7 @@ document.getElementById(
         let username =
             document.getElementById(
                 "channelUsernameInput"
-            ).value
-                .trim()
-                .toLowerCase();
+            ).value.trim().toLowerCase();
 
 
         if (!name) {
@@ -2889,8 +2631,7 @@ document.getElementById(
 
 
         if (
-            selectedChannelType ===
-            "public"
+            selectedChannelType === "public"
         ) {
 
             if (!username) {
@@ -2901,7 +2642,6 @@ document.getElementById(
 
                 return;
             }
-
 
             if (
                 !/^[a-z0-9_]{3,40}$/.test(
@@ -2922,10 +2662,7 @@ document.getElementById(
             } = await supabaseClient
                 .from("channels")
                 .select("id")
-                .eq(
-                    "username",
-                    username
-                )
+                .eq("username", username)
                 .maybeSingle();
 
             if (existingUsername) {
@@ -2939,19 +2676,14 @@ document.getElementById(
         }
 
 
-        button.disabled =
-            true;
-
-        button.textContent =
-            "Создание...";
+        button.disabled = true;
+        button.textContent = "Создание...";
 
 
         try {
 
             let avatarUrl = null;
 
-
-            /* UPLOAD PHOTO */
 
             if (selectedChannelFile) {
 
@@ -2978,11 +2710,8 @@ document.getElementById(
                         filePath,
                         selectedChannelFile,
                         {
-                            cacheControl:
-                                "3600",
-
-                            upsert:
-                                false
+                            cacheControl: "3600",
+                            upsert: false
                         }
                     );
 
@@ -3008,27 +2737,21 @@ document.getElementById(
                         filePath
                     );
 
-
                 avatarUrl =
                     publicUrl.publicUrl;
             }
 
 
-            /* PRIVATE INVITE CODE */
-
             let inviteCode = null;
 
             if (
-                selectedChannelType ===
-                "private"
+                selectedChannelType === "private"
             ) {
 
                 inviteCode =
                     generateInviteCode();
             }
 
-
-            /* CREATE */
 
             const {
                 data: channel,
@@ -3052,8 +2775,7 @@ document.getElementById(
                         selectedChannelType,
 
                     username:
-                        selectedChannelType ===
-                        "public"
+                        selectedChannelType === "public"
                             ? username
                             : null,
 
@@ -3073,8 +2795,6 @@ document.getElementById(
                 );
             }
 
-
-            /* ADD OWNER */
 
             const {
                 error: memberError
@@ -3106,35 +2826,26 @@ document.getElementById(
 
             document.getElementById(
                 "createChannelModal"
-            ).classList.remove(
-                "active"
-            );
+            ).classList.remove("active");
 
 
             await loadChats();
 
-
-            openChannel(
-                channel
-            );
+            openChannel(channel);
 
 
             if (
-                selectedChannelType ===
-                "private"
+                selectedChannelType === "private"
             ) {
 
-                setTimeout(
-                    () => {
+                setTimeout(() => {
 
-                        alert(
-                            "Канал создан!\n\nПриватная ссылка:\n" +
-                            getChannelLink(channel)
-                        );
+                    alert(
+                        "Канал создан!\n\nПриватная ссылка:\n" +
+                        getChannelLink(channel)
+                    );
 
-                    },
-                    300
-                );
+                }, 300);
             }
 
 
@@ -3149,18 +2860,15 @@ document.getElementById(
 
         } finally {
 
-            button.disabled =
-                false;
-
-            button.textContent =
-                "Создать";
+            button.disabled = false;
+            button.textContent = "Создать";
         }
     };
 
 
-/* =========================================
+/* =========================
    CHANNEL INFO
-========================================= */
+========================= */
 
 function openChannelInfo(channel) {
 
@@ -3213,16 +2921,13 @@ document.getElementById(
 };
 
 
-/* =========================================
+/* =========================
    CHANNEL LINK
-========================================= */
+========================= */
 
 function getChannelLink(channel) {
 
-    if (
-        channel.type ===
-        "public"
-    ) {
+    if (channel.type === "public") {
 
         return (
             window.location.origin +
@@ -3230,7 +2935,6 @@ function getChannelLink(channel) {
             channel.username
         );
     }
-
 
     return (
         window.location.origin +
@@ -3240,9 +2944,9 @@ function getChannelLink(channel) {
 }
 
 
-/* =========================================
-   INVITE CODE
-========================================= */
+/* =========================
+   INVITE
+========================= */
 
 function generateInviteCode() {
 
@@ -3251,11 +2955,7 @@ function generateInviteCode() {
 
     let result = "";
 
-    for (
-        let i = 0;
-        i < 32;
-        i++
-    ) {
+    for (let i = 0; i < 32; i++) {
 
         result +=
             characters.charAt(
@@ -3270,19 +2970,16 @@ function generateInviteCode() {
 }
 
 
-/* =========================================
+/* =========================
    AVATARS
-========================================= */
+========================= */
 
-function setAvatar(
-    element,
-    profile
-) {
+function setAvatar(element, profile) {
 
     if (profile.avatar_url) {
 
         element.innerHTML =
-            `<img src="${escapeHtml(profile.avatar_url)}">`;
+            `<img src="${escapeHtml(profile.avatar_url)}" alt="">`;
 
     } else {
 
@@ -3294,15 +2991,12 @@ function setAvatar(
 }
 
 
-function setChannelAvatar(
-    element,
-    channel
-) {
+function setChannelAvatar(element, channel) {
 
     if (channel.avatar_url) {
 
         element.innerHTML =
-            `<img src="${escapeHtml(channel.avatar_url)}">`;
+            `<img src="${escapeHtml(channel.avatar_url)}" alt="">`;
 
     } else {
 
@@ -3314,9 +3008,9 @@ function setChannelAvatar(
 }
 
 
-/* =========================================
-   CHATS
-========================================= */
+/* =========================
+   CHATS BUTTON
+========================= */
 
 document.getElementById(
     "chatsButton"
@@ -3333,8 +3027,7 @@ document.getElementById(
 
         document.getElementById(
             "chatList"
-        ).style.display =
-            "block";
+        ).style.display = "block";
 
         searchInput.value = "";
 
@@ -3342,9 +3035,9 @@ document.getElementById(
     };
 
 
-/* =========================================
-   CONTACTS
-========================================= */
+/* =========================
+   CONTACTS BUTTON
+========================= */
 
 document.getElementById(
     "contactsButton"
@@ -3364,10 +3057,12 @@ document.getElementById(
                 "chatList"
             );
 
+        list.style.display = "block";
         list.innerHTML = "";
 
         const {
-            data: contacts
+            data: contacts,
+            error
         } = await supabaseClient
             .from("contacts")
             .select("contact_id")
@@ -3375,6 +3070,18 @@ document.getElementById(
                 "user_id",
                 currentUser.id
             );
+
+        if (error) {
+
+            console.error(error);
+
+            list.innerHTML =
+                `<div class="empty">
+                    Не удалось загрузить контакты
+                </div>`;
+
+            return;
+        }
 
         if (
             !contacts ||
@@ -3389,9 +3096,7 @@ document.getElementById(
             return;
         }
 
-        for (
-            const contact of contacts
-        ) {
+        for (const contact of contacts) {
 
             const {
                 data: profile
@@ -3405,18 +3110,15 @@ document.getElementById(
                 .single();
 
             if (profile) {
-
-                createContactElement(
-                    profile
-                );
+                createContactElement(profile);
             }
         }
     };
 
 
-/* =========================================
-   PROFILE
-========================================= */
+/* =========================
+   PROFILE BUTTON
+========================= */
 
 document.getElementById(
     "profileButton"
@@ -3430,50 +3132,48 @@ document.getElementById(
 
     hideAllPages();
 
-    document.getElementById(
-        "profilePage"
-    ).style.display =
-        "block";
+    const profilePage =
+        document.getElementById(
+            "profilePage"
+        );
+
+    profilePage.style.display = "block";
+
+    profilePage.scrollTop = 0;
 
     searchInput.value = "";
 };
 
 
-/* =========================================
-   HIDE PAGES
-========================================= */
+/* =========================
+   HIDE ALL PAGES
+========================= */
 
 function hideAllPages() {
 
     document.getElementById(
         "profilePage"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
     document.getElementById(
         "chatWindow"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
     document.getElementById(
         "welcome"
-    ).style.display =
-        "flex";
+    ).style.display = "none";
 
     document.getElementById(
         "messageInputArea"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
     document.getElementById(
         "searchResults"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
     document.getElementById(
         "mobileBackButton"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
     currentContact = null;
     currentChannel = null;
@@ -3482,36 +3182,30 @@ function hideAllPages() {
 }
 
 
-/* =========================================
+/* =========================
    ACTIVE BUTTON
-========================================= */
+========================= */
 
 function setActiveButton(id) {
 
     document
-        .querySelectorAll(
-            ".menu button"
-        )
-        .forEach(
-            button => {
+        .querySelectorAll(".menu button")
+        .forEach(button => {
 
-                button.classList.remove(
-                    "active"
-                );
-            }
-        );
+            button.classList.remove(
+                "active"
+            );
+        });
 
     document.getElementById(
         id
-    ).classList.add(
-        "active"
-    );
+    ).classList.add("active");
 }
 
 
-/* =========================================
+/* =========================
    EDIT NAME
-========================================= */
+========================= */
 
 document.getElementById(
     "editNameButton"
@@ -3531,9 +3225,7 @@ document.getElementById(
         const cleanName =
             newName.trim();
 
-        if (
-            cleanName.length < 2
-        ) {
+        if (cleanName.length < 2) {
 
             alert(
                 "Имя должно содержать минимум 2 символа"
@@ -3547,8 +3239,7 @@ document.getElementById(
         } = await supabaseClient
             .from("profiles")
             .update({
-                name:
-                    cleanName
+                name: cleanName
             })
             .eq(
                 "id",
@@ -3576,9 +3267,9 @@ document.getElementById(
     };
 
 
-/* =========================================
+/* =========================
    LOGOUT
-========================================= */
+========================= */
 
 document.getElementById(
     "logoutButton"
@@ -3598,9 +3289,9 @@ document.getElementById(
     };
 
 
-/* =========================================
+/* =========================
    MOBILE MENU
-========================================= */
+========================= */
 
 const mobileMenuButton =
     document.getElementById(
@@ -3620,9 +3311,7 @@ const sidebar =
 
 function openMobileMenu() {
 
-    if (
-        window.innerWidth > 700
-    ) {
+    if (window.innerWidth > 700) {
         return;
     }
 
@@ -3660,9 +3349,9 @@ mobileOverlay.addEventListener(
 );
 
 
-/* =========================================
+/* =========================
    MOBILE BACK
-========================================= */
+========================= */
 
 document.getElementById(
     "mobileBackButton"
@@ -3670,9 +3359,7 @@ document.getElementById(
     "click",
     () => {
 
-        if (
-            window.innerWidth > 700
-        ) {
+        if (window.innerWidth > 700) {
             return;
         }
 
@@ -3683,42 +3370,35 @@ document.getElementById(
 
         document.getElementById(
             "chatWindow"
-        ).style.display =
-            "none";
+        ).style.display = "none";
 
         document.getElementById(
             "messageInputArea"
-        ).style.display =
-            "none";
+        ).style.display = "none";
 
         document.getElementById(
             "welcome"
-        ).style.display =
-            "flex";
+        ).style.display = "flex";
 
         document.getElementById(
             "mobileBackButton"
-        ).style.display =
-            "none";
+        ).style.display = "none";
 
         document.getElementById(
             "chatList"
-        ).style.display =
-            "block";
+        ).style.display = "block";
     }
 );
 
 
-/* =========================================
+/* =========================
    ESCAPE HTML
-========================================= */
+========================= */
 
 function escapeHtml(text) {
 
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     div.textContent =
         text ?? "";
@@ -3727,9 +3407,9 @@ function escapeHtml(text) {
 }
 
 
-/* =========================================
+/* =========================
    START
-========================================= */
+========================= */
 
 checkAuth();
 
@@ -3737,3 +3417,4 @@ checkAuth();
 
 </body>
 </html>
+```
