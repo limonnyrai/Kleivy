@@ -429,17 +429,28 @@ registerButton.addEventListener("click", async function () {
 
     if (!data.session) {
 
-        message.textContent =
-            "Аккаунт создан! Проверь почту и подтверди email. 📧";
+    message.textContent =
+        "Аккаунт создан, но сессия не получена.";
 
-        registerButton.disabled = false;
+    registerButton.disabled = false;
 
-        registerButton.textContent =
-            "Создать аккаунт";
+    registerButton.textContent =
+        "Создать аккаунт";
 
-        return;
+    return;
+}
 
-    }
+message.style.color = "#3c8cff";
+
+message.textContent =
+    "Аккаунт успешно создан! 🎉";
+
+localStorage.setItem(
+    "kleivy_logged_in",
+    "true"
+);
+
+window.location.replace("index.html");
 
 
     message.textContent =
