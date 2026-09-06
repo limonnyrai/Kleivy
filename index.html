@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Клейви Чат</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,8 +12,14 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
             font-family: Arial, sans-serif;
             background: #080b12;
             color: white;
@@ -25,13 +31,20 @@
             font-family: inherit;
         }
 
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         .app {
             display: flex;
             height: 100vh;
+            height: 100dvh;
             width: 100%;
         }
 
-        /* SIDEBAR */
+        /* =========================================
+           SIDEBAR
+        ========================================= */
 
         .sidebar {
             width: 330px;
@@ -39,6 +52,8 @@
             border-right: 1px solid #1d2638;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
+            z-index: 100;
         }
 
         .logo {
@@ -60,6 +75,7 @@
             outline: none;
             background: #151c2a;
             color: white;
+            font-size: 15px;
         }
 
         .search-box input::placeholder {
@@ -88,6 +104,7 @@
         .chat-list {
             overflow-y: auto;
             flex: 1;
+            -webkit-overflow-scrolling: touch;
         }
 
         .contact-item {
@@ -124,16 +141,23 @@
 
         .contact-info {
             min-width: 0;
+            flex: 1;
         }
 
         .contact-name {
             font-weight: bold;
             margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .contact-username {
             color: #75839c;
             font-size: 13px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .empty {
@@ -142,26 +166,32 @@
             padding: 30px 15px;
         }
 
-        /* MAIN */
+        /* =========================================
+           MAIN
+        ========================================= */
 
         .main {
             flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             background: #080d16;
+            height: 100vh;
+            height: 100dvh;
         }
+
+        /* =========================================
+           DESKTOP CHAT
+        ========================================= */
 
         .chat-header {
             height: 70px;
+            min-height: 70px;
             padding: 10px 20px;
             border-bottom: 1px solid #1b2638;
             display: flex;
             align-items: center;
             gap: 12px;
-        }
-
-        .chat-header-info {
-            display: none;
         }
 
         .chat-header-name {
@@ -191,6 +221,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message {
@@ -198,7 +229,9 @@
             padding: 10px 13px;
             border-radius: 14px;
             word-wrap: break-word;
+            overflow-wrap: anywhere;
             position: relative;
+            line-height: 1.35;
         }
 
         .message.mine {
@@ -229,16 +262,20 @@
 
         .message-input-area input {
             flex: 1;
+            min-width: 0;
             padding: 13px 15px;
             background: #151d2b;
             border: 1px solid #243149;
             border-radius: 14px;
             color: white;
             outline: none;
+            font-size: 15px;
         }
 
         .send-button {
             width: 48px;
+            min-width: 48px;
+            height: 48px;
             border: none;
             border-radius: 14px;
             background: #168cff;
@@ -247,12 +284,19 @@
             cursor: pointer;
         }
 
-        /* SEARCH */
+        .send-button:active {
+            transform: scale(.96);
+        }
+
+        /* =========================================
+           SEARCH
+        ========================================= */
 
         .search-results {
             display: none;
             flex: 1;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .search-card {
@@ -265,6 +309,7 @@
 
         .search-card-info {
             flex: 1;
+            min-width: 0;
         }
 
         .add-button {
@@ -274,6 +319,7 @@
             padding: 9px 12px;
             border-radius: 10px;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .add-button.added {
@@ -282,13 +328,16 @@
             cursor: default;
         }
 
-        /* PROFILE */
+        /* =========================================
+           PROFILE
+        ========================================= */
 
         .profile-page {
             display: none;
             flex: 1;
             overflow-y: auto;
             padding: 40px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .profile-box {
@@ -310,6 +359,13 @@
             align-items: center;
             font-size: 35px;
             font-weight: bold;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .profile-name {
@@ -340,13 +396,277 @@
             color: #ff7186;
         }
 
+        /* =========================================
+           MOBILE TOP BAR
+        ========================================= */
+
+        .mobile-topbar {
+            display: none;
+        }
+
+        .mobile-menu-button {
+            border: none;
+            background: transparent;
+            color: white;
+            width: 44px;
+            height: 44px;
+            font-size: 27px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .mobile-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #168cff;
+            margin-left: 5px;
+        }
+
+        .mobile-overlay {
+            display: none;
+        }
+
+        .mobile-back-button {
+            display: none;
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
         @media (max-width: 700px) {
+
+            body {
+                width: 100%;
+                height: 100dvh;
+                overflow: hidden;
+            }
+
+            .app {
+                width: 100%;
+                height: 100dvh;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* БОКОВОЕ МЕНЮ */
+
             .sidebar {
-                width: 280px;
+                position: fixed;
+                left: 0;
+                top: 0;
+
+                width: 85%;
+                max-width: 330px;
+                height: 100dvh;
+
+                transform: translateX(-105%);
+                transition: transform .25s ease;
+
+                box-shadow: 10px 0 35px rgba(0,0,0,.5);
+
+                z-index: 1000;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .logo {
+                padding: 20px 18px 15px;
+            }
+
+            .search-box {
+                padding: 0 12px 12px;
+            }
+
+            .menu button {
+                padding: 15px 4px;
+                font-size: 13px;
+            }
+
+            /* ЗАТЕМНЕНИЕ */
+
+            .mobile-overlay {
+                display: block;
+
+                position: fixed;
+                inset: 0;
+
+                background: rgba(0,0,0,.65);
+
+                opacity: 0;
+                pointer-events: none;
+
+                transition: opacity .25s ease;
+
+                z-index: 900;
+            }
+
+            .mobile-overlay.active {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* MAIN */
+
+            .main {
+                width: 100%;
+                height: 100dvh;
+                min-width: 0;
+            }
+
+            /* ВЕРХНЯЯ ПАНЕЛЬ */
+
+            .mobile-topbar {
+                display: flex;
+
+                width: 100%;
+                height: 62px;
+                min-height: 62px;
+
+                align-items: center;
+
+                padding: 0 10px;
+
+                background: #0d111b;
+                border-bottom: 1px solid #1b2638;
+            }
+
+            /* ЧАТ */
+
+            #chatWindow {
+                width: 100%;
+                height: calc(100dvh - 62px) !important;
+                min-height: 0;
+            }
+
+            .chat-header {
+                height: 62px;
+                min-height: 62px;
+                padding: 8px 10px;
+                gap: 8px;
+            }
+
+            .mobile-back-button {
+                display: flex;
+
+                width: 40px;
+                min-width: 40px;
+                height: 42px;
+
+                align-items: center;
+                justify-content: center;
+
+                border: none;
+                background: transparent;
+
+                color: white;
+                font-size: 29px;
+
+                cursor: pointer;
+            }
+
+            .chat-header .avatar {
+                width: 43px;
+                height: 43px;
+            }
+
+            .chat-header-name {
+                font-size: 15px;
+            }
+
+            .chat-header-username {
+                font-size: 12px;
+            }
+
+            .messages {
+                padding: 12px 9px;
+                gap: 6px;
             }
 
             .message {
-                max-width: 80%;
+                max-width: 84%;
+                padding: 9px 12px;
+                font-size: 15px;
+            }
+
+            .message-input-area {
+                padding: 8px;
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+
+                min-height: 64px;
+            }
+
+            .message-input-area input {
+                min-width: 0;
+                padding: 12px;
+                font-size: 16px;
+                border-radius: 14px;
+            }
+
+            .send-button {
+                width: 46px;
+                min-width: 46px;
+                height: 46px;
+            }
+
+            /* WELCOME */
+
+            .welcome {
+                height: calc(100dvh - 62px);
+                flex: none;
+            }
+
+            .welcome h2 {
+                font-size: 22px;
+            }
+
+            /* СПИСОК */
+
+            .chat-list {
+                height: calc(100dvh - 62px);
+            }
+
+            .contact-item {
+                min-height: 70px;
+                padding: 11px 14px;
+            }
+
+            /* ПОИСК */
+
+            .search-results {
+                height: calc(100dvh - 62px);
+            }
+
+            /* ПРОФИЛЬ */
+
+            .profile-page {
+                height: calc(100dvh - 62px);
+                padding: 20px 12px;
+            }
+
+            .profile-box {
+                width: 100%;
+                padding: 25px 18px;
+            }
+
+            .profile-name {
+                font-size: 22px;
+            }
+
+            /* ПОИСКОВАЯ КАРТОЧКА */
+
+            .search-card {
+                padding: 12px;
+            }
+
+            .add-button {
+                padding: 9px 10px;
+                font-size: 13px;
             }
         }
     </style>
@@ -356,7 +676,10 @@
 
 <div class="app">
 
-    <!-- SIDEBAR -->
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
     <aside class="sidebar">
 
         <div class="logo">
@@ -373,6 +696,7 @@
         </div>
 
         <div class="menu">
+
             <button id="chatsButton" class="active">
                 💬 Чаты
             </button>
@@ -384,12 +708,15 @@
             <button id="profileButton">
                 👤 Профиль
             </button>
+
         </div>
 
         <div id="chatList" class="chat-list">
+
             <div class="empty">
                 Пока нет чатов
             </div>
+
         </div>
 
         <div id="searchResults" class="search-results"></div>
@@ -397,25 +724,90 @@
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- =========================================
+         MOBILE OVERLAY
+    ========================================== -->
+
+    <div
+        id="mobileOverlay"
+        class="mobile-overlay"
+    ></div>
+
+
+    <!-- =========================================
+         MAIN
+    ========================================== -->
+
     <main class="main">
 
-        <div id="chatWindow" style="display:none; height:100%; flex-direction:column;">
+        <!-- MOBILE TOP BAR -->
+
+        <div class="mobile-topbar">
+
+            <button
+                id="mobileMenuButton"
+                class="mobile-menu-button"
+            >
+                ☰
+            </button>
+
+            <div class="mobile-title">
+                Клейви Чат
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             CHAT
+        ========================================== -->
+
+        <div
+            id="chatWindow"
+            style="display:none; height:100%; flex-direction:column;"
+        >
 
             <div class="chat-header">
 
-                <div id="chatAvatar" class="avatar"></div>
+                <button
+                    id="mobileBackButton"
+                    class="mobile-back-button"
+                >
+                    ←
+                </button>
+
+                <div
+                    id="chatAvatar"
+                    class="avatar"
+                ></div>
 
                 <div>
-                    <div id="chatName" class="chat-header-name"></div>
-                    <div id="chatUsername" class="chat-header-username"></div>
+
+                    <div
+                        id="chatName"
+                        class="chat-header-name"
+                    ></div>
+
+                    <div
+                        id="chatUsername"
+                        class="chat-header-username"
+                    ></div>
+
                 </div>
 
             </div>
 
-            <div id="messages" class="messages"></div>
 
-            <div id="messageInputArea" class="message-input-area">
+            <div
+                id="messages"
+                class="messages"
+            ></div>
+
+
+            <div
+                id="messageInputArea"
+                class="message-input-area"
+            >
 
                 <input
                     id="messageInput"
@@ -424,7 +816,10 @@
                     autocomplete="off"
                 >
 
-                <button id="sendButton" class="send-button">
+                <button
+                    id="sendButton"
+                    class="send-button"
+                >
                     ➤
                 </button>
 
@@ -433,39 +828,73 @@
         </div>
 
 
-        <div id="welcome" class="welcome">
+        <!-- =========================================
+             WELCOME
+        ========================================== -->
+
+        <div
+            id="welcome"
+            class="welcome"
+        >
+
             <div>
-                <h2>Клейви Чат</h2>
+
+                <h2>
+                    Клейви Чат
+                </h2>
+
                 <p>
                     Выберите контакт, чтобы начать общение
                 </p>
+
             </div>
+
         </div>
 
 
-        <!-- PROFILE -->
+        <!-- =========================================
+             PROFILE
+        ========================================== -->
 
-        <div id="profilePage" class="profile-page">
+        <div
+            id="profilePage"
+            class="profile-page"
+        >
 
             <div class="profile-box">
 
-                <div id="profileAvatar" class="profile-avatar">
+                <div
+                    id="profileAvatar"
+                    class="profile-avatar"
+                >
                     ?
                 </div>
 
-                <div id="profileName" class="profile-name">
+                <div
+                    id="profileName"
+                    class="profile-name"
+                >
                     Загрузка...
                 </div>
 
-                <div id="profileUsername" class="profile-username">
+                <div
+                    id="profileUsername"
+                    class="profile-username"
+                >
                     @username
                 </div>
 
-                <button id="editNameButton" class="profile-button">
+                <button
+                    id="editNameButton"
+                    class="profile-button"
+                >
                     ✏️ Изменить имя
                 </button>
 
-                <button id="logoutButton" class="profile-button logout">
+                <button
+                    id="logoutButton"
+                    class="profile-button logout"
+                >
                     🚪 Выйти
                 </button>
 
@@ -480,7 +909,12 @@
 
 <script>
 
-const SUPABASE_URL = "https://tnzdjjtubeulxrvfrmfr.supabase.co";
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_URL =
+    "https://tnzdjjtubeulxrvfrmfr.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_obyiISO1UFNJn6T6JEAiEQ_XLZanE6d";
@@ -492,9 +926,16 @@ const supabaseClient =
     );
 
 
+/* =========================================
+   VARIABLES
+========================================= */
+
 let currentUser = null;
+
 let currentProfile = null;
+
 let currentContact = null;
+
 let realtimeChannel = null;
 
 
@@ -510,14 +951,19 @@ async function checkAuth() {
         }
     } = await supabaseClient.auth.getSession();
 
+
     if (!session) {
 
-        window.location.href = "login.html";
+        window.location.href =
+            "login.html";
 
         return;
     }
 
-    currentUser = session.user;
+
+    currentUser =
+        session.user;
+
 
     await loadProfile();
 
@@ -540,6 +986,7 @@ async function loadProfile() {
         .eq("id", currentUser.id)
         .single();
 
+
     if (error) {
 
         console.error(error);
@@ -547,26 +994,40 @@ async function loadProfile() {
         return;
     }
 
-    currentProfile = data;
 
-    document.getElementById("profileName").textContent =
+    currentProfile =
+        data;
+
+
+    document.getElementById(
+        "profileName"
+    ).textContent =
         data.name;
 
-    document.getElementById("profileUsername").textContent =
+
+    document.getElementById(
+        "profileUsername"
+    ).textContent =
         "@" + data.username;
 
+
     const avatar =
-        document.getElementById("profileAvatar");
+        document.getElementById(
+            "profileAvatar"
+        );
+
 
     if (data.avatar_url) {
 
         avatar.innerHTML =
-            `<img src="${data.avatar_url}">`;
+            `<img src="${escapeHtml(data.avatar_url)}">`;
 
     } else {
 
         avatar.textContent =
-            data.name.charAt(0).toUpperCase();
+            data.name
+                .charAt(0)
+                .toUpperCase();
     }
 }
 
@@ -583,7 +1044,11 @@ async function loadContacts() {
     } = await supabaseClient
         .from("contacts")
         .select("contact_id")
-        .eq("user_id", currentUser.id);
+        .eq(
+            "user_id",
+            currentUser.id
+        );
+
 
     if (error) {
 
@@ -592,12 +1057,20 @@ async function loadContacts() {
         return;
     }
 
+
     const list =
-        document.getElementById("chatList");
+        document.getElementById(
+            "chatList"
+        );
+
 
     list.innerHTML = "";
 
-    if (!contacts || contacts.length === 0) {
+
+    if (
+        !contacts ||
+        contacts.length === 0
+    ) {
 
         list.innerHTML =
             `<div class="empty">
@@ -608,19 +1081,30 @@ async function loadContacts() {
     }
 
 
-    for (const contact of contacts) {
+    for (
+        const contact of contacts
+    ) {
 
         const {
             data: profile
         } = await supabaseClient
             .from("profiles")
             .select("*")
-            .eq("id", contact.contact_id)
+            .eq(
+                "id",
+                contact.contact_id
+            )
             .single();
 
-        if (!profile) continue;
 
-        createContactElement(profile);
+        if (!profile) {
+            continue;
+        }
+
+
+        createContactElement(
+            profile
+        );
     }
 }
 
@@ -629,40 +1113,59 @@ async function loadContacts() {
    CONTACT ELEMENT
 ========================================= */
 
-function createContactElement(profile) {
+function createContactElement(
+    profile
+) {
 
     const list =
-        document.getElementById("chatList");
+        document.getElementById(
+            "chatList"
+        );
+
 
     const item =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     item.className =
         "contact-item";
 
+
     const avatar =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     avatar.className =
         "avatar";
 
+
     if (profile.avatar_url) {
 
         avatar.innerHTML =
-            `<img src="${profile.avatar_url}">`;
+            `<img src="${escapeHtml(profile.avatar_url)}">`;
 
     } else {
 
         avatar.textContent =
-            profile.name.charAt(0).toUpperCase();
+            profile.name
+                .charAt(0)
+                .toUpperCase();
     }
 
 
     const info =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     info.className =
         "contact-info";
+
 
     info.innerHTML = `
         <div class="contact-name">
@@ -676,6 +1179,7 @@ function createContactElement(profile) {
 
 
     item.appendChild(avatar);
+
     item.appendChild(info);
 
 
@@ -695,33 +1199,51 @@ function createContactElement(profile) {
 ========================================= */
 
 const searchInput =
-    document.getElementById("searchInput");
+    document.getElementById(
+        "searchInput"
+    );
+
 
 searchInput.addEventListener(
     "input",
     async function () {
 
         const query =
-            this.value.trim().replace("@", "");
+            this.value
+                .trim()
+                .replace(/^@/, "");
+
 
         const results =
-            document.getElementById("searchResults");
+            document.getElementById(
+                "searchResults"
+            );
+
 
         const chatList =
-            document.getElementById("chatList");
+            document.getElementById(
+                "chatList"
+            );
 
 
         if (!query) {
 
-            results.style.display = "none";
-            chatList.style.display = "block";
+            results.style.display =
+                "none";
+
+            chatList.style.display =
+                "block";
 
             return;
         }
 
 
-        chatList.style.display = "none";
-        results.style.display = "block";
+        chatList.style.display =
+            "none";
+
+        results.style.display =
+            "block";
+
 
         results.innerHTML =
             `<div class="empty">
@@ -734,9 +1256,17 @@ searchInput.addEventListener(
             error
         } = await supabaseClient
             .from("profiles")
-            .select("id,name,username,avatar_url")
-            .ilike("username", `${query}%`)
-            .neq("id", currentUser.id)
+            .select(
+                "id,name,username,avatar_url"
+            )
+            .ilike(
+                "username",
+                `${query}%`
+            )
+            .neq(
+                "id",
+                currentUser.id
+            )
             .limit(10);
 
 
@@ -756,7 +1286,10 @@ searchInput.addEventListener(
         results.innerHTML = "";
 
 
-        if (!data || data.length === 0) {
+        if (
+            !data ||
+            data.length === 0
+        ) {
 
             results.innerHTML =
                 `<div class="empty">
@@ -767,10 +1300,13 @@ searchInput.addEventListener(
         }
 
 
-        for (const profile of data) {
+        for (
+            const profile of data
+        ) {
 
-            await createSearchCard(profile);
-
+            await createSearchCard(
+                profile
+            );
         }
 
     }
@@ -781,41 +1317,59 @@ searchInput.addEventListener(
    SEARCH CARD
 ========================================= */
 
-async function createSearchCard(profile) {
+async function createSearchCard(
+    profile
+) {
 
     const results =
-        document.getElementById("searchResults");
+        document.getElementById(
+            "searchResults"
+        );
+
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     card.className =
         "search-card";
 
 
     const avatar =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     avatar.className =
         "avatar";
 
+
     if (profile.avatar_url) {
 
         avatar.innerHTML =
-            `<img src="${profile.avatar_url}">`;
+            `<img src="${escapeHtml(profile.avatar_url)}">`;
 
     } else {
 
         avatar.textContent =
-            profile.name.charAt(0).toUpperCase();
+            profile.name
+                .charAt(0)
+                .toUpperCase();
     }
 
 
     const info =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     info.className =
         "search-card-info";
+
 
     info.innerHTML = `
         <div class="contact-name">
@@ -829,10 +1383,14 @@ async function createSearchCard(profile) {
 
 
     const button =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
+
 
     button.className =
         "add-button";
+
 
     button.textContent =
         "Добавить";
@@ -843,8 +1401,14 @@ async function createSearchCard(profile) {
     } = await supabaseClient
         .from("contacts")
         .select("id")
-        .eq("user_id", currentUser.id)
-        .eq("contact_id", profile.id)
+        .eq(
+            "user_id",
+            currentUser.id
+        )
+        .eq(
+            "contact_id",
+            profile.id
+        )
         .maybeSingle();
 
 
@@ -853,24 +1417,32 @@ async function createSearchCard(profile) {
         button.textContent =
             "Добавлен";
 
-        button.classList.add("added");
+        button.classList.add(
+            "added"
+        );
 
-        button.disabled = true;
+        button.disabled =
+            true;
     }
 
 
     button.onclick =
         async () => {
 
-            button.disabled = true;
+            button.disabled =
+                true;
+
 
             const {
                 error
             } = await supabaseClient
                 .from("contacts")
                 .insert({
-                    user_id: currentUser.id,
-                    contact_id: profile.id
+                    user_id:
+                        currentUser.id,
+
+                    contact_id:
+                        profile.id
                 });
 
 
@@ -882,7 +1454,8 @@ async function createSearchCard(profile) {
                     "Не удалось добавить контакт"
                 );
 
-                button.disabled = false;
+                button.disabled =
+                    false;
 
                 return;
             }
@@ -891,17 +1464,22 @@ async function createSearchCard(profile) {
             button.textContent =
                 "Добавлен";
 
-            button.classList.add("added");
+
+            button.classList.add(
+                "added"
+            );
 
 
             await loadContacts();
-
         };
 
 
     card.appendChild(avatar);
+
     card.appendChild(info);
+
     card.appendChild(button);
+
 
     results.appendChild(card);
 }
@@ -911,48 +1489,86 @@ async function createSearchCard(profile) {
    OPEN CHAT
 ========================================= */
 
-async function openChat(profile) {
+async function openChat(
+    profile
+) {
 
-    currentContact = profile;
+    currentContact =
+        profile;
 
 
-    document.getElementById("welcome")
-        .style.display = "none";
+    document.getElementById(
+        "welcome"
+    ).style.display =
+        "none";
 
-    document.getElementById("profilePage")
-        .style.display = "none";
 
-    document.getElementById("chatWindow")
-        .style.display = "flex";
+    document.getElementById(
+        "profilePage"
+    ).style.display =
+        "none";
 
-    document.getElementById("messageInputArea")
-        .style.display = "flex";
+
+    document.getElementById(
+        "chatWindow"
+    ).style.display =
+        "flex";
+
+
+    document.getElementById(
+        "messageInputArea"
+    ).style.display =
+        "flex";
+
+
+    if (
+        window.innerWidth <= 700
+    ) {
+
+        closeMobileMenu();
+
+
+        document.getElementById(
+            "mobileBackButton"
+        ).style.display =
+            "flex";
+    }
 
 
     const avatar =
-        document.getElementById("chatAvatar");
+        document.getElementById(
+            "chatAvatar"
+        );
 
 
     if (profile.avatar_url) {
 
         avatar.innerHTML =
-            `<img src="${profile.avatar_url}">`;
+            `<img src="${escapeHtml(profile.avatar_url)}">`;
 
     } else {
 
         avatar.textContent =
-            profile.name.charAt(0).toUpperCase();
+            profile.name
+                .charAt(0)
+                .toUpperCase();
     }
 
 
-    document.getElementById("chatName")
-        .textContent = profile.name;
+    document.getElementById(
+        "chatName"
+    ).textContent =
+        profile.name;
 
-    document.getElementById("chatUsername")
-        .textContent = "@" + profile.username;
+
+    document.getElementById(
+        "chatUsername"
+    ).textContent =
+        "@" + profile.username;
 
 
     await loadMessages();
+
 
     subscribeToMessages();
 }
@@ -965,9 +1581,13 @@ async function openChat(profile) {
 async function loadMessages() {
 
     const messages =
-        document.getElementById("messages");
+        document.getElementById(
+            "messages"
+        );
 
-    messages.innerHTML = "";
+
+    messages.innerHTML =
+        "";
 
 
     const {
@@ -979,9 +1599,12 @@ async function loadMessages() {
         .or(
             `and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
         )
-        .order("created_at", {
-            ascending: true
-        });
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
 
 
     if (error) {
@@ -992,10 +1615,13 @@ async function loadMessages() {
     }
 
 
-    for (const message of data) {
+    for (
+        const message of data
+    ) {
 
-        displayMessage(message);
-
+        displayMessage(
+            message
+        );
     }
 
 
@@ -1008,20 +1634,27 @@ async function loadMessages() {
    DISPLAY MESSAGE
 ========================================= */
 
-function displayMessage(message) {
+function displayMessage(
+    message
+) {
 
     const container =
-        document.getElementById("messages");
+        document.getElementById(
+            "messages"
+        );
 
 
     const element =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     element.className =
         "message " +
         (
-            message.sender_id === currentUser.id
+            message.sender_id ===
+            currentUser.id
                 ? "mine"
                 : "theirs"
         );
@@ -1050,7 +1683,10 @@ function displayMessage(message) {
     `;
 
 
-    container.appendChild(element);
+    container.appendChild(
+        element
+    );
+
 
     container.scrollTop =
         container.scrollHeight;
@@ -1062,10 +1698,15 @@ function displayMessage(message) {
 ========================================= */
 
 const messageInput =
-    document.getElementById("messageInput");
+    document.getElementById(
+        "messageInput"
+    );
+
 
 const sendButton =
-    document.getElementById("sendButton");
+    document.getElementById(
+        "sendButton"
+    );
 
 
 async function sendMessage() {
@@ -1074,13 +1715,17 @@ async function sendMessage() {
         messageInput.value.trim();
 
 
-    if (!text || !currentContact) {
+    if (
+        !text ||
+        !currentContact
+    ) {
 
         return;
     }
 
 
-    messageInput.value = "";
+    messageInput.value =
+        "";
 
 
     const {
@@ -1088,9 +1733,14 @@ async function sendMessage() {
     } = await supabaseClient
         .from("messages")
         .insert({
-            sender_id: currentUser.id,
-            receiver_id: currentContact.id,
-            content: text
+            sender_id:
+                currentUser.id,
+
+            receiver_id:
+                currentContact.id,
+
+            content:
+                text
         });
 
 
@@ -1102,7 +1752,8 @@ async function sendMessage() {
             "Сообщение не отправилось"
         );
 
-        messageInput.value = text;
+        messageInput.value =
+            text;
     }
 }
 
@@ -1117,10 +1768,14 @@ messageInput.addEventListener(
     "keydown",
     function (event) {
 
-        if (event.key === "Enter") {
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+            event.preventDefault();
 
             sendMessage();
-
         }
 
     }
@@ -1153,35 +1808,82 @@ function subscribeToMessages() {
                 "postgres_changes",
                 {
                     event: "INSERT",
+
                     schema: "public",
+
                     table: "messages"
                 },
+
                 payload => {
 
                     const message =
                         payload.new;
 
 
-                    const belongsToChat =
-                        (
-                            message.sender_id === currentUser.id &&
-                            message.receiver_id === currentContact.id
-                        )
-                        ||
-                        (
-                            message.sender_id === currentContact.id &&
-                            message.receiver_id === currentUser.id
-                        );
-
-
-                    if (!belongsToChat) {
+                    if (
+                        !currentContact
+                    ) {
 
                         return;
                     }
 
 
-                    displayMessage(message);
+                    const belongsToChat =
+                        (
+                            message.sender_id ===
+                            currentUser.id &&
 
+                            message.receiver_id ===
+                            currentContact.id
+                        )
+                        ||
+                        (
+                            message.sender_id ===
+                            currentContact.id &&
+
+                            message.receiver_id ===
+                            currentUser.id
+                        );
+
+
+                    if (
+                        !belongsToChat
+                    ) {
+
+                        return;
+                    }
+
+
+                    /*
+                       Не добавляем сообщение
+                       второй раз, если оно
+                       уже отображено.
+                    */
+
+                    const existingMessages =
+                        document.querySelectorAll(
+                            "#messages .message"
+                        );
+
+
+                    for (
+                        const existing of
+                        existingMessages
+                    ) {
+
+                        if (
+                            existing.dataset.id ===
+                            String(message.id)
+                        ) {
+
+                            return;
+                        }
+                    }
+
+
+                    displayMessage(
+                        message
+                    );
                 }
             )
             .subscribe();
@@ -1189,100 +1891,230 @@ function subscribeToMessages() {
 
 
 /* =========================================
-   NAVIGATION
+   NAVIGATION — CHATS
 ========================================= */
 
-document.getElementById("chatsButton")
-    .onclick = async () => {
+document.getElementById(
+    "chatsButton"
+).onclick =
+    async () => {
 
-        setActiveButton("chatsButton");
+        closeMobileMenu();
 
-        document.getElementById("profilePage")
-            .style.display = "none";
 
-        document.getElementById("chatList")
-            .style.display = "block";
+        setActiveButton(
+            "chatsButton"
+        );
 
-        document.getElementById("searchResults")
-            .style.display = "none";
 
-        document.getElementById("chatWindow")
-            .style.display = "none";
+        document.getElementById(
+            "profilePage"
+        ).style.display =
+            "none";
 
-        document.getElementById("welcome")
-            .style.display = "flex";
 
-        searchInput.value = "";
+        document.getElementById(
+            "chatList"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "searchResults"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "chatWindow"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "welcome"
+        ).style.display =
+            "flex";
+
+
+        document.getElementById(
+            "messageInputArea"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "mobileBackButton"
+        ).style.display =
+            "none";
+
+
+        searchInput.value =
+            "";
+
 
         await loadContacts();
     };
 
 
-document.getElementById("contactsButton")
-    .onclick = async () => {
+/* =========================================
+   NAVIGATION — CONTACTS
+========================================= */
 
-        setActiveButton("contactsButton");
+document.getElementById(
+    "contactsButton"
+).onclick =
+    async () => {
 
-        document.getElementById("profilePage")
-            .style.display = "none";
+        closeMobileMenu();
 
-        document.getElementById("chatList")
-            .style.display = "block";
 
-        document.getElementById("searchResults")
-            .style.display = "none";
+        setActiveButton(
+            "contactsButton"
+        );
 
-        document.getElementById("chatWindow")
-            .style.display = "none";
 
-        document.getElementById("welcome")
-            .style.display = "flex";
+        document.getElementById(
+            "profilePage"
+        ).style.display =
+            "none";
 
-        searchInput.value = "";
+
+        document.getElementById(
+            "chatList"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "searchResults"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "chatWindow"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "welcome"
+        ).style.display =
+            "flex";
+
+
+        document.getElementById(
+            "messageInputArea"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "mobileBackButton"
+        ).style.display =
+            "none";
+
+
+        searchInput.value =
+            "";
+
 
         await loadContacts();
     };
 
 
-document.getElementById("profileButton")
-    .onclick = () => {
+/* =========================================
+   NAVIGATION — PROFILE
+========================================= */
 
-        setActiveButton("profileButton");
+document.getElementById(
+    "profileButton"
+).onclick =
+    () => {
 
-        document.getElementById("chatList")
-            .style.display = "none";
+        closeMobileMenu();
 
-        document.getElementById("searchResults")
-            .style.display = "none";
 
-        document.getElementById("chatWindow")
-            .style.display = "none";
+        setActiveButton(
+            "profileButton"
+        );
 
-        document.getElementById("welcome")
-            .style.display = "none";
 
-        document.getElementById("profilePage")
-            .style.display = "block";
+        document.getElementById(
+            "chatList"
+        ).style.display =
+            "none";
 
-        searchInput.value = "";
 
+        document.getElementById(
+            "searchResults"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "chatWindow"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "welcome"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "messageInputArea"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "mobileBackButton"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "profilePage"
+        ).style.display =
+            "block";
+
+
+        searchInput.value =
+            "";
     };
 
 
-function setActiveButton(id) {
+/* =========================================
+   ACTIVE BUTTON
+========================================= */
+
+function setActiveButton(
+    id
+) {
 
     document
-        .querySelectorAll(".menu button")
-        .forEach(button => {
+        .querySelectorAll(
+            ".menu button"
+        )
+        .forEach(
+            button => {
 
-            button.classList.remove("active");
+                button.classList.remove(
+                    "active"
+                );
+            }
+        );
 
-        });
 
-
-    document
-        .getElementById(id)
-        .classList.add("active");
+    document.getElementById(
+        id
+    ).classList.add(
+        "active"
+    );
 }
 
 
@@ -1290,8 +2122,10 @@ function setActiveButton(id) {
    EDIT NAME
 ========================================= */
 
-document.getElementById("editNameButton")
-    .onclick = async () => {
+document.getElementById(
+    "editNameButton"
+).onclick =
+    async () => {
 
         const newName =
             prompt(
@@ -1306,17 +2140,39 @@ document.getElementById("editNameButton")
         }
 
 
+        const cleanName =
+            newName.trim();
+
+
+        if (
+            cleanName.length < 2
+        ) {
+
+            alert(
+                "Имя должно содержать минимум 2 символа"
+            );
+
+            return;
+        }
+
+
         const {
             error
         } = await supabaseClient
             .from("profiles")
             .update({
-                name: newName
+                name:
+                    cleanName
             })
-            .eq("id", currentUser.id);
+            .eq(
+                "id",
+                currentUser.id
+            );
 
 
         if (error) {
+
+            console.error(error);
 
             alert(
                 "Не удалось изменить имя"
@@ -1327,11 +2183,13 @@ document.getElementById("editNameButton")
 
 
         currentProfile.name =
-            newName;
+            cleanName;
 
-        document.getElementById("profileName")
-            .textContent = newName;
 
+        document.getElementById(
+            "profileName"
+        ).textContent =
+            cleanName;
     };
 
 
@@ -1339,14 +2197,20 @@ document.getElementById("editNameButton")
    LOGOUT
 ========================================= */
 
-document.getElementById("logoutButton")
-    .onclick = async () => {
+document.getElementById(
+    "logoutButton"
+).onclick =
+    async () => {
 
-        await supabaseClient.auth.signOut();
+        await supabaseClient
+            .auth
+            .signOut();
+
 
         localStorage.removeItem(
             "kleivy_logged_in"
         );
+
 
         window.location.href =
             "login.html";
@@ -1354,16 +2218,157 @@ document.getElementById("logoutButton")
 
 
 /* =========================================
-   SECURITY
+   MOBILE MENU
 ========================================= */
 
-function escapeHtml(text) {
+const mobileMenuButton =
+    document.getElementById(
+        "mobileMenuButton"
+    );
+
+
+const mobileOverlay =
+    document.getElementById(
+        "mobileOverlay"
+    );
+
+
+const sidebar =
+    document.querySelector(
+        ".sidebar"
+    );
+
+
+function openMobileMenu() {
+
+    if (
+        window.innerWidth > 700
+    ) {
+
+        return;
+    }
+
+
+    sidebar.classList.add(
+        "mobile-open"
+    );
+
+
+    mobileOverlay.classList.add(
+        "active"
+    );
+}
+
+
+function closeMobileMenu() {
+
+    sidebar.classList.remove(
+        "mobile-open"
+    );
+
+
+    mobileOverlay.classList.remove(
+        "active"
+    );
+}
+
+
+mobileMenuButton.addEventListener(
+    "click",
+    openMobileMenu
+);
+
+
+mobileOverlay.addEventListener(
+    "click",
+    closeMobileMenu
+);
+
+
+/* =========================================
+   MOBILE BACK
+========================================= */
+
+const mobileBackButton =
+    document.getElementById(
+        "mobileBackButton"
+    );
+
+
+mobileBackButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            window.innerWidth > 700
+        ) {
+
+            return;
+        }
+
+
+        currentContact =
+            null;
+
+
+        if (realtimeChannel) {
+
+            supabaseClient.removeChannel(
+                realtimeChannel
+            );
+
+            realtimeChannel =
+                null;
+        }
+
+
+        document.getElementById(
+            "chatWindow"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "messageInputArea"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "welcome"
+        ).style.display =
+            "flex";
+
+
+        mobileBackButton.style.display =
+            "none";
+
+
+        document.getElementById(
+            "chatList"
+        ).style.display =
+            "block";
+    }
+);
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(
+    text
+) {
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     div.textContent =
-        text;
+        text ?? "";
+
 
     return div.innerHTML;
 }
