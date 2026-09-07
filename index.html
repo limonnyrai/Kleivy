@@ -298,10 +298,6 @@ button{
     padding:30px;
 }
 
-.welcome h2{
-    color:#168cff;
-}
-
 .messages{
     flex:1;
     min-height:0;
@@ -623,33 +619,6 @@ button{
     color:#ff7186;
 }
 
-/* MOBILE HOME */
-
-.mobile-home-buttons{
-    display:none;
-    width:100%;
-    max-width:400px;
-    margin:25px auto 0;
-    gap:10px;
-}
-
-.mobile-home-button{
-    flex:1;
-    padding:14px 10px;
-    border:none;
-    border-radius:13px;
-    background:#151e2e;
-    border:1px solid #26344c;
-    color:white;
-    font-size:15px;
-    cursor:pointer;
-}
-
-.mobile-home-button.active{
-    background:#102d4b;
-    border-color:#168cff;
-}
-
 /* MODALS */
 
 .modal{
@@ -835,27 +804,6 @@ button{
     font-size:13px;
 }
 
-/* SETTINGS */
-
-.settings-list{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.settings-button{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    background:#151e2e;
-    border:1px solid #26344c;
-    color:white;
-    text-align:left;
-    cursor:pointer;
-    font-size:15px;
-}
-
 /* MEDIA VIEWER */
 
 .media-viewer{
@@ -882,16 +830,11 @@ button{
     gap:15px;
 }
 
-.media-viewer img,
-.media-viewer video{
+.media-viewer img{
     max-width:95vw;
     max-height:78vh;
     object-fit:contain;
     border-radius:10px;
-}
-
-.media-viewer video{
-    background:#000;
 }
 
 .media-viewer-buttons{
@@ -911,16 +854,6 @@ button{
 
 .media-viewer-buttons .close-media{
     background:#263348;
-}
-
-.upload-progress{
-    display:none;
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
-    height:3px;
-    background:#168cff;
 }
 
 /* MOBILE */
@@ -976,11 +909,49 @@ button{
     }
 
     .sidebar{
-        display:none;
+        position:fixed;
+        left:0;
+        top:0;
+        width:85%;
+        max-width:330px;
+        height:100dvh;
+        transform:translateX(-105%);
+        transition:transform .25s ease;
+        box-shadow:10px 0 35px rgba(0,0,0,.5);
+        z-index:1000;
+    }
+
+    .sidebar.mobile-open{
+        transform:translateX(0);
+    }
+
+    .logo{
+        padding:20px 18px 15px;
+    }
+
+    .search-box{
+        padding:0 12px 12px;
+    }
+
+    .menu button{
+        padding:15px 4px;
+        font-size:13px;
     }
 
     .mobile-overlay{
-        display:none !important;
+        display:block;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.65);
+        opacity:0;
+        pointer-events:none;
+        transition:opacity .25s ease;
+        z-index:900;
+    }
+
+    .mobile-overlay.active{
+        opacity:1;
+        pointer-events:auto;
     }
 
     .main{
@@ -1076,12 +1047,18 @@ button{
         height:calc(100dvh - 62px);
         flex:1;
         min-height:0;
-        flex-direction:column;
-        justify-content:center;
     }
 
-    .mobile-home-buttons{
-        display:flex;
+    .chat-list{
+        height:auto;
+        flex:1;
+        min-height:0;
+    }
+
+    .search-results{
+        height:auto;
+        flex:1;
+        min-height:0;
     }
 
     .profile-page{
@@ -1164,9 +1141,11 @@ autocomplete="off">
 </div>
 
 <div id="chatList" class="chat-list">
+
 <div class="empty">
-Пока нет чатов
+Загрузка чатов...
 </div>
+
 </div>
 
 <div id="searchResults" class="search-results"></div>
@@ -1297,10 +1276,7 @@ class="send-button"
 
 </div>
 
-<div
-id="welcome"
-class="welcome"
->
+<div id="welcome" class="welcome">
 
 <div>
 
@@ -1309,26 +1285,8 @@ class="welcome"
 </h2>
 
 <p>
-Выберите раздел
+Выберите контакт или канал
 </p>
-
-</div>
-
-<div class="mobile-home-buttons">
-
-<button
-id="mobileChatsButton"
-class="mobile-home-button active"
->
-💬 Чаты
-</button>
-
-<button
-id="mobileContactsButton"
-class="mobile-home-button"
->
-👥 Контакты
-</button>
 
 </div>
 
@@ -1384,48 +1342,6 @@ class="profile-button logout"
 
 </div>
 
-<!-- SETTINGS -->
-
-<div
-id="settingsModal"
-class="modal"
->
-
-<div class="modal-box">
-
-<div class="modal-title">
-⚙️ Настройки
-</div>
-
-<div class="settings-list">
-
-<button
-id="settingsProfileButton"
-class="settings-button"
->
-👤 Профиль
-</button>
-
-<button
-id="settingsLogoutButton"
-class="settings-button"
-style="color:#ff7186;"
->
-🚪 Выйти
-</button>
-
-<button
-id="closeSettingsButton"
-class="settings-button"
->
-Закрыть
-</button>
-
-</div>
-
-</div>
-
-</div>
 
 <!-- CREATE CHANNEL -->
 
@@ -1557,6 +1473,7 @@ class="modal-create"
 
 </div>
 
+
 <!-- PLUS -->
 
 <div
@@ -1595,6 +1512,7 @@ class="profile-button"
 </div>
 
 </div>
+
 
 <!-- CHANNEL INFO -->
 
@@ -1645,6 +1563,7 @@ class="profile-button"
 
 </div>
 
+
 <!-- MEDIA VIEWER -->
 
 <div
@@ -1654,12 +1573,16 @@ class="media-viewer"
 
 <div class="media-viewer-content">
 
-<div id="mediaViewerVisual"></div>
+<img
+id="mediaViewerImage"
+src=""
+alt=""
+>
 
 <div class="media-viewer-buttons">
 
 <button id="saveMediaButton">
-⬇️ Сохранить
+⬇️ Сохранить в галерею
 </button>
 
 <button
@@ -1674,6 +1597,7 @@ class="close-media"
 </div>
 
 </div>
+
 
 <script>
 
@@ -1700,7 +1624,6 @@ let selectedChannelFile = null;
 
 let selectedChatFile = null;
 let selectedViewerUrl = null;
-let selectedViewerType = null;
 
 
 /* AUTH */
@@ -1709,8 +1632,7 @@ async function checkAuth(){
 
     const {
         data:{session}
-    } =
-    await supabaseClient.auth.getSession();
+    } = await supabaseClient.auth.getSession();
 
     if(!session){
 
@@ -1721,8 +1643,19 @@ async function checkAuth(){
     currentUser=session.user;
 
     await loadProfile();
-    await loadChats();
 
+    /*
+     * Сразу открываем ЧАТЫ.
+     * Никакого дополнительного выбора.
+     */
+
+    setActiveButton("chatsButton");
+
+    hideAllPages();
+
+    document.getElementById("chatList").style.display="block";
+
+    await loadChats();
 }
 
 
@@ -1735,20 +1668,20 @@ function isSpecialUser(profile){
     }
 
     const username =
-    profile.username
-    .replace(/^@/,"")
-    .trim()
-    .toLowerCase();
+        profile.username
+        .replace(/^@/,"")
+        .trim()
+        .toLowerCase();
 
-    return username==="abdulla" ||
-           username==="хакер";
+    return username === "abdulla" ||
+           username === "хакер";
 }
 
 
 function usernameHTML(profile){
 
     const username =
-    escapeHtml(profile.username || "");
+        escapeHtml(profile.username || "");
 
     if(isSpecialUser(profile)){
 
@@ -1756,6 +1689,7 @@ function usernameHTML(profile){
         <span class="username-special">
             @${username}
         </span>
+
         <span
             class="verified-badge"
             title="Подтверждённый пользователь"
@@ -1777,12 +1711,11 @@ async function loadProfile(){
     const {
         data,
         error
-    } =
-    await supabaseClient
-    .from("profiles")
-    .select("*")
-    .eq("id",currentUser.id)
-    .single();
+    } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id",currentUser.id)
+        .single();
 
     if(error){
 
@@ -1797,161 +1730,219 @@ async function loadProfile(){
     ).textContent=data.name;
 
     const profileUsernameElement =
-    document.getElementById(
-        "profileUsername"
-    );
+        document.getElementById(
+            "profileUsername"
+        );
 
     profileUsernameElement.innerHTML =
-    usernameHTML(data);
+        usernameHTML(data);
 
     profileUsernameElement.classList.toggle(
         "username-special",
         isSpecialUser(data)
     );
 
+    const avatar =
+        document.getElementById(
+            "profileAvatar"
+        );
+
     setAvatar(
-        document.getElementById("profileAvatar"),
+        avatar,
         data
     );
 }
 
 
-/* LOAD CHATS */
-/*
-    ВАЖНО:
-    Здесь больше НЕ используются contacts
-    для формирования списка чатов.
+/* ==========================================
+   LOAD CHATS
+   ========================================== */
 
-    Чат появляется только если в messages
-    существует хотя бы одно сообщение
-    между текущим пользователем и контактом.
-*/
+/*
+ * ВАЖНО:
+ *
+ * Раньше loadChats() брала ВСЕ контакты.
+ * Поэтому пользователь появлялся в Чатах
+ * сразу после добавления.
+ *
+ * Теперь Чаты строятся из таблицы messages.
+ *
+ * Если:
+ *  - ты написал человеку
+ *  - человек написал тебе
+ *
+ * он появляется в Чатах.
+ *
+ * Set используется для полного исключения
+ * дубликатов.
+ */
 
 async function loadChats(){
 
     const list =
-    document.getElementById("chatList");
+        document.getElementById("chatList");
+
+    /*
+     * Полностью очищаем старый список.
+     * Это убирает дублирование при переходах.
+     */
 
     list.innerHTML="";
 
-    let hasSomething=false;
+    const uniqueUsers =
+        new Map();
 
-    /* PERSONAL CHATS */
+    const latestMessages =
+        new Map();
+
+
+    /* ================================
+       ЛИЧНЫЕ СООБЩЕНИЯ
+       ================================ */
 
     const {
         data:messages,
         error:messagesError
-    } =
-    await supabaseClient
-    .from("messages")
-    .select(
-        "sender_id,receiver_id,created_at"
-    )
-    .or(
-        `sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`
-    )
-    .order(
-        "created_at",
-        {ascending:false}
-    );
+    } = await supabaseClient
+        .from("messages")
+        .select(
+            "id,sender_id,receiver_id,created_at"
+        )
+        .or(
+            `sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`
+        )
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
 
     if(messagesError){
 
         console.error(
-            "Ошибка загрузки чатов:",
+            "Ошибка загрузки сообщений:",
             messagesError
         );
 
     }else if(messages){
 
-        const userIds=[];
-        const seenIds=new Set();
-
         for(const message of messages){
 
-            const otherId =
-            message.sender_id===currentUser.id
-            ?message.receiver_id
-            :message.sender_id;
+            let otherUserId=null;
 
             if(
-                otherId &&
-                otherId!==currentUser.id &&
-                !seenIds.has(otherId)
+                message.sender_id===
+                currentUser.id
             ){
 
-                seenIds.add(otherId);
-                userIds.push(otherId);
+                otherUserId =
+                    message.receiver_id;
+
+            }else{
+
+                otherUserId =
+                    message.sender_id;
             }
+
+            if(!otherUserId){
+                continue;
+            }
+
+            /*
+             * Первый message для пользователя
+             * является самым новым из-за сортировки.
+             */
+
+            if(!latestMessages.has(otherUserId)){
+
+                latestMessages.set(
+                    otherUserId,
+                    message.created_at
+                );
+            }
+
+            uniqueUsers.set(
+                otherUserId,
+                true
+            );
         }
+    }
 
-        /*
-            Загружаем профили пользователей,
-            с которыми уже есть переписка.
-        */
 
-        if(userIds.length){
+    /* ================================
+       ЗАГРУЖАЕМ ПРОФИЛИ
+       ================================ */
 
-            const {
-                data:profiles,
-                error:profilesError
-            } =
-            await supabaseClient
+    const userIds =
+        Array.from(uniqueUsers.keys());
+
+
+    if(userIds.length>0){
+
+        const {
+            data:profiles,
+            error:profilesError
+        } = await supabaseClient
             .from("profiles")
             .select("*")
             .in("id",userIds);
 
-            if(profilesError){
 
-                console.error(
-                    "Ошибка профилей:",
-                    profilesError
+        if(profilesError){
+
+            console.error(
+                "Ошибка загрузки профилей:",
+                profilesError
+            );
+
+        }else if(profiles){
+
+            /*
+             * Сортируем профили по последнему
+             * сообщению.
+             */
+
+            profiles.sort((a,b)=>{
+
+                const dateA =
+                    new Date(
+                        latestMessages.get(a.id) || 0
+                    ).getTime();
+
+                const dateB =
+                    new Date(
+                        latestMessages.get(b.id) || 0
+                    ).getTime();
+
+                return dateB-dateA;
+            });
+
+
+            for(const profile of profiles){
+
+                createContactElement(
+                    profile
                 );
-
-            }else if(profiles){
-
-                const profileMap=new Map();
-
-                profiles.forEach(profile=>{
-                    profileMap.set(
-                        String(profile.id),
-                        profile
-                    );
-                });
-
-                for(const id of userIds){
-
-                    const profile =
-                    profileMap.get(String(id));
-
-                    if(!profile){
-                        continue;
-                    }
-
-                    createContactElement(
-                        profile
-                    );
-
-                    hasSomething=true;
-                }
             }
         }
     }
 
 
-    /* CHANNELS */
+    /* ================================
+       КАНАЛЫ
+       ================================ */
 
     const {
         data:channels,
         error:channelsError
-    } =
-    await supabaseClient
-    .from("channels")
-    .select("*")
-    .order(
-        "created_at",
-        {ascending:false}
-    );
+    } = await supabaseClient
+        .from("channels")
+        .select("*")
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
 
     if(channelsError){
 
@@ -1965,8 +1956,8 @@ async function loadChats(){
         for(const channel of channels){
 
             const canShow =
-            channel.type==="public" ||
-            channel.owner_id===currentUser.id;
+                channel.type==="public" ||
+                channel.owner_id===currentUser.id;
 
             if(!canShow){
                 continue;
@@ -1975,20 +1966,25 @@ async function loadChats(){
             createChannelElement(
                 channel
             );
-
-            hasSomething=true;
         }
     }
 
 
-    if(!hasSomething){
+    /*
+     * Если ничего нет.
+     */
 
-        list.innerHTML=
-        `<div class="empty">
+    if(
+        list.children.length===0
+    ){
+
+        list.innerHTML =
+        `
+        <div class="empty">
             Пока нет чатов
-        </div>`;
+        </div>
+        `;
     }
-
 }
 
 
@@ -1997,15 +1993,31 @@ async function loadChats(){
 function createContactElement(profile){
 
     const list =
-    document.getElementById("chatList");
+        document.getElementById("chatList");
+
+    /*
+     * Дополнительная защита от дублей.
+     */
+
+    const existing =
+        list.querySelector(
+            `[data-user-id="${profile.id}"]`
+        );
+
+    if(existing){
+        return;
+    }
 
     const item =
-    document.createElement("div");
+        document.createElement("div");
 
     item.className="contact-item";
 
+    item.dataset.userId =
+        profile.id;
+
     const avatar =
-    document.createElement("div");
+        document.createElement("div");
 
     avatar.className="avatar";
 
@@ -2015,7 +2027,7 @@ function createContactElement(profile){
     );
 
     const info =
-    document.createElement("div");
+        document.createElement("div");
 
     info.className="contact-info";
 
@@ -2045,15 +2057,31 @@ function createContactElement(profile){
 function createChannelElement(channel){
 
     const list =
-    document.getElementById("chatList");
+        document.getElementById("chatList");
+
+    /*
+     * Не добавляем канал второй раз.
+     */
+
+    const existing =
+        list.querySelector(
+            `[data-channel-id="${channel.id}"]`
+        );
+
+    if(existing){
+        return;
+    }
 
     const item =
-    document.createElement("div");
+        document.createElement("div");
 
     item.className="channel-item";
 
+    item.dataset.channelId =
+        channel.id;
+
     const avatar =
-    document.createElement("div");
+        document.createElement("div");
 
     avatar.className="avatar";
 
@@ -2063,21 +2091,19 @@ function createChannelElement(channel){
     );
 
     const info =
-    document.createElement("div");
+        document.createElement("div");
 
     info.className="contact-info";
 
     const usernameText =
-    channel.username
-    ?"@"+channel.username
-    :"🔒 Частный канал";
+        channel.username
+        ? "@"+channel.username
+        : "🔒 Частный канал";
 
     info.innerHTML=`
         <div class="contact-name">
             ${escapeHtml(channel.name)}
-            <span class="channel-badge">
-                📢
-            </span>
+            <span class="channel-badge">📢</span>
         </div>
 
         <div class="contact-username">
@@ -2103,38 +2129,47 @@ function createChannelElement(channel){
 }
 
 
-/* CONTACTS */
+/* ==========================================
+   CONTACTS
+   ========================================== */
 
 async function loadContacts(){
 
     const list =
-    document.getElementById("chatList");
+        document.getElementById("chatList");
+
+    /*
+     * Обязательно очищаем список.
+     */
 
     list.innerHTML="";
 
     const {
         data:contacts,
         error
-    } =
-    await supabaseClient
-    .from("contacts")
-    .select("contact_id")
-    .eq(
-        "user_id",
-        currentUser.id
-    );
+    } = await supabaseClient
+        .from("contacts")
+        .select("contact_id")
+        .eq(
+            "user_id",
+            currentUser.id
+        );
+
 
     if(error){
 
         console.error(error);
 
         list.innerHTML=
-        `<div class="empty">
+        `
+        <div class="empty">
             Не удалось загрузить контакты
-        </div>`;
+        </div>
+        `;
 
         return;
     }
+
 
     if(
         !contacts ||
@@ -2142,118 +2177,216 @@ async function loadContacts(){
     ){
 
         list.innerHTML=
-        `<div class="empty">
+        `
+        <div class="empty">
             У вас пока нет контактов
-        </div>`;
+        </div>
+        `;
 
         return;
     }
 
+
+    /*
+     * Set удаляет возможные дубли
+     * contact_id.
+     */
+
+    const uniqueIds =
+        [
+            ...new Set(
+                contacts.map(
+                    contact =>
+                        contact.contact_id
+                )
+            )
+        ];
+
+
     for(
-        const contact of contacts
+        const contactId
+        of uniqueIds
     ){
 
         const {
             data:profile
-        } =
-        await supabaseClient
-        .from("profiles")
-        .select("*")
-        .eq(
-            "id",
-            contact.contact_id
-        )
-        .single();
+        } = await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq(
+                "id",
+                contactId
+            )
+            .single();
 
-        if(profile){
-
-            createContactElement(
-                profile
-            );
+        if(!profile){
+            continue;
         }
+
+
+        /*
+         * В Contacts нужен отдельный элемент,
+         * поэтому используем функцию с
+         * data-contact-id.
+         */
+
+        createContactListElement(
+            profile
+        );
     }
+}
+
+
+function createContactListElement(profile){
+
+    const list =
+        document.getElementById(
+            "chatList"
+        );
+
+    const existing =
+        list.querySelector(
+            `[data-contact-id="${profile.id}"]`
+        );
+
+    if(existing){
+        return;
+    }
+
+    const item =
+        document.createElement("div");
+
+    item.className="contact-item";
+
+    item.dataset.contactId =
+        profile.id;
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className="avatar";
+
+    setAvatar(
+        avatar,
+        profile
+    );
+
+    const info =
+        document.createElement("div");
+
+    info.className="contact-info";
+
+    info.innerHTML=`
+        <div class="contact-name">
+            ${escapeHtml(profile.name)}
+        </div>
+
+        <div class="contact-username">
+            ${usernameHTML(profile)}
+        </div>
+    `;
+
+    item.appendChild(avatar);
+    item.appendChild(info);
+
+    item.onclick=()=>{
+        openChat(profile);
+    };
+
+    list.appendChild(item);
 }
 
 
 /* SEARCH */
 
 const searchInput =
-document.getElementById(
-    "searchInput"
-);
+    document.getElementById(
+        "searchInput"
+    );
 
 searchInput.addEventListener(
     "input",
     async function(){
 
         const query =
-        this.value
-        .trim()
-        .replace(/^@/,"")
-        .toLowerCase();
+            this.value
+            .trim()
+            .replace(/^@/,"")
+            .toLowerCase();
 
         const results =
-        document.getElementById(
-            "searchResults"
-        );
+            document.getElementById(
+                "searchResults"
+            );
 
         const chatList =
-        document.getElementById(
-            "chatList"
-        );
+            document.getElementById(
+                "chatList"
+            );
 
         if(!query){
 
             results.style.display="none";
+
             chatList.style.display="block";
 
             return;
         }
 
         chatList.style.display="none";
+
         results.style.display="block";
 
         results.innerHTML=
-        `<div class="empty">
+        `
+        <div class="empty">
             Поиск...
-        </div>`;
+        </div>
+        `;
 
         let found=false;
+
+
+        /* USERS */
 
         const {
             data:users,
             error:usersError
-        } =
-        await supabaseClient
-        .from("profiles")
-        .select(
-            "id,name,username,avatar_url"
-        )
-        .ilike(
-            "username",
-            `${query}%`
-        )
-        .neq(
-            "id",
-            currentUser.id
-        )
-        .limit(10);
+        } = await supabaseClient
+            .from("profiles")
+            .select(
+                "id,name,username,avatar_url"
+            )
+            .ilike(
+                "username",
+                `${query}%`
+            )
+            .neq(
+                "id",
+                currentUser.id
+            )
+            .limit(10);
 
-        if(!usersError && users){
+
+        if(
+            !usersError &&
+            users
+        ){
 
             for(
-                const profile of users
+                const profile
+                of users
             ){
 
                 found=true;
 
                 const card =
-                document.createElement("div");
+                    document.createElement("div");
 
                 card.className="search-card";
 
                 const avatar =
-                document.createElement("div");
+                    document.createElement("div");
 
                 avatar.className="avatar";
 
@@ -2263,10 +2396,10 @@ searchInput.addEventListener(
                 );
 
                 const info =
-                document.createElement("div");
+                    document.createElement("div");
 
                 info.className=
-                "search-card-info";
+                    "search-card-info";
 
                 info.innerHTML=`
                     <div class="contact-name">
@@ -2279,31 +2412,35 @@ searchInput.addEventListener(
                 `;
 
                 const button =
-                document.createElement("button");
+                    document.createElement("button");
 
-                button.className="add-button";
+                button.className=
+                    "add-button";
 
-                button.textContent="Добавить";
+                button.textContent=
+                    "Добавить";
+
 
                 const {
                     data:existing
-                } =
-                await supabaseClient
-                .from("contacts")
-                .select("id")
-                .eq(
-                    "user_id",
-                    currentUser.id
-                )
-                .eq(
-                    "contact_id",
-                    profile.id
-                )
-                .maybeSingle();
+                } = await supabaseClient
+                    .from("contacts")
+                    .select("id")
+                    .eq(
+                        "user_id",
+                        currentUser.id
+                    )
+                    .eq(
+                        "contact_id",
+                        profile.id
+                    )
+                    .maybeSingle();
+
 
                 if(existing){
 
-                    button.textContent="Добавлен";
+                    button.textContent=
+                        "Добавлен";
 
                     button.classList.add(
                         "added"
@@ -2312,46 +2449,63 @@ searchInput.addEventListener(
                     button.disabled=true;
                 }
 
-                button.onclick=async event=>{
 
-                    event.stopPropagation();
+                button.onclick=
+                    async event=>{
 
-                    const {
-                        error
-                    } =
-                    await supabaseClient
-                    .from("contacts")
-                    .insert({
-                        user_id:
-                        currentUser.id,
+                        event.stopPropagation();
 
-                        contact_id:
-                        profile.id
-                    });
+                        const {
+                            error
+                        } =
+                        await supabaseClient
+                            .from("contacts")
+                            .insert({
+                                user_id:
+                                    currentUser.id,
 
-                    if(error){
+                                contact_id:
+                                    profile.id
+                            });
 
-                        console.error(error);
 
-                        alert(
-                            "Не удалось добавить контакт"
+                        if(error){
+
+                            console.error(
+                                error
+                            );
+
+                            alert(
+                                "Не удалось добавить контакт"
+                            );
+
+                            return;
+                        }
+
+                        button.textContent=
+                            "Добавлен";
+
+                        button.classList.add(
+                            "added"
                         );
 
-                        return;
-                    }
+                        button.disabled=true;
 
-                    button.textContent=
-                    "Добавлен";
+                        /*
+                         * НЕ loadChats().
+                         *
+                         * Потому что добавление контакта
+                         * само по себе НЕ означает наличие
+                         * чата.
+                         */
 
-                    button.classList.add(
-                        "added"
-                    );
+                    };
 
-                    button.disabled=true;
-                };
 
                 card.appendChild(avatar);
+
                 card.appendChild(info);
+
                 card.appendChild(button);
 
                 results.appendChild(card);
@@ -2359,39 +2513,40 @@ searchInput.addEventListener(
         }
 
 
-        /* CHANNEL SEARCH */
+        /* CHANNELS */
 
         const {
             data:channels,
             error:channelsError
-        } =
-        await supabaseClient
-        .from("channels")
-        .select("*")
-        .eq(
-            "type",
-            "public"
-        )
-        .or(
-            `username.ilike.${query}%,name.ilike.%${query}%`
-        )
-        .limit(10);
+        } = await supabaseClient
+            .from("channels")
+            .select("*")
+            .eq("type","public")
+            .or(
+                `username.ilike.${query}%,name.ilike.%${query}%`
+            )
+            .limit(10);
 
-        if(!channelsError && channels){
+
+        if(
+            !channelsError &&
+            channels
+        ){
 
             for(
-                const channel of channels
+                const channel
+                of channels
             ){
 
                 found=true;
 
                 const card =
-                document.createElement("div");
+                    document.createElement("div");
 
                 card.className="search-card";
 
                 const avatar =
-                document.createElement("div");
+                    document.createElement("div");
 
                 avatar.className="avatar";
 
@@ -2401,51 +2556,54 @@ searchInput.addEventListener(
                 );
 
                 const info =
-                document.createElement("div");
+                    document.createElement("div");
 
                 info.className=
-                "search-card-info";
+                    "search-card-info";
 
                 info.innerHTML=`
                     <div class="contact-name">
                         ${escapeHtml(channel.name)}
-                        <span class="channel-badge">
-                            📢
-                        </span>
+                        <span class="channel-badge">📢</span>
                     </div>
 
                     <div class="contact-username">
-                        @${escapeHtml(
-                            channel.username||""
-                        )}
+                        @${escapeHtml(channel.username||"")}
                     </div>
                 `;
 
                 const button =
-                document.createElement("button");
+                    document.createElement("button");
 
-                button.className="add-button";
+                button.className=
+                    "add-button";
 
-                button.textContent="Открыть";
+                button.textContent=
+                    "Открыть";
 
                 button.onclick=()=>{
                     openChannel(channel);
                 };
 
                 card.appendChild(avatar);
+
                 card.appendChild(info);
+
                 card.appendChild(button);
 
                 results.appendChild(card);
             }
         }
 
+
         if(!found){
 
             results.innerHTML=
-            `<div class="empty">
+            `
+            <div class="empty">
                 Ничего не найдено
-            </div>`;
+            </div>
+            `;
         }
 
     }
@@ -2457,6 +2615,7 @@ searchInput.addEventListener(
 async function openChat(profile){
 
     currentContact=profile;
+
     currentChannel=null;
 
     stopRealtime();
@@ -2473,12 +2632,16 @@ async function openChat(profile){
         "messageInputArea"
     ).style.display="flex";
 
+
     if(window.innerWidth<=700){
+
+        closeMobileMenu();
 
         document.getElementById(
             "mobileBackButton"
         ).style.display="flex";
     }
+
 
     setAvatar(
         document.getElementById(
@@ -2487,27 +2650,34 @@ async function openChat(profile){
         profile
     );
 
+
     document.getElementById(
         "chatName"
-    ).textContent=profile.name;
+    ).textContent=
+        profile.name;
+
 
     const chatUsernameElement =
-    document.getElementById(
-        "chatUsername"
-    );
+        document.getElementById(
+            "chatUsername"
+        );
 
-    chatUsernameElement.innerHTML=
-    usernameHTML(profile);
+
+    chatUsernameElement.innerHTML =
+        usernameHTML(profile);
+
 
     chatUsernameElement.classList.toggle(
         "username-special",
         isSpecialUser(profile)
     );
 
+
     document.getElementById(
         "messageInput"
     ).placeholder=
-    "Написать сообщение...";
+        "Написать сообщение...";
+
 
     await loadMessages();
 
@@ -2520,6 +2690,7 @@ async function openChat(profile){
 async function openChannel(channel){
 
     currentChannel=channel;
+
     currentContact=null;
 
     stopRealtime();
@@ -2532,12 +2703,16 @@ async function openChannel(channel){
         "chatWindow"
     ).style.display="flex";
 
+
     if(window.innerWidth<=700){
+
+        closeMobileMenu();
 
         document.getElementById(
             "mobileBackButton"
         ).style.display="flex";
     }
+
 
     setChannelAvatar(
         document.getElementById(
@@ -2546,16 +2721,20 @@ async function openChannel(channel){
         channel
     );
 
+
     document.getElementById(
         "chatName"
-    ).textContent=channel.name;
+    ).textContent=
+        channel.name;
+
 
     document.getElementById(
         "chatUsername"
     ).textContent=
-    channel.username
-    ?"@"+channel.username
-    :"🔒 Частный канал";
+        channel.username
+        ? "@"+channel.username
+        : "🔒 Частный канал";
+
 
     document.getElementById(
         "chatUsername"
@@ -2563,10 +2742,12 @@ async function openChannel(channel){
         "username-special"
     );
 
+
     const canWrite =
-    await canWriteToChannel(
-        channel
-    );
+        await canWriteToChannel(
+            channel
+        );
+
 
     if(canWrite){
 
@@ -2577,7 +2758,7 @@ async function openChannel(channel){
         document.getElementById(
             "messageInput"
         ).placeholder=
-        "Написать в канал...";
+            "Написать в канал...";
 
     }else{
 
@@ -2585,6 +2766,7 @@ async function openChannel(channel){
             "messageInputArea"
         ).style.display="none";
     }
+
 
     await loadChannelMessages();
 
@@ -2596,30 +2778,35 @@ async function openChannel(channel){
 
 async function canWriteToChannel(channel){
 
-    if(channel.owner_id===currentUser.id){
+    if(
+        channel.owner_id===
+        currentUser.id
+    ){
+
         return true;
     }
 
     const {
         data,
         error
-    } =
-    await supabaseClient
-    .from("channel_members")
-    .select("role")
-    .eq(
-        "channel_id",
-        channel.id
-    )
-    .eq(
-        "user_id",
-        currentUser.id
-    )
-    .maybeSingle();
+    } = await supabaseClient
+        .from("channel_members")
+        .select("role")
+        .eq(
+            "channel_id",
+            channel.id
+        )
+        .eq(
+            "user_id",
+            currentUser.id
+        )
+        .maybeSingle();
+
 
     if(error || !data){
         return false;
     }
+
 
     return data.role==="admin" ||
            data.role==="owner";
@@ -2631,42 +2818,47 @@ async function canWriteToChannel(channel){
 async function loadMessages(){
 
     const messages =
-    document.getElementById(
-        "messages"
-    );
+        document.getElementById(
+            "messages"
+        );
 
     messages.innerHTML="";
+
 
     const {
         data,
         error
-    } =
-    await supabaseClient
-    .from("messages")
-    .select("*")
-    .or(
-        `and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
-    )
-    .order(
-        "created_at",
-        {ascending:true}
-    );
+    } = await supabaseClient
+        .from("messages")
+        .select("*")
+        .or(
+            `and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentContact.id}),and(sender_id.eq.${currentContact.id},receiver_id.eq.${currentUser.id})`
+        )
+        .order(
+            "created_at",
+            {ascending:true}
+        );
+
 
     if(error){
 
         console.error(error);
+
         return;
     }
 
+
     for(
-        const message of data || []
+        const message
+        of data
     ){
 
         displayMessage(message);
     }
 
+
     messages.scrollTop=
-    messages.scrollHeight;
+        messages.scrollHeight;
 }
 
 
@@ -2675,36 +2867,40 @@ async function loadMessages(){
 async function loadChannelMessages(){
 
     const messages =
-    document.getElementById(
-        "messages"
-    );
+        document.getElementById(
+            "messages"
+        );
 
     messages.innerHTML="";
+
 
     const {
         data,
         error
-    } =
-    await supabaseClient
-    .from("channel_messages")
-    .select("*")
-    .eq(
-        "channel_id",
-        currentChannel.id
-    )
-    .order(
-        "created_at",
-        {ascending:true}
-    );
+    } = await supabaseClient
+        .from("channel_messages")
+        .select("*")
+        .eq(
+            "channel_id",
+            currentChannel.id
+        )
+        .order(
+            "created_at",
+            {ascending:true}
+        );
+
 
     if(error){
 
         console.error(error);
+
         return;
     }
 
+
     for(
-        const message of data || []
+        const message
+        of data
     ){
 
         displayChannelMessage(
@@ -2712,8 +2908,9 @@ async function loadChannelMessages(){
         );
     }
 
+
     messages.scrollTop=
-    messages.scrollHeight;
+        messages.scrollHeight;
 }
 
 
@@ -2722,9 +2919,10 @@ async function loadChannelMessages(){
 function displayMessage(message){
 
     const container =
-    document.getElementById(
-        "messages"
-    );
+        document.getElementById(
+            "messages"
+        );
+
 
     if(
         container.querySelector(
@@ -2735,31 +2933,35 @@ function displayMessage(message){
         return;
     }
 
+
     const element =
-    document.createElement("div");
+        document.createElement("div");
+
 
     element.className=
-    "message "+
-    (
-        message.sender_id===
-        currentUser.id
-        ?"mine"
-        :"theirs"
-    );
+        "message "+
+        (
+            message.sender_id===
+            currentUser.id
+            ?"mine"
+            :"theirs"
+        );
+
 
     element.dataset.id=
-    String(message.id);
+        String(message.id);
+
 
     const time =
-    new Date(
-        message.created_at
-    ).toLocaleTimeString(
-        "ru-RU",
-        {
-            hour:"2-digit",
-            minute:"2-digit"
-        }
-    );
+        new Date(
+            message.created_at
+        ).toLocaleTimeString(
+            "ru-RU",
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
 
 
     /* MEDIA */
@@ -2767,10 +2969,11 @@ function displayMessage(message){
     if(message.media_url){
 
         const mediaWrap =
-        document.createElement("div");
+            document.createElement("div");
 
         mediaWrap.className=
-        "message-media";
+            "message-media";
+
 
         if(
             message.media_type &&
@@ -2780,108 +2983,94 @@ function displayMessage(message){
         ){
 
             const image =
-            document.createElement("img");
+                document.createElement("img");
 
             image.className=
-            "message-image";
+                "message-image";
 
             image.src=
-            message.media_url;
+                message.media_url;
 
             image.alt=
-            message.media_name ||
-            "Изображение";
+                message.media_name ||
+                "Изображение";
 
-            image.loading="lazy";
+            image.loading=
+                "lazy";
+
 
             image.onclick=()=>{
                 openMediaViewer(
-                    message.media_url,
-                    "image"
+                    message.media_url
                 );
             };
 
-            mediaWrap.appendChild(image);
 
-        }else if(
-            message.media_type &&
-            message.media_type.startsWith(
-                "video/"
-            )
-        ){
-
-            const video =
-            document.createElement("video");
-
-            video.className=
-            "message-image";
-
-            video.src=
-            message.media_url;
-
-            video.controls=true;
-
-            video.preload="metadata";
-
-            video.onclick=event=>{
-                event.stopPropagation();
-            };
-
-            mediaWrap.appendChild(video);
+            mediaWrap.appendChild(
+                image
+            );
 
         }else{
 
             const fileCard =
-            document.createElement("div");
+                document.createElement("div");
 
             fileCard.className=
-            "file-card";
+                "file-card";
+
 
             const icon =
-            document.createElement("div");
+                document.createElement("div");
 
             icon.className=
-            "file-icon";
+                "file-icon";
 
             icon.textContent="📄";
 
+
             const info =
-            document.createElement("div");
+                document.createElement("div");
 
             info.className=
-            "file-info";
+                "file-info";
+
 
             const name =
-            document.createElement("div");
+                document.createElement("div");
 
             name.className=
-            "file-name";
+                "file-name";
 
             name.textContent=
-            message.media_name ||
-            "Файл";
+                message.media_name ||
+                "Файл";
+
 
             const size =
-            document.createElement("div");
+                document.createElement("div");
 
             size.className=
-            "file-size";
+                "file-size";
 
             size.textContent=
-            formatFileSize(
-                message.media_size
-            );
+                formatFileSize(
+                    message.media_size
+                );
+
 
             info.appendChild(name);
+
             info.appendChild(size);
 
+
             const download =
-            document.createElement("button");
+                document.createElement("button");
 
             download.className=
-            "file-download";
+                "file-download";
 
             download.textContent="⬇️";
+
 
             download.onclick=()=>{
                 downloadFile(
@@ -2891,8 +3080,11 @@ function displayMessage(message){
                 );
             };
 
+
             fileCard.appendChild(icon);
+
             fileCard.appendChild(info);
+
             fileCard.appendChild(download);
 
             mediaWrap.appendChild(
@@ -2900,24 +3092,25 @@ function displayMessage(message){
             );
         }
 
+
         element.appendChild(
             mediaWrap
         );
     }
 
 
-    /* CAPTION / TEXT */
+    /* TEXT */
 
     if(message.content){
 
         const caption =
-        document.createElement("div");
+            document.createElement("div");
 
         caption.className=
-        "message-caption";
+            "message-caption";
 
         caption.textContent=
-        message.content;
+            message.content;
 
         element.appendChild(
             caption
@@ -2926,24 +3119,26 @@ function displayMessage(message){
 
 
     const timeElement =
-    document.createElement("div");
+        document.createElement("div");
 
     timeElement.className=
-    "message-time";
+        "message-time";
 
     timeElement.textContent=
-    time;
+        time;
 
     element.appendChild(
         timeElement
     );
 
+
     container.appendChild(
         element
     );
 
+
     container.scrollTop=
-    container.scrollHeight;
+        container.scrollHeight;
 }
 
 
@@ -2952,9 +3147,10 @@ function displayMessage(message){
 function displayChannelMessage(message){
 
     const container =
-    document.getElementById(
-        "messages"
-    );
+        document.getElementById(
+            "messages"
+        );
+
 
     if(
         container.querySelector(
@@ -2965,31 +3161,32 @@ function displayChannelMessage(message){
         return;
     }
 
+
     const element =
-    document.createElement("div");
+        document.createElement("div");
 
     element.className=
-    "message mine";
+        "message mine";
 
     element.dataset.id=
-    String(message.id);
+        String(message.id);
+
 
     const time =
-    new Date(
-        message.created_at
-    ).toLocaleTimeString(
-        "ru-RU",
-        {
-            hour:"2-digit",
-            minute:"2-digit"
-        }
-    );
+        new Date(
+            message.created_at
+        ).toLocaleTimeString(
+            "ru-RU",
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
 
     element.innerHTML=`
         <div>
-            ${escapeHtml(
-                message.content || ""
-            )}
+            ${escapeHtml(message.content)}
         </div>
 
         <div class="message-time">
@@ -2997,21 +3194,23 @@ function displayChannelMessage(message){
         </div>
     `;
 
+
     container.appendChild(
         element
     );
 
     container.scrollTop=
-    container.scrollHeight;
+        container.scrollHeight;
 }
 
 
 /* FILE SELECT */
 
 const fileInput =
-document.getElementById(
-    "fileInput"
-);
+    document.getElementById(
+        "fileInput"
+    );
+
 
 document.getElementById(
     "attachButton"
@@ -3034,21 +3233,21 @@ fileInput.addEventListener(
     "change",
     event=>{
 
-        const file=
-        event.target.files[0];
+        const file =
+            event.target.files[0];
 
         if(!file){
             return;
         }
 
         /*
-            Сейчас ограничение размера
-            оставляем таким же, как было
-            в твоём коде.
-        */
+         * Ограничение 50 МБ пока оставляем
+         * в соответствии с текущим кодом.
+         */
 
         const maxSize=
-        50*1024*1024;
+            50*1024*1024;
+
 
         if(file.size>maxSize){
 
@@ -3061,6 +3260,7 @@ fileInput.addEventListener(
             return;
         }
 
+
         selectedChatFile=file;
 
         showFilePreview(file);
@@ -3072,29 +3272,33 @@ fileInput.addEventListener(
 
 function showFilePreview(file){
 
-    const preview=
-    document.getElementById(
-        "filePreview"
-    );
+    const preview =
+        document.getElementById(
+            "filePreview"
+        );
 
-    const visual=
-    document.getElementById(
-        "filePreviewVisual"
-    );
+    const visual =
+        document.getElementById(
+            "filePreviewVisual"
+        );
+
 
     document.getElementById(
         "filePreviewName"
     ).textContent=
-    file.name;
+        file.name;
+
 
     document.getElementById(
         "filePreviewSize"
     ).textContent=
-    formatFileSize(
-        file.size
-    );
+        formatFileSize(
+            file.size
+        );
+
 
     visual.innerHTML="";
+
 
     if(
         file.type.startsWith(
@@ -3102,53 +3306,28 @@ function showFilePreview(file){
         )
     ){
 
-        const image=
-        document.createElement("img");
+        const image =
+            document.createElement("img");
 
         image.className=
-        "file-preview-image";
+            "file-preview-image";
 
         image.src=
-        URL.createObjectURL(
-            file
-        );
+            URL.createObjectURL(
+                file
+            );
 
         visual.appendChild(
             image
         );
 
-    }else if(
-        file.type.startsWith(
-            "video/"
-        )
-    ){
-
-        const video=
-        document.createElement("video");
-
-        video.className=
-        "file-preview-image";
-
-        video.src=
-        URL.createObjectURL(
-            file
-        );
-
-        video.muted=true;
-
-        video.playsInline=true;
-
-        visual.appendChild(
-            video
-        );
-
     }else{
 
-        const icon=
-        document.createElement("div");
+        const icon =
+            document.createElement("div");
 
         icon.className=
-        "file-preview-icon";
+            "file-preview-icon";
 
         icon.textContent="📄";
 
@@ -3156,6 +3335,7 @@ function showFilePreview(file){
             icon
         );
     }
+
 
     preview.classList.add(
         "active"
@@ -3178,19 +3358,23 @@ function clearSelectedFile(){
 
     fileInput.value="";
 
+
     document.getElementById(
         "filePreview"
     ).classList.remove(
         "active"
     );
 
+
     document.getElementById(
         "filePreviewVisual"
     ).innerHTML="";
 
+
     document.getElementById(
         "filePreviewName"
     ).textContent="";
+
 
     document.getElementById(
         "filePreviewSize"
@@ -3200,21 +3384,23 @@ function clearSelectedFile(){
 
 /* SEND MESSAGE */
 
-const messageInput=
-document.getElementById(
-    "messageInput"
-);
+const messageInput =
+    document.getElementById(
+        "messageInput"
+    );
 
-const sendButton=
-document.getElementById(
-    "sendButton"
-);
+
+const sendButton =
+    document.getElementById(
+        "sendButton"
+    );
 
 
 async function sendMessage(){
 
-    const text=
-    messageInput.value.trim();
+    const text =
+        messageInput.value.trim();
+
 
     if(
         !text &&
@@ -3230,17 +3416,21 @@ async function sendMessage(){
     if(currentContact){
 
         const file=
-        selectedChatFile;
+            selectedChatFile;
 
         messageInput.value="";
 
         sendButton.disabled=true;
 
+
         try{
 
             let mediaUrl=null;
+
             let mediaName=null;
+
             let mediaType=null;
+
             let mediaSize=null;
 
 
@@ -3248,41 +3438,44 @@ async function sendMessage(){
 
             if(file){
 
-                const extension=
-                file.name.includes(".")
-                ?file.name
-                    .split(".")
-                    .pop()
-                    .toLowerCase()
-                :"";
+                const extension =
+                    file.name.includes(".")
+                    ?file.name
+                        .split(".")
+                        .pop()
+                        .toLowerCase()
+                    :"";
 
-                const filePath=
-                currentUser.id+
-                "/"+
-                crypto.randomUUID()+
-                (
-                    extension
-                    ?"."+extension
-                    :""
-                );
+
+                const filePath =
+                    currentUser.id+
+                    "/"+
+                    crypto.randomUUID()+
+                    (
+                        extension
+                        ?"."+extension
+                        :""
+                    );
+
 
                 const {
                     error:uploadError
                 } =
                 await supabaseClient
-                .storage
-                .from("chat-media")
-                .upload(
-                    filePath,
-                    file,
-                    {
-                        cacheControl:"3600",
-                        upsert:false,
-                        contentType:
-                        file.type ||
-                        "application/octet-stream"
-                    }
-                );
+                    .storage
+                    .from("chat-media")
+                    .upload(
+                        filePath,
+                        file,
+                        {
+                            cacheControl:"3600",
+                            upsert:false,
+                            contentType:
+                                file.type ||
+                                "application/octet-stream"
+                        }
+                    );
+
 
                 if(uploadError){
 
@@ -3296,61 +3489,68 @@ async function sendMessage(){
                     );
                 }
 
+
                 const {
                     data:publicData
                 } =
                 supabaseClient
-                .storage
-                .from("chat-media")
-                .getPublicUrl(
-                    filePath
-                );
+                    .storage
+                    .from("chat-media")
+                    .getPublicUrl(
+                        filePath
+                    );
+
 
                 mediaUrl=
-                publicData.publicUrl;
+                    publicData.publicUrl;
 
                 mediaName=
-                file.name;
+                    file.name;
 
                 mediaType=
-                file.type ||
-                "application/octet-stream";
+                    file.type ||
+                    "application/octet-stream";
 
                 mediaSize=
-                file.size;
+                    file.size;
             }
 
 
             /* INSERT MESSAGE */
 
             const {
+                data:newMessage,
                 error
             } =
             await supabaseClient
-            .from("messages")
-            .insert({
+                .from("messages")
+                .insert({
 
-                sender_id:
-                currentUser.id,
+                    sender_id:
+                        currentUser.id,
 
-                receiver_id:
-                currentContact.id,
+                    receiver_id:
+                        currentContact.id,
 
-                content:
-                text||null,
+                    content:
+                        text||null,
 
-                media_url:
-                mediaUrl,
+                    media_url:
+                        mediaUrl,
 
-                media_name:
-                mediaName,
+                    media_name:
+                        mediaName,
 
-                media_type:
-                mediaType,
+                    media_type:
+                        mediaType,
 
-                media_size:
-                mediaSize
-            });
+                    media_size:
+                        mediaSize
+
+                })
+                .select()
+                .single();
+
 
             if(error){
 
@@ -3362,17 +3562,20 @@ async function sendMessage(){
                 );
             }
 
+
             clearSelectedFile();
 
 
             /*
-                ВАЖНО:
-                После первого сообщения
-                пользователь автоматически
-                появляется в разделе "Чаты".
-            */
+             * Сразу добавляем чат в список,
+             * чтобы пользователь увидел его без
+             * перезагрузки страницы.
+             */
 
-            await loadChats();
+            addContactToChats(
+                currentContact
+            );
+
 
         }catch(error){
 
@@ -3382,12 +3585,14 @@ async function sendMessage(){
                 error.message
             );
 
-            messageInput.value=text;
+            messageInput.value=
+                text;
 
         }finally{
 
             sendButton.disabled=false;
         }
+
 
         return;
     }
@@ -3397,10 +3602,11 @@ async function sendMessage(){
 
     if(currentChannel){
 
-        const canWrite=
-        await canWriteToChannel(
-            currentChannel
-        );
+        const canWrite =
+            await canWriteToChannel(
+                currentChannel
+            );
+
 
         if(!canWrite){
 
@@ -3411,6 +3617,7 @@ async function sendMessage(){
             return;
         }
 
+
         if(selectedChatFile){
 
             alert(
@@ -3420,24 +3627,28 @@ async function sendMessage(){
             return;
         }
 
+
         messageInput.value="";
+
 
         const {
             error
         } =
         await supabaseClient
-        .from("channel_messages")
-        .insert({
+            .from("channel_messages")
+            .insert({
 
-            channel_id:
-            currentChannel.id,
+                channel_id:
+                    currentChannel.id,
 
-            sender_id:
-            currentUser.id,
+                sender_id:
+                    currentUser.id,
 
-            content:
-            text
-        });
+                content:
+                    text
+
+            });
+
 
         if(error){
 
@@ -3447,10 +3658,10 @@ async function sendMessage(){
                 "Сообщение не отправилось"
             );
 
-            messageInput.value=text;
+            messageInput.value=
+                text;
         }
     }
-
 }
 
 
@@ -3474,69 +3685,136 @@ messageInput.addEventListener(
 );
 
 
+/* ==========================================
+   ДОБАВЛЕНИЕ ЧАТА БЕЗ ДУБЛЯ
+   ========================================== */
+
+function addContactToChats(profile){
+
+    const list =
+        document.getElementById(
+            "chatList"
+        );
+
+    /*
+     * Если элемент уже есть,
+     * ничего не делаем.
+     */
+
+    if(
+        list.querySelector(
+            `[data-user-id="${profile.id}"]`
+        )
+    ){
+
+        return;
+    }
+
+
+    /*
+     * Убираем "Пока нет чатов".
+     */
+
+    const empty =
+        list.querySelector(
+            ".empty"
+        );
+
+    if(empty){
+        empty.remove();
+    }
+
+
+    createContactElement(
+        profile
+    );
+}
+
+
 /* REALTIME PERSONAL */
 
 function subscribeToMessages(){
 
     stopRealtime();
 
-    realtimeChannel=
-    supabaseClient
-    .channel(
-        "messages-"+
-        currentUser.id+
-        "-"+
-        currentContact.id
-    )
-    .on(
-        "postgres_changes",
-        {
-            event:"INSERT",
-            schema:"public",
-            table:"messages"
-        },
-        async payload=>{
 
-            const message=
-            payload.new;
-
-            if(!currentContact){
-                return;
-            }
-
-            const belongs=
-            (
-                message.sender_id===
-                currentUser.id &&
-                message.receiver_id===
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                "messages-"+
+                currentUser.id+
+                "-"+
                 currentContact.id
             )
-            ||
-            (
-                message.sender_id===
-                currentContact.id &&
-                message.receiver_id===
-                currentUser.id
-            );
+            .on(
+                "postgres_changes",
+                {
+                    event:"INSERT",
+                    schema:"public",
+                    table:"messages"
+                },
+                payload=>{
 
-            if(!belongs){
-                return;
-            }
+                    const message =
+                        payload.new;
 
-            displayMessage(
-                message
-            );
 
-            /*
-                Если сообщение пришло от нового
-                пользователя, он появляется в чатах.
-            */
+                    if(!currentContact){
+                        return;
+                    }
 
-            await loadChats();
 
-        }
-    )
-    .subscribe();
+                    const belongs =
+                        (
+                            message.sender_id===
+                            currentUser.id &&
+                            message.receiver_id===
+                            currentContact.id
+                        )
+                        ||
+                        (
+                            message.sender_id===
+                            currentContact.id &&
+                            message.receiver_id===
+                            currentUser.id
+                        );
+
+
+                    if(!belongs){
+                        return;
+                    }
+
+
+                    displayMessage(
+                        message
+                    );
+
+
+                    /*
+                     * Любое входящее сообщение
+                     * автоматически создаёт чат.
+                     */
+
+                    const otherUserId =
+                        message.sender_id===
+                        currentUser.id
+                        ?message.receiver_id
+                        :message.sender_id;
+
+
+                    if(
+                        otherUserId===
+                        currentContact.id
+                    ){
+
+                        addContactToChats(
+                            currentContact
+                        );
+                    }
+
+                }
+            )
+            .subscribe();
 }
 
 
@@ -3546,42 +3824,46 @@ function subscribeToChannelMessages(){
 
     stopRealtime();
 
-    realtimeChannel=
-    supabaseClient
-    .channel(
-        "channel-"+
-        currentChannel.id
-    )
-    .on(
-        "postgres_changes",
-        {
-            event:"INSERT",
-            schema:"public",
-            table:"channel_messages"
-        },
-        payload=>{
 
-            const message=
-            payload.new;
-
-            if(!currentChannel){
-                return;
-            }
-
-            if(
-                message.channel_id!==
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                "channel-"+
                 currentChannel.id
-            ){
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event:"INSERT",
+                    schema:"public",
+                    table:"channel_messages"
+                },
+                payload=>{
 
-                return;
-            }
+                    const message =
+                        payload.new;
 
-            displayChannelMessage(
-                message
-            );
-        }
-    )
-    .subscribe();
+
+                    if(!currentChannel){
+                        return;
+                    }
+
+
+                    if(
+                        message.channel_id!==
+                        currentChannel.id
+                    ){
+
+                        return;
+                    }
+
+
+                    displayChannelMessage(
+                        message
+                    );
+                }
+            )
+            .subscribe();
 }
 
 
@@ -3592,9 +3874,9 @@ function stopRealtime(){
     if(realtimeChannel){
 
         supabaseClient
-        .removeChannel(
-            realtimeChannel
-        );
+            .removeChannel(
+                realtimeChannel
+            );
 
         realtimeChannel=null;
     }
@@ -3603,51 +3885,15 @@ function stopRealtime(){
 
 /* MEDIA VIEWER */
 
-function openMediaViewer(
-    url,
-    type="image"
-){
+function openMediaViewer(url){
 
     selectedViewerUrl=url;
-    selectedViewerType=type;
 
-    const visual=
+
     document.getElementById(
-        "mediaViewerVisual"
-    );
+        "mediaViewerImage"
+    ).src=url;
 
-    visual.innerHTML="";
-
-    if(type==="video"){
-
-        const video=
-        document.createElement("video");
-
-        video.src=url;
-
-        video.controls=true;
-
-        video.autoplay=true;
-
-        video.playsInline=true;
-
-        visual.appendChild(
-            video
-        );
-
-    }else{
-
-        const image=
-        document.createElement("img");
-
-        image.src=url;
-
-        image.alt="";
-
-        visual.appendChild(
-            image
-        );
-    }
 
     document.getElementById(
         "mediaViewer"
@@ -3667,12 +3913,13 @@ document.getElementById(
         "active"
     );
 
+
     document.getElementById(
-        "mediaViewerVisual"
-    ).innerHTML="";
+        "mediaViewerImage"
+    ).src="";
+
 
     selectedViewerUrl=null;
-    selectedViewerType=null;
 };
 
 
@@ -3702,9 +3949,7 @@ document.getElementById(
 
     await downloadFile(
         selectedViewerUrl,
-        selectedViewerType==="video"
-        ?"kleivy-video.mp4"
-        :"kleivy-image.jpg"
+        "kleivy-image.jpg"
     );
 };
 
@@ -3718,8 +3963,9 @@ async function downloadFile(
 
     try{
 
-        const response=
-        await fetch(url);
+        const response =
+            await fetch(url);
+
 
         if(!response.ok){
 
@@ -3728,20 +3974,27 @@ async function downloadFile(
             );
         }
 
-        const blob=
-        await response.blob();
 
-        const blobUrl=
-        URL.createObjectURL(
-            blob
-        );
+        const blob =
+            await response.blob();
 
-        const link=
-        document.createElement("a");
 
-        link.href=blobUrl;
+        const blobUrl =
+            URL.createObjectURL(
+                blob
+            );
 
-        link.download=fileName;
+
+        const link =
+            document.createElement("a");
+
+
+        link.href=
+            blobUrl;
+
+        link.download=
+            fileName;
+
 
         document.body.appendChild(
             link
@@ -3751,11 +4004,13 @@ async function downloadFile(
 
         link.remove();
 
+
         setTimeout(()=>{
             URL.revokeObjectURL(
                 blobUrl
             );
         },1000);
+
 
     }catch(error){
 
@@ -3777,10 +4032,12 @@ function formatFileSize(bytes){
         return "";
     }
 
+
     if(bytes<1024){
 
         return bytes+" Б";
     }
+
 
     if(bytes<1024*1024){
 
@@ -3789,6 +4046,7 @@ function formatFileSize(bytes){
         ).toFixed(1)+" КБ";
     }
 
+
     if(bytes<1024*1024*1024){
 
         return (
@@ -3796,6 +4054,7 @@ function formatFileSize(bytes){
             (1024*1024)
         ).toFixed(1)+" МБ";
     }
+
 
     return (
         bytes/
@@ -3812,9 +4071,11 @@ function hideContentForChat(){
         "profilePage"
     ).style.display="none";
 
+
     document.getElementById(
         "welcome"
     ).style.display="none";
+
 
     document.getElementById(
         "searchResults"
@@ -3880,25 +4141,33 @@ document.getElementById(
 
 function openCreateChannel(){
 
-    selectedChannelType="private";
+    selectedChannelType=
+        "private";
 
-    selectedChannelFile=null;
+    selectedChannelFile=
+        null;
+
 
     document.getElementById(
         "channelNameInput"
     ).value="";
 
+
     document.getElementById(
         "channelDescriptionInput"
     ).value="";
+
 
     document.getElementById(
         "channelUsernameInput"
     ).value="";
 
+
     document.getElementById(
         "publicUsernameBlock"
-    ).style.display="none";
+    ).style.display=
+        "none";
+
 
     document.getElementById(
         "privateType"
@@ -3906,19 +4175,23 @@ function openCreateChannel(){
         "selected"
     );
 
+
     document.getElementById(
         "publicType"
     ).classList.remove(
         "selected"
     );
 
+
     document.getElementById(
         "channelPhotoPreview"
     ).innerHTML="📷";
 
+
     document.getElementById(
         "channelPhotoInput"
     ).value="";
+
 
     document.getElementById(
         "createChannelModal"
@@ -3946,25 +4219,34 @@ document.getElementById(
     "change",
     event=>{
 
-        const file=
-        event.target.files[0];
+        const file =
+            event.target.files[0];
 
         if(!file){
             return;
         }
 
+
         selectedChannelFile=file;
 
-        const reader=
-        new FileReader();
+
+        const reader =
+            new FileReader();
+
 
         reader.onload=()=>{
 
             document.getElementById(
                 "channelPhotoPreview"
             ).innerHTML=
-            `<img src="${reader.result}" alt="">`;
+            `
+            <img
+                src="${reader.result}"
+                alt=""
+            >
+            `;
         };
+
 
         reader.readAsDataURL(
             file
@@ -3979,7 +4261,9 @@ document.getElementById(
     "privateType"
 ).onclick=()=>{
 
-    selectedChannelType="private";
+    selectedChannelType=
+        "private";
+
 
     document.getElementById(
         "privateType"
@@ -3987,15 +4271,18 @@ document.getElementById(
         "selected"
     );
 
+
     document.getElementById(
         "publicType"
     ).classList.remove(
         "selected"
     );
 
+
     document.getElementById(
         "publicUsernameBlock"
-    ).style.display="none";
+    ).style.display=
+        "none";
 };
 
 
@@ -4003,7 +4290,9 @@ document.getElementById(
     "publicType"
 ).onclick=()=>{
 
-    selectedChannelType="public";
+    selectedChannelType=
+        "public";
+
 
     document.getElementById(
         "publicType"
@@ -4011,15 +4300,18 @@ document.getElementById(
         "selected"
     );
 
+
     document.getElementById(
         "privateType"
     ).classList.remove(
         "selected"
     );
 
+
     document.getElementById(
         "publicUsernameBlock"
-    ).style.display="block";
+    ).style.display=
+        "block";
 };
 
 
@@ -4043,27 +4335,31 @@ document.getElementById(
     "createChannelButton"
 ).onclick=async()=>{
 
-    const button=
-    document.getElementById(
-        "createChannelButton"
-    );
+    const button =
+        document.getElementById(
+            "createChannelButton"
+        );
 
-    const name=
-    document.getElementById(
-        "channelNameInput"
-    ).value.trim();
 
-    const description=
-    document.getElementById(
-        "channelDescriptionInput"
-    ).value.trim();
+    const name =
+        document.getElementById(
+            "channelNameInput"
+        ).value.trim();
 
-    let username=
-    document.getElementById(
-        "channelUsernameInput"
-    ).value
-    .trim()
-    .toLowerCase();
+
+    const description =
+        document.getElementById(
+            "channelDescriptionInput"
+        ).value.trim();
+
+
+    let username =
+        document.getElementById(
+            "channelUsernameInput"
+        ).value
+        .trim()
+        .toLowerCase();
+
 
     if(!name){
 
@@ -4074,6 +4370,7 @@ document.getElementById(
         return;
     }
 
+
     if(name.length<2){
 
         alert(
@@ -4083,8 +4380,10 @@ document.getElementById(
         return;
     }
 
+
     if(
-        selectedChannelType==="public"
+        selectedChannelType===
+        "public"
     ){
 
         if(!username){
@@ -4095,6 +4394,7 @@ document.getElementById(
 
             return;
         }
+
 
         if(
             !/^[a-z0-9_]{3,40}$/.test(
@@ -4109,17 +4409,19 @@ document.getElementById(
             return;
         }
 
+
         const {
             data:existingUsername
         } =
         await supabaseClient
-        .from("channels")
-        .select("id")
-        .eq(
-            "username",
-            username
-        )
-        .maybeSingle();
+            .from("channels")
+            .select("id")
+            .eq(
+                "username",
+                username
+            )
+            .maybeSingle();
+
 
         if(existingUsername){
 
@@ -4131,44 +4433,50 @@ document.getElementById(
         }
     }
 
+
     button.disabled=true;
 
     button.textContent=
-    "Создание...";
+        "Создание...";
+
 
     try{
 
         let avatarUrl=null;
 
+
         if(selectedChannelFile){
 
-            const extension=
-            selectedChannelFile.name
-            .split(".")
-            .pop()
-            .toLowerCase();
+            const extension =
+                selectedChannelFile.name
+                .split(".")
+                .pop()
+                .toLowerCase();
 
-            const filePath=
-            currentUser.id+
-            "/"+
-            crypto.randomUUID()+
-            "."+
-            extension;
+
+            const filePath =
+                currentUser.id+
+                "/"+
+                crypto.randomUUID()+
+                "."+
+                extension;
+
 
             const {
                 error:uploadError
             } =
             await supabaseClient
-            .storage
-            .from("channel-avatars")
-            .upload(
-                filePath,
-                selectedChannelFile,
-                {
-                    cacheControl:"3600",
-                    upsert:false
-                }
-            );
+                .storage
+                .from("channel-avatars")
+                .upload(
+                    filePath,
+                    selectedChannelFile,
+                    {
+                        cacheControl:"3600",
+                        upsert:false
+                    }
+                );
+
 
             if(uploadError){
 
@@ -4181,63 +4489,73 @@ document.getElementById(
                 );
             }
 
+
             const {
                 data:publicUrl
             } =
             supabaseClient
-            .storage
-            .from("channel-avatars")
-            .getPublicUrl(
-                filePath
-            );
+                .storage
+                .from("channel-avatars")
+                .getPublicUrl(
+                    filePath
+                );
+
 
             avatarUrl=
-            publicUrl.publicUrl;
+                publicUrl.publicUrl;
         }
+
 
         let inviteCode=null;
 
+
         if(
-            selectedChannelType==="private"
+            selectedChannelType===
+            "private"
         ){
 
             inviteCode=
-            generateInviteCode();
+                generateInviteCode();
         }
+
 
         const {
             data:channel,
             error
         } =
         await supabaseClient
-        .from("channels")
-        .insert({
+            .from("channels")
+            .insert({
 
-            owner_id:
-            currentUser.id,
+                owner_id:
+                    currentUser.id,
 
-            name:name,
+                name:
+                    name,
 
-            description:
-            description||null,
+                description:
+                    description||
+                    null,
 
-            avatar_url:
-            avatarUrl,
+                avatar_url:
+                    avatarUrl,
 
-            type:
-            selectedChannelType,
+                type:
+                    selectedChannelType,
 
-            username:
-            selectedChannelType==="public"
-            ?username
-            :null,
+                username:
+                    selectedChannelType===
+                    "public"
+                    ?username
+                    :null,
 
-            invite_code:
-            inviteCode
+                invite_code:
+                    inviteCode
 
-        })
-        .select()
-        .single();
+            })
+            .select()
+            .single();
+
 
         if(error){
 
@@ -4248,21 +4566,24 @@ document.getElementById(
             );
         }
 
+
         const {
             error:memberError
         } =
         await supabaseClient
-        .from("channel_members")
-        .insert({
+            .from("channel_members")
+            .insert({
 
-            channel_id:
-            channel.id,
+                channel_id:
+                    channel.id,
 
-            user_id:
-            currentUser.id,
+                user_id:
+                    currentUser.id,
 
-            role:"owner"
-        });
+                role:
+                    "owner"
+            });
+
 
         if(memberError){
 
@@ -4275,31 +4596,39 @@ document.getElementById(
             );
         }
 
+
         document.getElementById(
             "createChannelModal"
         ).classList.remove(
             "active"
         );
 
+
         await loadChats();
+
 
         openChannel(
             channel
         );
 
+
         if(
-            selectedChannelType==="private"
+            selectedChannelType===
+            "private"
         ){
 
             setTimeout(()=>{
 
                 alert(
                     "Канал создан!\n\nПриватная ссылка:\n"+
-                    getChannelLink(channel)
+                    getChannelLink(
+                        channel
+                    )
                 );
 
             },300);
         }
+
 
     }catch(error){
 
@@ -4315,7 +4644,7 @@ document.getElementById(
         button.disabled=false;
 
         button.textContent=
-        "Создать";
+            "Создать";
     }
 };
 
@@ -4324,38 +4653,46 @@ document.getElementById(
 
 function openChannelInfo(channel){
 
-    const avatar=
-    document.getElementById(
-        "infoChannelAvatar"
-    );
+    const avatar =
+        document.getElementById(
+            "infoChannelAvatar"
+        );
+
 
     setChannelAvatar(
         avatar,
         channel
     );
 
+
     document.getElementById(
         "infoChannelName"
     ).textContent=
-    channel.name;
+        channel.name;
+
 
     document.getElementById(
         "infoChannelDescription"
     ).textContent=
-    channel.description ||
-    "Описание отсутствует";
+        channel.description ||
+        "Описание отсутствует";
+
 
     document.getElementById(
         "infoChannelLink"
     ).textContent=
-    getChannelLink(channel);
+        getChannelLink(
+            channel
+        );
+
 
     document.getElementById(
         "infoChannelType"
     ).textContent=
-    channel.type==="public"
-    ?"🌐 Публичный канал"
-    :"🔒 Частный канал";
+        channel.type==="public"
+        ?"🌐 Публичный канал"
+        :"🔒 Частный канал";
+
 
     document.getElementById(
         "channelInfoModal"
@@ -4381,7 +4718,9 @@ document.getElementById(
 
 function getChannelLink(channel){
 
-    if(channel.type==="public"){
+    if(
+        channel.type==="public"
+    ){
 
         return (
             window.location.origin+
@@ -4389,6 +4728,7 @@ function getChannelLink(channel){
             channel.username
         );
     }
+
 
     return (
         window.location.origin+
@@ -4402,21 +4742,28 @@ function getChannelLink(channel){
 
 function generateInviteCode(){
 
-    const characters=
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const characters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
 
     let result="";
 
-    for(let i=0;i<32;i++){
 
-        result+=
-        characters.charAt(
-            Math.floor(
-                Math.random()*
-                characters.length
-            )
-        );
+    for(
+        let i=0;
+        i<32;
+        i++
+    ){
+
+        result +=
+            characters.charAt(
+                Math.floor(
+                    Math.random()*
+                    characters.length
+                )
+            );
     }
+
 
     return result;
 }
@@ -4429,19 +4776,28 @@ function setAvatar(
     profile
 ){
 
-    if(profile.avatar_url){
+    if(
+        profile &&
+        profile.avatar_url
+    ){
 
         element.innerHTML=
-        `<img src="${escapeHtml(
-            profile.avatar_url
-        )}" alt="">`;
+        `
+        <img
+            src="${escapeHtml(profile.avatar_url)}"
+            alt=""
+        >
+        `;
 
     }else{
 
         element.textContent=
-        (profile.name || "?")
-        .charAt(0)
-        .toUpperCase();
+            profile &&
+            profile.name
+            ?profile.name
+                .charAt(0)
+                .toUpperCase()
+            :"?";
     }
 }
 
@@ -4451,28 +4807,41 @@ function setChannelAvatar(
     channel
 ){
 
-    if(channel.avatar_url){
+    if(
+        channel &&
+        channel.avatar_url
+    ){
 
         element.innerHTML=
-        `<img src="${escapeHtml(
-            channel.avatar_url
-        )}" alt="">`;
+        `
+        <img
+            src="${escapeHtml(channel.avatar_url)}"
+            alt=""
+        >
+        `;
 
     }else{
 
         element.textContent=
-        (channel.name || "?")
-        .charAt(0)
-        .toUpperCase();
+            channel &&
+            channel.name
+            ?channel.name
+                .charAt(0)
+                .toUpperCase()
+            :"📢";
     }
 }
 
 
-/* CHATS BUTTON */
+/* ==========================================
+   CHATS BUTTON
+   ========================================== */
 
 document.getElementById(
     "chatsButton"
 ).onclick=async()=>{
+
+    closeMobileMenu();
 
     setActiveButton(
         "chatsButton"
@@ -4480,21 +4849,35 @@ document.getElementById(
 
     hideAllPages();
 
-    document.getElementById(
-        "chatList"
-    ).style.display="block";
+
+    const list =
+        document.getElementById(
+            "chatList"
+        );
+
+    list.style.display="block";
 
     searchInput.value="";
+
+
+    /*
+     * Загружаем именно ЧАТЫ,
+     * а не контакты.
+     */
 
     await loadChats();
 };
 
 
-/* CONTACTS BUTTON */
+/* ==========================================
+   CONTACTS BUTTON
+   ========================================== */
 
 document.getElementById(
     "contactsButton"
 ).onclick=async()=>{
+
+    closeMobileMenu();
 
     setActiveButton(
         "contactsButton"
@@ -4502,210 +4885,37 @@ document.getElementById(
 
     hideAllPages();
 
-    const list=
-    document.getElementById(
-        "chatList"
-    );
+
+    const list =
+        document.getElementById(
+            "chatList"
+        );
+
 
     list.style.display="block";
 
-    await loadContacts();
-};
 
+    searchInput.value="";
 
-/* MOBILE CHATS */
-
-document.getElementById(
-    "mobileChatsButton"
-).onclick=async()=>{
-
-    document.getElementById(
-        "mobileChatsButton"
-    ).classList.add(
-        "active"
-    );
-
-    document.getElementById(
-        "mobileContactsButton"
-    ).classList.remove(
-        "active"
-    );
-
-    hideAllPages();
-
-    document.getElementById(
-        "chatList"
-    ).style.display="block";
 
     /*
-        На мобильном chatList находится
-        в скрытом sidebar, поэтому показываем
-        мобильную страницу со списком.
-    */
-
-    showMobileList();
-
-    await loadChats();
-};
-
-
-/* MOBILE CONTACTS */
-
-document.getElementById(
-    "mobileContactsButton"
-).onclick=async()=>{
-
-    document.getElementById(
-        "mobileContactsButton"
-    ).classList.add(
-        "active"
-    );
-
-    document.getElementById(
-        "mobileChatsButton"
-    ).classList.remove(
-        "active"
-    );
-
-    hideAllPages();
-
-    showMobileList();
+     * Теперь здесь загружаются ВСЕ контакты,
+     * а не сообщения.
+     */
 
     await loadContacts();
 };
 
 
-/*
-    На телефоне список чатов/контактов
-    показывается на главной странице.
-*/
-
-function showMobileList(){
-
-    const welcome=
-    document.getElementById(
-        "welcome"
-    );
-
-    welcome.style.display="flex";
-
-    welcome.innerHTML=`
-        <div style="width:100%;height:100%;display:flex;flex-direction:column;min-height:0;">
-            
-            <div style="
-                display:flex;
-                padding:12px;
-                gap:8px;
-                border-bottom:1px solid #1b2638;
-            ">
-
-                <button
-                    id="mobileListChats"
-                    class="mobile-home-button active"
-                >
-                    💬 Чаты
-                </button>
-
-                <button
-                    id="mobileListContacts"
-                    class="mobile-home-button"
-                >
-                    👥 Контакты
-                </button>
-
-            </div>
-
-            <div
-                id="mobileChatList"
-                style="
-                    flex:1;
-                    overflow-y:auto;
-                    min-height:0;
-                    text-align:left;
-                "
-            ></div>
-
-        </div>
-    `;
-
-    /*
-        Переносим содержимое обычного chatList
-        в мобильный список.
-    */
-
-    const source=
-    document.getElementById(
-        "chatList"
-    );
-
-    const target=
-    document.getElementById(
-        "mobileChatList"
-    );
-
-    while(source.firstChild){
-
-        target.appendChild(
-            source.firstChild
-        );
-    }
-
-    document.getElementById(
-        "mobileListChats"
-    ).onclick=async()=>{
-
-        document.getElementById(
-            "mobileListChats"
-        ).classList.add("active");
-
-        document.getElementById(
-            "mobileListContacts"
-        ).classList.remove("active");
-
-        source.innerHTML="";
-
-        await loadChats();
-
-        while(source.firstChild){
-
-            target.appendChild(
-                source.firstChild
-            );
-        }
-    };
-
-
-    document.getElementById(
-        "mobileListContacts"
-    ).onclick=async()=>{
-
-        document.getElementById(
-            "mobileListContacts"
-        ).classList.add("active");
-
-        document.getElementById(
-            "mobileListChats"
-        ).classList.remove("active");
-
-        source.innerHTML="";
-
-        await loadContacts();
-
-        while(source.firstChild){
-
-            target.appendChild(
-                source.firstChild
-            );
-        }
-    };
-}
-
-
-/* PROFILE BUTTON */
+/* ==========================================
+   PROFILE BUTTON
+   ========================================== */
 
 document.getElementById(
     "profileButton"
 ).onclick=()=>{
+
+    closeMobileMenu();
 
     setActiveButton(
         "profileButton"
@@ -4713,81 +4923,20 @@ document.getElementById(
 
     hideAllPages();
 
-    const profilePage=
-    document.getElementById(
-        "profilePage"
-    );
+
+    const profilePage =
+        document.getElementById(
+            "profilePage"
+        );
+
 
     profilePage.style.display=
-    "block";
+        "block";
+
 
     profilePage.scrollTop=0;
 
     searchInput.value="";
-};
-
-
-/* SETTINGS */
-
-document.getElementById(
-    "mobileMenuButton"
-).onclick=()=>{
-
-    document.getElementById(
-        "settingsModal"
-    ).classList.add(
-        "active"
-    );
-};
-
-
-document.getElementById(
-    "closeSettingsButton"
-).onclick=()=>{
-
-    document.getElementById(
-        "settingsModal"
-    ).classList.remove(
-        "active"
-    );
-};
-
-
-document.getElementById(
-    "settingsProfileButton"
-).onclick=()=>{
-
-    document.getElementById(
-        "settingsModal"
-    ).classList.remove(
-        "active"
-    );
-
-    if(window.innerWidth<=700){
-
-        hideAllPages();
-
-        document.getElementById(
-            "profilePage"
-        ).style.display="block";
-    }
-};
-
-
-/* SETTINGS LOGOUT */
-
-document.getElementById(
-    "settingsLogoutButton"
-).onclick=async()=>{
-
-    await supabaseClient.auth.signOut();
-
-    localStorage.removeItem(
-        "kleivy_logged_in"
-    );
-
-    window.location.href=
-    "login.html";
 };
 
 
@@ -4799,27 +4948,42 @@ function hideAllPages(){
         "profilePage"
     ).style.display="none";
 
+
     document.getElementById(
         "chatWindow"
     ).style.display="none";
+
 
     document.getElementById(
         "welcome"
     ).style.display="none";
 
+
     document.getElementById(
         "messageInputArea"
     ).style.display="none";
+
 
     document.getElementById(
         "searchResults"
     ).style.display="none";
 
+
     document.getElementById(
         "mobileBackButton"
     ).style.display="none";
 
+
+    /*
+     * Не очищаем chatList здесь.
+     *
+     * Это важно, потому что после hideAllPages()
+     * следующий раздел сам загружает нужный
+     * список через loadChats/loadContacts.
+     */
+
     clearSelectedFile();
+
 
     currentContact=null;
 
@@ -4840,13 +5004,20 @@ function setActiveButton(id){
         button.classList.remove(
             "active"
         );
+
     });
 
-    document.getElementById(
-        id
-    ).classList.add(
-        "active"
-    );
+
+    const button =
+        document.getElementById(id);
+
+
+    if(button){
+
+        button.classList.add(
+            "active"
+        );
+    }
 }
 
 
@@ -4856,18 +5027,21 @@ document.getElementById(
     "editNameButton"
 ).onclick=async()=>{
 
-    const newName=
-    prompt(
-        "Введите новое имя:",
-        currentProfile.name
-    );
+    const newName =
+        prompt(
+            "Введите новое имя:",
+            currentProfile.name
+        );
+
 
     if(!newName){
         return;
     }
 
+
     const cleanName=
-    newName.trim();
+        newName.trim();
+
 
     if(cleanName.length<2){
 
@@ -4878,18 +5052,20 @@ document.getElementById(
         return;
     }
 
+
     const {
         error
     } =
     await supabaseClient
-    .from("profiles")
-    .update({
-        name:cleanName
-    })
-    .eq(
-        "id",
-        currentUser.id
-    );
+        .from("profiles")
+        .update({
+            name:cleanName
+        })
+        .eq(
+            "id",
+            currentUser.id
+        );
+
 
     if(error){
 
@@ -4902,13 +5078,15 @@ document.getElementById(
         return;
     }
 
+
     currentProfile.name=
-    cleanName;
+        cleanName;
+
 
     document.getElementById(
         "profileName"
     ).textContent=
-    cleanName;
+        cleanName;
 };
 
 
@@ -4920,13 +5098,78 @@ document.getElementById(
 
     await supabaseClient.auth.signOut();
 
+
     localStorage.removeItem(
         "kleivy_logged_in"
     );
 
+
     window.location.href=
-    "login.html";
+        "login.html";
 };
+
+
+/* MOBILE */
+
+const mobileMenuButton =
+    document.getElementById(
+        "mobileMenuButton"
+    );
+
+
+const mobileOverlay =
+    document.getElementById(
+        "mobileOverlay"
+    );
+
+
+const sidebar =
+    document.querySelector(
+        ".sidebar"
+    );
+
+
+function openMobileMenu(){
+
+    if(window.innerWidth>700){
+        return;
+    }
+
+
+    sidebar.classList.add(
+        "mobile-open"
+    );
+
+
+    mobileOverlay.classList.add(
+        "active"
+    );
+}
+
+
+function closeMobileMenu(){
+
+    sidebar.classList.remove(
+        "mobile-open"
+    );
+
+
+    mobileOverlay.classList.remove(
+        "active"
+    );
+}
+
+
+mobileMenuButton.addEventListener(
+    "click",
+    openMobileMenu
+);
+
+
+mobileOverlay.addEventListener(
+    "click",
+    closeMobileMenu
+);
 
 
 /* MOBILE BACK */
@@ -4941,31 +5184,40 @@ document.getElementById(
             return;
         }
 
+
         currentContact=null;
 
         currentChannel=null;
+
 
         clearSelectedFile();
 
         stopRealtime();
 
+
         document.getElementById(
             "chatWindow"
         ).style.display="none";
+
 
         document.getElementById(
             "messageInputArea"
         ).style.display="none";
 
+
         document.getElementById(
             "welcome"
         ).style.display="flex";
+
 
         document.getElementById(
             "mobileBackButton"
         ).style.display="none";
 
-        showMobileList();
+
+        document.getElementById(
+            "chatList"
+        ).style.display="block";
     }
 );
 
@@ -4974,35 +5226,16 @@ document.getElementById(
 
 function escapeHtml(text){
 
-    const div=
-    document.createElement("div");
+    const div =
+        document.createElement("div");
+
 
     div.textContent=
-    text??"";
+        text??"";
+
 
     return div.innerHTML;
 }
-
-
-/* CLOSE MODALS BY BACKGROUND */
-
-document.querySelectorAll(
-    ".modal"
-).forEach(modal=>{
-
-    modal.addEventListener(
-        "click",
-        event=>{
-
-            if(event.target===modal){
-
-                modal.classList.remove(
-                    "active"
-                );
-            }
-        }
-    );
-});
 
 
 /* START */
