@@ -4947,94 +4947,120 @@ channel.name
 
 /* CHATS BUTTON */
 
-document.getElementById(
-"chatsButton"
-).onclick=async()=>{
+document.getElementById("chatsButton").onclick = async () => {
 
-closeMobileMenu();
+    closeMobileMenu();
 
-setActiveButton(
-"chatsButton"
-);
+    setActiveButton("chatsButton");
 
-hideAllPages();
+    stopRealtime();
 
-if(window.innerWidth<=700){
-showMobileHome("chats");
-}else{
-document.getElementById("chatList").style.display="block";
-}
+    currentContact = null;
+    currentChannel = null;
 
-searchInput.value="";
+    clearSelectedFile();
 
-await loadChats();
+    document.getElementById("profilePage").style.display = "none";
+    document.getElementById("chatWindow").style.display = "none";
+    document.getElementById("welcome").style.display = "flex";
+    document.getElementById("messageInputArea").style.display = "none";
+    document.getElementById("searchResults").style.display = "none";
+    document.getElementById("mobileBackButton").style.display = "none";
+
+    searchInput.value = "";
+
+    const list = document.getElementById("chatList");
+
+    list.style.display = "block";
+
+    await loadChats();
 };
-
 /* CONTACTS BUTTON */
 
-document.getElementById(
-"contactsButton"
-).onclick=async()=>{
+document.getElementById("contactsButton").onclick = async () => {
 
-closeMobileMenu();
+    closeMobileMenu();
 
-setActiveButton(
-"contactsButton"
-);
+    setActiveButton("contactsButton");
 
-hideAllPages();
+    // Останавливаем открытый чат
+    stopRealtime();
 
-if(window.innerWidth<=700){
-showMobileHome("contacts");
-await loadContactsInto(document.getElementById("mobileChatList"));
-return;
-}
+    currentContact = null;
+    currentChannel = null;
 
-await loadContactsInto(document.getElementById("chatList"));
+    clearSelectedFile();
+
+    // Скрываем страницы
+    document.getElementById("profilePage").style.display = "none";
+    document.getElementById("chatWindow").style.display = "none";
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("messageInputArea").style.display = "none";
+    document.getElementById("searchResults").style.display = "none";
+    document.getElementById("mobileBackButton").style.display = "none";
+
+    // Показываем список
+    const list = document.getElementById("chatList");
+
+    list.style.display = "block";
+    list.innerHTML = "";
+
+    const {
+        data: contacts,
+        error
+    } = await supabaseClient
+        .from("contacts")
+        .select("contact_id")
+        .eq("user_id", currentUser.id);
+
+    if (error) {
+
+        console.error("Ошибка загрузки контактов:", error);
+
+        list.innerHTML = `
+            <div class="empty">
+                Не удалось загрузить контакты
+            </div>
+        `;
+
+        return;
+    }
+
+    if (!contacts || contacts.length === 0) {
+
+        list.innerHTML = `
+            <div class="empty">
+                У вас пока нет контактов
+            </div>
+        `;
+
+        return;
+    }
+
+    for (const contact of contacts) {
+
+        const {
+            data: profile,
+            error: profileError
+        } = await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("id", contact.contact_id)
+            .maybeSingle();
+
+        if (profileError) {
+            console.error(
+                "Ошибка загрузки пользователя:",
+                profileError
+            );
+            continue;
+        }
+
+        if (!profile) continue;
+
+        createContactElement(profile);
+    }
 };
-
-async function loadContactsInto(list){
-
-if(!list)return;
-
-list.style.display="block";
-list.innerHTML="";
-
-const {data:contacts,error}=await supabaseClient
-.from("contacts")
-.select("contact_id")
-.eq("user_id",currentUser.id);
-
-if(error){
-console.error(error);
-list.innerHTML=`<div class="empty">Не удалось загрузить контакты</div>`;
-return;
-}
-
-if(!contacts || contacts.length===0){
-list.innerHTML=`<div class="empty">У вас пока нет контактов</div>`;
-return;
-}
-
-const ids=[...new Set(contacts.map(c=>c.contact_id).filter(Boolean))];
-const {data:profiles,error:profilesError}=await supabaseClient
-.from("profiles")
-.select("id,name,username,avatar_url,online,last_seen")
-.in("id",ids);
-
-if(profilesError){
-console.error(profilesError);
-list.innerHTML=`<div class="empty">Не удалось загрузить контакты</div>`;
-return;
-}
-
-const map=new Map((profiles||[]).map(p=>[p.id,p]));
-for(const contact of contacts){
-const profile=map.get(contact.contact_id);
-if(profile) createContactElement(profile,list);
-}
-}
-
 /* MOBILE HOME */
 
 function showMobileHome(section="chats"){
@@ -5101,44 +5127,27 @@ searchInput.value="";
 
 function hideAllPages(){
 
-document.getElementById(
-"profilePage"
-).style.display="none";
+    document.getElementById("profilePage").style.display = "none";
 
-document.getElementById(
-"mobileHome"
-).style.display="none";
+    document.getElementById("chatWindow").style.display = "none";
 
-document.getElementById(
-"chatWindow"
-).style.display="none";
+    document.getElementById("welcome").style.display = "none";
 
-document.getElementById(
-"welcome"
-).style.display="none";
+    document.getElementById("messageInputArea").style.display = "none";
 
-document.getElementById(
-"messageInputArea"
-).style.display="none";
+    document.getElementById("searchResults").style.display = "none";
 
-document.getElementById(
-"searchResults"
-).style.display="none";
+    document.getElementById("chatList").style.display = "none";
 
-document.getElementById(
-"mobileBackButton"
-).style.display="none";
+    document.getElementById("mobileBackButton").style.display = "none";
 
-clearSelectedFile();
+    clearSelectedFile();
 
-currentContact=null;
+    currentContact = null;
+    currentChannel = null;
 
-currentChannel=null;
-
-stopRealtime();
+    stopRealtime();
 }
-
-
 /* ACTIVE BUTTON */
 
 function setActiveButton(id){
